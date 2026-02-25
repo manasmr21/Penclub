@@ -66,14 +66,14 @@ const HeroCarousel = () => {
           {cards.map((card, index) => (
             <div
               key={card.id}
-              className={`flex-[0_0_85%] sm:flex-[0_0_60%] lg:flex-[0_0_33.3333%]
-                          px-2 lg:px-3 transition-all duration-500 ${
+              className={`flex-[0_0_85%] sm:flex-[0_0_60%] lg:flex-[0_0_33%]
+                          px-2 lg:px-1 transition-all duration-500 ${
                 index === selectedIndex
                   ? "scale-100 origin-bottom z-10"
                   : "scale-90 lg:scale-85 origin-bottom opacity-70"
               }`}
             >
-              <div className="bg-white rounded-2xl shadow-xl h-72 sm:h-80 lg:h-96
+              <div className="bg-white rounded-2xl shadow-xl h-72 sm:h-80 lg:h-75
                               flex items-center justify-center text-xl font-semibold">
                 {card.title}
               </div>

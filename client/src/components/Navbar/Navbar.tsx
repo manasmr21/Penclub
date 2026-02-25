@@ -5,7 +5,7 @@ import Image from "next/image";
 const Navbar = () => {
   return (
     <>
-      <nav className="navbar fixed w-full top-0">
+      <nav className="navbar fixed w-full top-0 z-[999]">
         <div className="main-container flex items-center justify-between px-4 py-2 font-inter">
           <div className="logo">
             <Image src={logo} alt="logo" className="logo-image" />
@@ -27,7 +27,7 @@ const Navbar = () => {
           </div>
           <div className="contacts flex items-center gap-3">
             <Image src={contact} alt="contact" className="contact-image w-11" />
-            <button className=" bg-primary py-3 px-5 text-center rounded-full">
+            <button className=" bg-primary py-3 px-5 text-center rounded-full text-white">
               9534545333
             </button>
           </div>

@@ -17,7 +17,7 @@ const Hero = () => {
           </div>
 
           {/* Content */}
-          <div className="flex flex-col lg:flex-row justify-between items-start w-[95%]">
+          <div className="flex flex-col lg:flex-row justify-between items-start w-[90%]">
 
             {/* LEFT SIDE */}
             <div className="left-content max-w-xl">
@@ -43,7 +43,7 @@ const Hero = () => {
             </div>
 
             {/* RIGHT SIDE (CAROUSEL LOWERED) */}
-            <div className="right-carousel w-full lg:w-auto mt-12 lg:mt-24">
+            <div className="right-carousel w-full lg:w-auto mt-12 lg:mt-35">
               <HeroCarousel />
             </div>
 
