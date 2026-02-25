@@ -123,7 +123,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-white text-foreground;
   }
 }
 
@@ -133,7 +133,7 @@
   margin: auto;
 }
 
-.section-hero{
+.hero{
   background: url("../../public/images/hero-bottom.png") no-repeat bottom;
   background-size: contain;
   min-height: 100dvh;
@@ -159,4 +159,33 @@
   position: absolute;
   opacity: 0.3;
   right: 110%;
+}
+
+.menu-items ul li{
+  position: relative;
+}
+
+.menu-items ul li::after{
+  content: "";
+  position: absolute;
+  width: 0%;
+  height: 3px;
+  background-color: var(--primary);
+  border-radius: 15px;
+  left: 0;
+  bottom: 0px;
+  transition: width 0.1s ease-in-out;
+}
+
+.menu-items ul li:hover::after{
+  width: 100%;
+}
+
+.testimonial-card {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease-in-out;
+}
+
+.testimonial-card:hover {
+  transform: perspective(1000px) rotateY(-50deg); 
 }

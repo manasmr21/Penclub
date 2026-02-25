@@ -1,7 +1,16 @@
 "use client";
 
-import useEmblaCarousel from "embla-carousel-react";
 import { useEffect, useState } from "react";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/src/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
+import {book} from "@/public/images";
+import Image from "next/image";
 
 const cards = [
   { id: 1, title: "Card 1" },
@@ -15,76 +24,64 @@ const cards = [
   { id: 9, title: "Card 9" },
 ];
 
-const HeroCarousel = () => {
-  const [emblaRef, emblaApi] = useEmblaCarousel({
-    align: "start",
-    containScroll: "trimSnaps",
-  });
-
+export default function HeroCarousel() {
+  const [api, setApi] = useState<any>(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   useEffect(() => {
-    if (!emblaApi) return;
+    if (!api) return;
 
     const onSelect = () => {
-      setSelectedIndex(emblaApi.selectedScrollSnap());
+      setSelectedIndex(api.selectedScrollSnap());
     };
 
-    emblaApi.on("select", onSelect);
+    api.on("select", onSelect);
     onSelect();
-  }, [emblaApi]);
+  }, [api]);
 
   return (
     <div className="relative">
-
-      {/* LEFT BUTTON */}
-      <button
-        onClick={() => emblaApi?.scrollPrev()}
-        className="absolute left-2 lg:-left-12 bottom-4 lg:bottom-8 z-20
-                   bg-[#e8aa05] text-white w-9 h-9 lg:w-10 lg:h-10
-                   rounded-full flex items-center justify-center
-                   hover:scale-105 transition"
+      <Carousel
+        setApi={setApi}
+        plugins={[
+          Autoplay({
+            delay: 2000,
+          }),
+        ]}
+        opts={{
+          align: "start",
+          containScroll: "trimSnaps",
+        }}
+        className="max-w-[850px] mx-auto "
       >
-        ‹
-      </button>
-
-      {/* RIGHT BUTTON */}
-      <button
-        onClick={() => emblaApi?.scrollNext()}
-        className="absolute right-2 lg:-right-12 bottom-4 lg:bottom-8 z-20
-                   bg-[#e8aa05] text-white w-9 h-9 lg:w-10 lg:h-10
-                   rounded-full flex items-center justify-center
-                   hover:scale-105 transition"
-      >
-        ›
-      </button>
-
-      {/* CAROUSEL */}
-      <div className="overflow-hidden max-w-[850px] mx-auto" ref={emblaRef}>
-        <div className="flex">
-
+        <CarouselContent className="">
           {cards.map((card, index) => (
-            <div
+            <CarouselItem
               key={card.id}
-              className={`flex-[0_0_85%] sm:flex-[0_0_60%] lg:flex-[0_0_33%]
-                          px-2 lg:px-1 transition-all duration-500 ${
-                index === selectedIndex
-                  ? "scale-100 origin-bottom z-10"
-                  : "scale-90 lg:scale-85 origin-bottom opacity-70"
-              }`}
+              className="basis-1/1 sm:basis-1/2 lg:basis-1/3 "
             >
-              <div className="bg-white rounded-2xl shadow-xl h-72 sm:h-80 lg:h-75
-                              flex items-center justify-center text-xl font-semibold">
-                {card.title}
+              <div
+                className={`
+                             h-85
+                            flex items-center justify-center
+                            text-xl font-semibold
+                            transition-all duration-500
+                            origin-bottom 
+                            ${
+                              index === selectedIndex
+                                ? "scale-100 z-10"
+                                : "scale-90 lg:scale-85"
+                            }`}
+              >
+                <Image src={book} alt={card.title} className="w-full h-full " />
               </div>
-            </div>
+            </CarouselItem>
           ))}
+        </CarouselContent>
 
-        </div>
-      </div>
-
+        <CarouselPrevious className="absolute right-full top-[90%] bg-[#e8aa05] text-white p-5" />
+        <CarouselNext className="absolute left-full  top-[90%] bg-[#e8aa05] text-white p-5" />
+      </Carousel>
     </div>
   );
-};
-
-export default HeroCarousel;
+}

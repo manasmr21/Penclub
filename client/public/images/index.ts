@@ -13,6 +13,13 @@ import mystery from "./mystry.png"
 import romance from "./romance.png"
 import scifi from "./scifi.png"
 import fantasy from "./fantasy.png"
+import puffin from "./puffinBooks.png"
+import summertime from "./summertime.png"
+import simon from "./simonNschuter.png"
+import brightbooks from "./brightBooks.png"
+import pinkUnicorn from "./pinkUnicorn.png"
+import kalmbach from "./kalmbach.png"
+
 
 
 export {
@@ -30,5 +37,11 @@ export {
     mystery,
     romance,
     scifi,
-    fantasy
+    fantasy,
+    puffin,
+    summertime,
+    simon,
+    brightbooks,
+    pinkUnicorn,
+    kalmbach
 };

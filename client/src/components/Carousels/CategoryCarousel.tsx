@@ -61,7 +61,7 @@ const CategoryCarousel = () => {
       <Carousel
         plugins={[
           Autoplay({
-            delay: 2000,
+            delay: 1000,
           }),
         ]}
         opts={{
@@ -80,13 +80,17 @@ const CategoryCarousel = () => {
                 <Card>
                   <CardContent className="flex aspect-square items-center justify-center flex-col">
                     <Image src={item.img} alt="" />
-                    <p className="font-semibold text-xl text-center">{item.name}</p>
+                    <p className="font-semibold text-xl text-center">
+                      {item.name}
+                    </p>
                   </CardContent>
                 </Card>
               </div>
             </CarouselItem>
           ))}
         </CarouselContent>
+        <CarouselPrevious className="p-5 bg-white border-none shadow-xs shadow-neutral-950 active:transform-[translateY(2px)] active:shadow-none " />
+        <CarouselNext className="p-5 bg-white border-none shadow-xs shadow-neutral-950 active:transform-[translateY(2px)] active:shadow-none " />
       </Carousel>
     </>
   );

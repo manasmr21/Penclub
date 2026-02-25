@@ -1,11 +1,26 @@
-import React from "react";
+"use client";
 import { logo, contact } from "@/public/images";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 
 const Navbar = () => {
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <>
-      <nav className="navbar fixed w-full top-0 z-[999]">
+      <nav
+        className={`navbar fixed w-full top-0 z-[999] ${
+          scrolled ? "bg-background" : "bg-transparent"
+        } `}
+      >
         <div className="main-container flex items-center justify-between px-4 py-2 font-inter">
           <div className="logo">
             <Image src={logo} alt="logo" className="logo-image" />
@@ -18,10 +33,10 @@ const Navbar = () => {
             </div>
             <div className="menu-items uppercase mt-2">
               <ul className="flex gap-3">
-                <li className="cursor-pointer">magazine</li>
-                <li className="cursor-pointer">books</li>
-                <li className="cursor-pointer">podcast</li>
-                <li className="cursor-pointer">events</li>
+                <li className="cursor-pointer ">magazine</li>
+                <li className="cursor-pointer ">books</li>
+                <li className="cursor-pointer ">podcast</li>
+                <li className="cursor-pointer ">events</li>
               </ul>
             </div>
           </div>
