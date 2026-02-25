@@ -189,3 +189,8 @@
 .testimonial-card:hover {
   transform: perspective(1000px) rotateY(-50deg); 
 }
+
+.section-footer{
+  background: url("../../public/images/footer.png") no-repeat center;
+  background-size: cover;
+}

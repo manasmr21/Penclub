@@ -78,7 +78,7 @@ const Testimonials = () => {
         </div>
         <div className="curtain text-center absolute w-full top-1/2">
             <p className="py-1 font-semibold text-black w-[110px] m-auto rounded-2xl bg-gray-200 mb-10">Testimonials</p>
-            <div>
+            <div className="font-semibold">
                 <p className="text-black text-6xl font-inter">Trusted by leaders</p>
                 <p className="text-gray-400 text-6xl font-inter">from various industries</p>
             </div>
