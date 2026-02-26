@@ -13,7 +13,6 @@ import Image from "next/image";
 import Autoplay from "embla-carousel-autoplay";
 
 const podcastImages = [
-  "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?q=80&w=2070&auto=format&fit=crop",
   "https://images.unsplash.com/photo-1589903308904-1010c2294adc?q=80&w=1170&auto=format&fit=crop",
   "https://images.unsplash.com/photo-1581368135153-a506cf13b1e1?q=80&w=1170&auto=format&fit=crop",
   "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?q=80&w=2070&auto=format&fit=crop",
