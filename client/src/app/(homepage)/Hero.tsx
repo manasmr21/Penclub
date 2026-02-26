@@ -30,10 +30,10 @@ const Hero = () => {
         <div className="middle-content w-[80%] max-w-[1920px] mx-auto flex flex-col lg:flex-row items-center justify-center lg:justify-between gap-10 flex-1 py-8">
           
           {/* LEFT SIDE (SHIFTED UP) */}
-          <div className="left-sect text-center lg:text-left lg:-translate-y-12 xl:-translate-y-16 transition-transform duration-300">
+          <div className="left-sect text-center lg:text-left lg:-translate-y-12 xl:-translate-y-20 transition-transform duration-300">
             
             <div className="leading-tight">
-              <p className="text-primary text-[clamp(1.8rem,4vw,4rem)]">
+              <p className="text-primary text-[clamp(1.8rem,4vw,3.5rem)]">
                 Where{" "}
                 <span className="font-rouge text-secondary font-semibold">
                   stories
@@ -48,7 +48,7 @@ const Hero = () => {
               </p>
             </div>
 
-            <button className="mt-6 text-sm md:text-lg uppercase bg-[#ea6312] text-white rounded-full px-8 py-2 shadow-xl shadow-[#ecb150] hover:scale-105 transition-all duration-300">
+            <button className=" text-sm md:text-lg uppercase bg-[#ea6312] text-white rounded-full px-8 py-2 shadow-xl shadow-[#ecb150] hover:scale-105 transition-all duration-300">
               Explore
             </button>
           </div>

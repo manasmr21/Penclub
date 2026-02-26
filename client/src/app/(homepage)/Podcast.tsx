@@ -4,7 +4,7 @@ const Podcast = () => {
   return (
     <>
       <div className="section-podcast  bg-white">
-        <div className="py-20 main-container">
+        <div className="py-12 lg:py-20 main-container">
           <h1 className="text-3xl font-bold text-primary text-center uppercase">
             podcasts
           </h1>

@@ -50,12 +50,13 @@ const PodcastCarousel = () => {
         setApi={setApi}
         plugins={[
           Autoplay({
-            delay:1000
+            delay:2000
           })
         ]}
         opts={{
           align: "center",
           containScroll: "trimSnaps",
+          watchDrag:false
         }}
         className=""
       >

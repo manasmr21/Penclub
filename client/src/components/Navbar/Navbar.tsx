@@ -27,11 +27,15 @@ const Navbar = () => {
       >
         <div className="main-container flex items-center justify-between px-4 py-2 font-inter">
           <div className="logo">
-            <Image src={logo} alt="logo" className="logo-image" />
+            <Image
+  src={logo}
+  alt="logo"
+  className="w-[30px] md:w-[65px] h-auto"
+/>
           </div>
           <div className="nav-menu text-primary">
             <div>
-              <h3 className="uppercase text-center text-3xl font-bold hidden">
+              <h3 className="uppercase text-center md:text-3xl font-bold text-2xl ">
                 pen club
               </h3>
             </div>
