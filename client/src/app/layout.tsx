@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Inter, Rouge_Script  } from "next/font/google";
+import { Geist, Geist_Mono, Inter, Rouge_Script, Chau_Philomene_One  } from "next/font/google";
 import "./globals.css";
 import Navbar from "../components/Navbar/Navbar";
 
@@ -11,6 +11,13 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const chauPhilomene = Chau_Philomene_One({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-chau",
+  display: "swap",
 });
 
 const interFont = Inter({
@@ -37,7 +44,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${interFont.variable} ${rougeScript.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${interFont.variable} ${rougeScript.variable} ${chauPhilomene.variable} antialiased`}
       >
         <Navbar/>
         {children}

@@ -43,7 +43,7 @@ const Hero = () => {
               <p className="text-primary text-[clamp(1.8rem,4vw,4rem)]">
                 their{" "}
                 <span className="font-rouge text-secondary font-semibold">
-                  voices
+                  voice
                 </span>
               </p>
             </div>
