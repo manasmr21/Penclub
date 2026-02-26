@@ -9,7 +9,7 @@ import {
   CarouselPrevious,
 } from "@/src/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
-import {book} from "@/public/images";
+import { book } from "@/public/images";
 import Image from "next/image";
 
 const cards = [
@@ -40,47 +40,55 @@ export default function HeroCarousel() {
   }, [api]);
 
   return (
-    <div className="relative">
+    <div className="relative w-full">
       <Carousel
         setApi={setApi}
         plugins={[
           Autoplay({
-            delay: 2000,
+            delay: 2500,
           }),
         ]}
         opts={{
           align: "start",
           containScroll: "trimSnaps",
         }}
-        className="max-w-[850px] mx-auto "
+        className=" w-[55vw] sm:w-full  mx-auto"
       >
-        <CarouselContent className="">
+        <CarouselContent className="px-2">
           {cards.map((card, index) => (
             <CarouselItem
               key={card.id}
-              className="basis-1/1 sm:basis-1/2 lg:basis-1/3 "
+              className="basis-full sm:basis-1/2 lg:basis-1/3"
             >
               <div
                 className={`
-                             h-85
-                            flex items-center justify-center
-                            text-xl font-semibold
-                            transition-all duration-500
-                            origin-bottom 
-                            ${
-                              index === selectedIndex
-                                ? "scale-100 z-10"
-                                : "scale-90 lg:scale-85"
-                            }`}
+                  flex items-center justify-center
+                  h-[220px] sm:h-[260px] md:h-[300px] lg:h-[350px]
+                  transition-all duration-500
+                  origin-bottom
+                  ${
+                    index === selectedIndex
+                      ? "lg:scale-100 lg:z-10"
+                      : "lg:scale-90"
+                  }
+                `}
               >
-                <Image src={book} alt={card.title} className="w-full h-full " />
+                <div className="w-full h-full relative">
+                  <Image
+                    src={book}
+                    alt={card.title}
+                    fill
+                    className="object-contain"
+                  />
+                </div>
               </div>
             </CarouselItem>
           ))}
         </CarouselContent>
 
+        {/* SAME BUTTON POSITIONS AS YOUR ORIGINAL */}
         <CarouselPrevious className="absolute right-full top-[90%] bg-[#e8aa05] text-white p-5" />
-        <CarouselNext className="absolute left-full  top-[90%] bg-[#e8aa05] text-white p-5" />
+        <CarouselNext className="absolute left-full top-[90%] bg-[#e8aa05] text-white p-5" />
       </Carousel>
     </div>
   );

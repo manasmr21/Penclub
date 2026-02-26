@@ -7,8 +7,8 @@ const imgUrl =
 const Testimonials = () => {
   return (
     <div className="section-testimonials bg-white py-20 overflow-hidden">
-      <div className="main-container relative">
-        <div className="background bg-transparent flex justify-between">
+      <div className=" max-w-[1400px] m-auto relative">
+        <div className="background bg-transparent flex justify-between transform-[translateX(-45%)] md:transform-[translateX(-35%)] lg:transform-none">
           <div className=" transform-[translateY(-110px)]">
             <div className=" testimonial-card blank w-[130px] h-[150px] bg-gray-50 rounded-2xl overflow-hidden mt-2"></div>
             <div className=" testimonial-card img aspect-square relative w-[130px] h-[150px] rounded-2xl overflow-hidden mt-2">
@@ -79,8 +79,8 @@ const Testimonials = () => {
         <div className="curtain text-center absolute w-full top-1/2">
             <p className="py-1 font-semibold text-black w-[110px] m-auto rounded-2xl bg-gray-200 mb-10">Testimonials</p>
             <div className="font-semibold">
-                <p className="text-black text-6xl font-inter">Trusted by leaders</p>
-                <p className="text-gray-400 text-6xl font-inter">from various industries</p>
+                <p className="text-black text-4xl md:text-6xl font-inter">Trusted by leaders</p>
+                <p className="text-gray-400 text-4xl md:text-6xl font-inter">from various industries</p>
             </div>
         </div>
       </div>

@@ -2,9 +2,13 @@
 import { logo, contact } from "@/public/images";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import "./Navbar.css";
+import { GiHamburgerMenu } from "react-icons/gi";
+import { ImCross } from "react-icons/im";
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
@@ -27,17 +31,31 @@ const Navbar = () => {
           </div>
           <div className="nav-menu text-primary">
             <div>
-              <h3 className="uppercase text-center text-3xl font-bold">
+              <h3 className="uppercase text-center text-3xl font-bold hidden">
                 pen club
               </h3>
             </div>
-            <div className="menu-items uppercase mt-2">
+            <div
+              className="menu-items uppercase mt-2"
+              menu-open={`${menuOpen}`}
+            >
               <ul className="flex gap-3">
                 <li className="cursor-pointer ">magazine</li>
                 <li className="cursor-pointer ">books</li>
                 <li className="cursor-pointer ">podcast</li>
                 <li className="cursor-pointer ">events</li>
+                <div className="responsive-contact hidden">
+                  <button className=" bg-white py-3 px-5 text-center rounded-full text-primary">
+                    9534545333
+                  </button>
+                </div>
               </ul>
+              <div
+                className="close-burger text-4xl hidden"
+                onClick={() => setMenuOpen(false)}
+              >
+                <ImCross />
+              </div>
             </div>
           </div>
           <div className="contacts flex items-center gap-3">
@@ -45,6 +63,13 @@ const Navbar = () => {
             <button className=" bg-primary py-3 px-5 text-center rounded-full text-white">
               9534545333
             </button>
+          </div>
+
+          <div
+            className="burger-menu hidden text-4xl"
+            onClick={() => setMenuOpen(true)}
+          >
+            <GiHamburgerMenu />
           </div>
         </div>
       </nav>

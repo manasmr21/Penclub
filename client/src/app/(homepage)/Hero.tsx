@@ -3,53 +3,68 @@
 import Image from "next/image";
 import { cloud, cloud2 } from "@/public/images";
 import HeroCarousel from "@/src/components/Carousels/HeroCarousel";
+import Strip from "./Strip";
+import "./Hero.css";
 
 const Hero = () => {
   return (
-    <div className="section-hero bg-background">
-      <div className="w-full h-dvh hero">
-        <div className="section-container main-container text-primary">
-          <div className="pt-24 lg:pt-32">
-            {/* Clouds */}
-            <div className="cloud-images flex justify-between w-full">
-              <Image src={cloud} alt="cloud" width={250} height={80} />
-              <Image src={cloud2} alt="cloud" width={250} height={80} />
+    <section className="hero bg-background min-h-screen flex flex-col justify-between">
+      
+      <div className="section-hero pt-6 md:pt-10 flex flex-col flex-1">
+        
+        {/* CLOUDS */}
+        <div className="upper-content w-[90%] max-w-[1400px] mx-auto flex justify-between items-start">
+          <Image
+            src={cloud}
+            alt="cloud"
+            className="w-[120px] md:w-[200px] lg:w-[300px] h-auto"
+          />
+          <Image
+            src={cloud2}
+            alt="cloud"
+            className="w-[120px] md:w-[200px] lg:w-[300px] h-auto"
+          />
+        </div>
+
+        {/* MIDDLE SECTION */}
+        <div className="middle-content w-[80%] max-w-[1920px] mx-auto flex flex-col lg:flex-row items-center justify-center lg:justify-between gap-10 flex-1 py-8">
+          
+          {/* LEFT SIDE (SHIFTED UP) */}
+          <div className="left-sect text-center lg:text-left lg:-translate-y-12 xl:-translate-y-16 transition-transform duration-300">
+            
+            <div className="leading-tight">
+              <p className="text-primary text-[clamp(1.8rem,4vw,4rem)]">
+                Where{" "}
+                <span className="font-rouge text-secondary font-semibold">
+                  stories
+                </span>{" "}
+                find
+              </p>
+              <p className="text-primary text-[clamp(1.8rem,4vw,4rem)]">
+                their{" "}
+                <span className="font-rouge text-secondary font-semibold">
+                  voices
+                </span>
+              </p>
             </div>
 
-            {/* Content */}
-            <div className="flex flex-col lg:flex-row justify-between items-start w-full gap-10">
-              {/* LEFT SIDE */}
-              <div className="left-content max-w-xl w-[50%]">
-                <h2 className="text-3xl sm:text-4xl lg:text-5xl leading-tight ">
-                  <p>
-                    Where{" "}
-                    <span className="font-rouge font-bold text-5xl sm:text-6xl lg:text-7xl text-secondary">
-                      stories
-                    </span>{" "}
-                    find
-                  </p>
-                  <p>
-                    their{" "}
-                    <span className="font-rouge font-bold text-5xl sm:text-6xl lg:text-7xl text-secondary">
-                      voice
-                    </span>
-                  </p>
-                </h2>
+            <button className="mt-6 text-sm md:text-lg uppercase bg-[#ea6312] text-white rounded-full px-8 py-2 shadow-xl shadow-[#ecb150] hover:scale-105 transition-all duration-300">
+              Explore
+            </button>
+          </div>
 
-                <button className="mt-8 bg-[#ea6312] cursor-pointer text-white text-lg sm:text-xl py-3 px-8 shadow-xl shadow-[#eeb75c] rounded-full hover:scale-105 transition">
-                  Explore
-                </button>
-              </div>
-
-              {/* RIGHT SIDE (CAROUSEL LOWERED) */}
-              <div className="right-carousel w-full lg:w-auto mt-12 lg:mt-35">
-                <HeroCarousel />
-              </div>
-            </div>
+          {/* RIGHT SIDE */}
+          <div className="right-sect w-full max-w-[600px]">
+            <HeroCarousel />
           </div>
         </div>
       </div>
-    </div>
+
+      {/* STRIP */}
+      <div className="bottom-content">
+        <Strip />
+      </div>
+    </section>
   );
 };
 

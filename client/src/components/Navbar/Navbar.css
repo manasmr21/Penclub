@@ -1,0 +1,46 @@
+@media only screen and (max-width:800px){
+    .contacts{
+        display: none;
+    }
+
+    .menu-items{
+        height: 100dvh;
+        position: absolute;
+        inset: 0;
+        transform: translateY(-150%);
+        background: var(--color-primary);
+        display: grid;
+        color: white;
+        place-items: center;
+        font-size: 30px;
+        font-weight: bold;
+        transition: transform 0.2s ease-in-out;
+    }
+
+    .menu-items[menu-open="true"]{
+        transform: translateY(-1%);
+    }
+
+    .menu-items ul{
+        align-items: center;
+        height: 30%;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .responsive-contact{
+        display: block;
+    }
+
+    .close-burger{
+        position: absolute;
+        top: 50px;
+        right: 50px;
+        display: block;
+    }
+
+    .burger-menu{
+        display: block;
+    }
+
+}
