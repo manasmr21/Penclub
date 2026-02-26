@@ -10,6 +10,7 @@ import {
   CarouselNext, // Imported for better type safety
 } from "@/src/components/ui/carousel";
 import Image from "next/image";
+import Autoplay from "embla-carousel-autoplay";
 
 const podcastImages = [
   "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?q=80&w=2070&auto=format&fit=crop",
@@ -47,6 +48,11 @@ const PodcastCarousel = () => {
     <div className="w-[90%] m-auto">
       <Carousel
         setApi={setApi}
+        plugins={[
+          Autoplay({
+            delay:1000
+          })
+        ]}
         opts={{
           align: "center",
           containScroll: "trimSnaps",
@@ -55,10 +61,10 @@ const PodcastCarousel = () => {
       >
         <CarouselContent className="">
           {podcastImages.map((item, idx) => (
-            <CarouselItem key={idx} className="basis-full sm:basis-1/2 lg:basis-1/3">
+            <CarouselItem key={idx} className="basis-full sm:basis-1/3 lg:basis-1/3">
               <div className={`relative aspect-square overflow-hidden rounded-3xl m-2 duration-200 select-none shadow-xl
-                    ${idx === selectedIndex + 1 ? "scale-100 z-50" : "scale-80"}
-                    ${idx === selectedIndex  ? "transform-[translateX(120px)]" : ""}
+                    ${idx === selectedIndex + 1 ? "sm:scale-100 sm:z-50 scale-100" : "scale-80"}
+                    ${idx === selectedIndex  ? "sm:transform-[translateX(120px)]" : ""}
                     ${idx === selectedIndex + 2 ? "transform-[translateX(-120px)]" : ""}
                 `}>
                 <Image
@@ -74,8 +80,8 @@ const PodcastCarousel = () => {
             
           ))}
         </CarouselContent>
-        <CarouselPrevious className="bg-primary text-white p-5 shadow-xs active:shadow-none active:transform-[translateY(2px)]" />
-        <CarouselNext className="bg-primary text-white p-5 shadow-xs active:shadow-none active:transform-[translateY(2px)]" />
+        <CarouselPrevious className="bg-primary left-0 sm:left-auto sm:right-full text-white p-5 shadow-xs active:shadow-none active:transform-[translateY(2px)]" />
+        <CarouselNext className="bg-primary right-0 sm:right-auto sm:left-full text-white p-5 shadow-xs active:shadow-none active:transform-[translateY(2px)]" />
       </Carousel>
     </div>
   );
