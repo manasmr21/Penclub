@@ -21,6 +21,7 @@ import simon from "./simonNschuter.png"
 import brightbooks from "./brightBooks.png"
 import pinkUnicorn from "./pinkUnicorn.png"
 import kalmbach from "./kalmbach.png"
+import favicon from "./favicon.ico"
 
 
 
@@ -47,5 +48,6 @@ export {
     simon,
     brightbooks,
     pinkUnicorn,
-    kalmbach
+    kalmbach,
+    favicon
 };

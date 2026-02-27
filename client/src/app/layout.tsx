@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter, Rouge_Script, Chau_Philomene_One  } from "next/font/google";
 import "./globals.css";
 import Navbar from "../components/Navbar/Navbar";
+import {favicon} from "@/public/images/index"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,6 +35,9 @@ const rougeScript = Rouge_Script({
 export const metadata: Metadata = {
   title: "Penclub",
   description: "",
+  icons:{
+    icon: "@/public/images/favicon.ico"
+  }
 };
 
 export default function RootLayout({
