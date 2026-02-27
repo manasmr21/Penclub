@@ -1,51 +1,55 @@
+import { FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
+
 const Footer = () => {
   return (
-    <footer className="section-footer bg-primary">
-      <div className="curtain main-container">
-        <div className="text-white 
+    <footer className="bg-primary text-white">
+      <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-4">
+        <div className="
           flex flex-col 
           md:flex-row 
-          md:flex-wrap 
+          items-center 
           justify-between 
-          gap-10 
-          px-6 sm:px-10 lg:px-16 
-          py-12">
-
-          {/* Column 1 */}
-          <div className="flex-1 min-w-[220px] text-center md:text-left">
-            <h1 className="text-secondary mb-4 text-2xl sm:text-3xl lg:text-4xl font-bold font-inter">
-              Penclub
-            </h1>
-            <p className="font-semibold w-[70%] m-auto md:m-0">
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-              Doloremque architecto vel et debitis rerum maxime!
-            </p>
+          gap-4
+        ">
+          
+          {/* Left */}
+          <div className="text-sm font-medium text-center md:text-left flex justify-center items-center">
+             <span className="text-xl mr-2">©</span>{new Date().getFullYear()} Penclub
           </div>
 
-          {/* Column 2 */}
-          <div className="flex-1 min-w-[180px] text-center md:text-left">
-            <h1 className="text-secondary mb-4 text-2xl sm:text-3xl lg:text-4xl font-bold font-inter">
-              Quick Links
-            </h1>
-            <ul className="font-semibold space-y-2">
-              <li className="cursor-pointer hover:underline w-max m-auto md:m-0 ">Home</li>
-              <li className="cursor-pointer hover:underline w-max m-auto md:m-0 ">Magazine</li>
-              <li className="cursor-pointer hover:underline w-max m-auto md:m-0 ">Podcast</li>
-              <li className="cursor-pointer hover:underline w-max m-auto md:m-0 ">Books</li>
-              <li className="cursor-pointer hover:underline w-max m-auto md:m-0 ">Events</li>
-            </ul>
+          {/* Center */}
+          <div className="text-xl font-quicksand  font-semibold text-center">
+            Penned with love ❤️
           </div>
 
-          {/* Column 3 */}
-          <div className="flex-1 min-w-[200px] text-center md:text-left">
-            <h1 className="text-secondary mb-4 text-2xl sm:text-3xl lg:text-4xl font-bold font-inter">
-              Location
-            </h1>
-            <div className="space-y-1 font-semibold">
-              <p>Madanpur</p>
-              <p>near Infovalley, Bhubaneswar,</p>
-              <p>Odisha 752054</p>
-            </div>
+          {/* Right */}
+          <div className="flex items-center gap-4 text-lg">
+            <a
+              href="#"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-secondary transition"
+            >
+              <FaInstagram />
+            </a>
+
+            <a
+              href="#"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-secondary transition"
+            >
+              <FaTwitter />
+            </a>
+
+            <a
+              href="#"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-secondary transition"
+            >
+              <FaYoutube />
+            </a>
           </div>
 
         </div>
