@@ -3,6 +3,8 @@ import contact from './contact.png';
 import cloud from './cloud.png';
 import cloud2 from './cloud-2.png';
 import book from './book.png';
+import book2 from "./book-2.png"
+import book3 from "./book-3.png"
 import podcast from './podcast.png';
 import publication from "./newpublication.png"
 import authorSpotlight from "./authorspotlight.png"
@@ -28,6 +30,8 @@ export {
     cloud,
     cloud2,
     book,
+    book2,
+    book3,
     podcast,
     publication,
     authorSpotlight,

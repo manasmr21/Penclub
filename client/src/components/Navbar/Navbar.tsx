@@ -25,7 +25,7 @@ const Navbar = () => {
           scrolled ? "bg-background" : "bg-transparent"
         } `}
       >
-        <div className="main-container flex items-center justify-between px-4 py-2 font-inter">
+        <div className="main-container flex items-center justify-between py-2 font-inter">
           <div className="logo">
             <Image
               src={logo}
@@ -63,8 +63,8 @@ const Navbar = () => {
             </div>
           </div>
           <div className="contacts flex items-center gap-3">
-            <Image src={contact} alt="contact" className="contact-image w-11" />
-            <button className=" bg-primary py-3 px-5 text-center rounded-full text-white">
+            <Image src={contact} alt="contact" className="contact-image w-11 hover:rotate-25 duration-300" />
+            <button className=" cursor-pointer border border-transparent hover:bg-transparent hover:border-primary duration-300 hover:text-primary font-semibold bg-primary py-3 px-5 text-center rounded-full text-white">
               9534545333
             </button>
           </div>

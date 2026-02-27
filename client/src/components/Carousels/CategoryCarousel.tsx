@@ -79,7 +79,7 @@ const CategoryCarousel = () => {
               <div className="p-1">
                 <Card>
                   <CardContent className="flex aspect-square items-center justify-center flex-col">
-                    <Image src={item.img} alt="" />
+                    <Image src={item.img} alt="" className="w-full h-full object-contain" />
                     <p className="font-semibold text-xl text-center">
                       {item.name}
                     </p>

@@ -9,19 +9,19 @@ import {
   CarouselPrevious,
 } from "@/src/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
-import { book } from "@/public/images";
+import { book,book2,book3 } from "@/public/images";
 import Image from "next/image";
 
 const cards = [
-  { id: 1, title: "Card 1" },
-  { id: 2, title: "Card 2" },
-  { id: 3, title: "Card 3" },
-  { id: 4, title: "Card 4" },
-  { id: 5, title: "Card 5" },
-  { id: 6, title: "Card 6" },
-  { id: 7, title: "Card 7" },
-  { id: 8, title: "Card 8" },
-  { id: 9, title: "Card 9" },
+  { id: 1, title: "Card 1", book: book3 },
+  { id: 2, title: "Card 2", book: book },
+  { id: 3, title: "Card 3", book: book2 },
+  { id: 4, title: "Card 4", book: book3 },
+  { id: 5, title: "Card 5", book: book },
+  { id: 6, title: "Card 6", book: book2 },
+  { id: 7, title: "Card 7", book: book3 },
+  { id: 8, title: "Card 8", book: book },
+  { id: 9, title: "Card 9", book: book2 },
 ];
 
 export default function HeroCarousel() {
@@ -52,7 +52,7 @@ export default function HeroCarousel() {
           align: "start",
           containScroll: "trimSnaps",
         }}
-        className=" w-[55vw] sm:w-full  mx-auto"
+        className="w-full  mx-auto"
       >
         <CarouselContent className="px-2">
           {cards.map((card, index) => (
@@ -63,7 +63,7 @@ export default function HeroCarousel() {
               <div
                 className={`
                   flex items-center justify-center
-                  h-[220px] sm:h-[260px] md:h-[300px] lg:h-[350px]
+                  h-[220px] sm:h-[260px] md:h-[300px] lg:h-[350px] 
                   transition-all duration-500
                   origin-bottom
                   ${
@@ -75,7 +75,7 @@ export default function HeroCarousel() {
               >
                 <div className="w-full h-full relative">
                   <Image
-                    src={book}
+                    src={card.book}
                     alt={card.title}
                     fill
                     className="object-contain"

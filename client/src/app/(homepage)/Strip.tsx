@@ -40,8 +40,8 @@ const stripData = [
 
 const Strip = () => {
   return (
-    <div className="section-strip bg-primary">
-      <div className="strip-card grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 w-[90%] m-auto place-items-start py-2">
+    <div className="section-strip bg-primary ">
+      <div className="strip-card main-container grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 w-[90%] m-auto place-items-start py-2">
         {stripData?.map((item) => (
           <div
             key={item.id}
