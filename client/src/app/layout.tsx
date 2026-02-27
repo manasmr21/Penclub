@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Inter, Rouge_Script, Chau_Philomene_One  } from "next/font/google";
+import { Geist, Geist_Mono, Inter, Rouge_Script, Chau_Philomene_One, Quicksand } from "next/font/google";
 import "./globals.css";
 import Navbar from "../components/Navbar/Navbar";
-import {favicon} from "@/public/images/index"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,6 +31,11 @@ const rougeScript = Rouge_Script({
   display: "swap",
 });
 
+const quickSand = Quicksand({
+  subsets: ["latin"],
+  variable:"--font-quicksand"
+})
+
 export const metadata: Metadata = {
   title: "Penclub",
   description: "",
@@ -48,7 +52,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${interFont.variable} ${rougeScript.variable} ${chauPhilomene.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${interFont.variable} ${rougeScript.variable} ${chauPhilomene.variable} ${quickSand.variable} antialiased`}
       >
         <Navbar/>
         {children}

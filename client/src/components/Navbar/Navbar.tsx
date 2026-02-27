@@ -65,7 +65,7 @@ const Navbar = () => {
                 <li>events</li>
 
                 <div className="responsive-contact hidden">
-                  <button>9534545333</button>
+                  <button>+91 83289 76521</button>
                 </div>
               </ul>
 
@@ -86,7 +86,7 @@ const Navbar = () => {
               className="contact-image w-11 hover:rotate-25 duration-300"
             />
             <button className="cursor-pointer border border-transparent hover:bg-transparent hover:border-primary duration-300 hover:text-primary font-semibold bg-primary py-3 px-5 text-center rounded-full text-white">
-              9534545333
+              +91 83289 76521
             </button>
           </div>
 

@@ -29,17 +29,17 @@ const Hero = () => {
           <div className="middle-content w-[95%] max-w-[1920px] 2xl:m-auto flex flex-col lg:flex-row items-center justify-center lg:justify-between gap-10 flex-1 py-8">
             {/* LEFT SIDE (SHIFTED UP) */}
             <div className="left-sect text-center lg:text-left lg:-translate-y-12 xl:-translate-y-20 transition-transform duration-300">
-              <div className="leading-[60px] text-[clamp(3rem,3.5vw,6rem)]">
-                <p className="text-primary">
+              <div className="leading-[60px] font-quicksand text-[clamp(3rem,3.5vw,6rem)]">
+                <p className="text-primary font-semibold ">
                   Where{" "}
-                  <span className="font-rouge text-secondary font-semibold">
+                  <span className="font-gveret text-secondary font-semibold">
                     stories
                   </span>{" "}
                   find
                 </p>
-                <p className="text-primary">
+                <p className="text-primary font-semibold ">
                   their{" "}
-                  <span className="font-rouge text-secondary font-semibold">
+                  <span className="font-gveret text-secondary font-semibold">
                     voice
                   </span>
                 </p>

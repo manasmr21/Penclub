@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Gveret+Levin&display=swap');
+
 .hero {
   min-height: 100vh;
 }
@@ -8,6 +10,12 @@
 
 .cloud-2{
   animation: heroCloudAnimation2 ease-in-out infinite 10s ;
+}
+
+.font-gveret{
+  font-family: "Gveret Levin", cursive;
+  font-weight: 500;
+  font-style: normal;
 }
 
 @keyframes heroCloudAnimation{

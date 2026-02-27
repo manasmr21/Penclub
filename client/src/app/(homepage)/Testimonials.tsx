@@ -94,7 +94,7 @@ const Testimonials = () => {
             </div>
           </div>
         </div>
-        <div className="curtain text-center absolute w-full top-1/2">
+        <div className="curtain text-center absolute w-full z-0 top-1/2">
             <p className="py-1 font-semibold text-black w-[110px] m-auto rounded-2xl bg-gray-200 mb-10">Testimonials</p>
             <div className="font-semibold">
                 <p className="text-black text-4xl md:text-6xl font-inter">Trusted by leaders</p>
