@@ -49,7 +49,7 @@ const Navbar = () => {
                 <li className="cursor-pointer ">podcast</li>
                 <li className="cursor-pointer ">events</li>
                 <div className="responsive-contact hidden">
-                  <button className=" bg-white py-3 px-5 text-center rounded-full text-primary">
+                  <button className=" bg-transparent text-white py-3 px-5 text-center rounded-full border border-white">
                     9534545333
                   </button>
                 </div>
