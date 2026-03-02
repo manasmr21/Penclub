@@ -187,25 +187,6 @@
   }
 }
 
-.menu-items ul li{
-  position: relative;
-}
-
-.menu-items ul li::after{
-  content: "";
-  position: absolute;
-  width: 0%;
-  height: 3px;
-  background-color: var(--primary);
-  border-radius: 15px;
-  left: 0;
-  bottom: 0px;
-  transition: width 0.1s ease-in-out;
-}
-
-.menu-items ul li:hover::after{
-  width: 100%;
-}
 
 .testimonial-card {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);

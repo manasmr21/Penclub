@@ -108,3 +108,39 @@
     transform: rotate(90deg);
   }
 }
+
+
+/* .menu-items ul li{
+  position: relative;
+}
+
+.menu-items ul li::after{
+  content: "";
+  position: absolute;
+  width: 0%;
+  height: 3px;
+  background-color: var(--primary);
+  border-radius: 15px;
+  left: 0;
+  bottom: 0px;
+  transition: width 0.1s ease-in-out;
+}
+
+.menu-items ul li:hover::after{
+  width: 100%;
+} */
+
+.menu-items ul li{
+  border: 1px solid transparent;
+  padding: 8px;
+  border-radius: 15px;
+  transition: all 0.2s ease-out;
+}
+
+.menu-items ul li:hover{
+  border: 1px solid var(--color-primary);
+}
+
+.menu-items ul li:active{
+  transform: scale(0.98);
+}

@@ -45,7 +45,7 @@ const Hero = () => {
                 </p>
               </div>
 
-              <button className="cursor-pointer mt-8 text-sm text-[clamp(1rem,1.2vw,2rem)] uppercase bg-[#ea6312] text-white rounded-full px-8 py-2 shadow-xl shadow-[#ecb150] hover:scale-105 transition-all duration-100">
+              <button className="cursor-pointer mt-8 text-sm text-[clamp(1rem,1.2vw,2rem)] uppercase bg-[#ea6312] text-white rounded-full px-8 py-2 shadow-xl shadow-[#ecb150] hover:scale-105 transition-all duration-100 active:scale-[0.98]">
                 Explore
               </button>
             </div>
