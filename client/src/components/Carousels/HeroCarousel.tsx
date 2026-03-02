@@ -9,19 +9,22 @@ import {
   CarouselPrevious,
 } from "@/src/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
-import { book,book2,book3 } from "@/public/images";
+import { book,book2,book3, book4, book5, book6 } from "@/public/images";
 import Image from "next/image";
 
 const cards = [
   { id: 1, title: "Card 1", book: book3 },
   { id: 2, title: "Card 2", book: book },
   { id: 3, title: "Card 3", book: book2 },
-  { id: 4, title: "Card 4", book: book3 },
-  { id: 5, title: "Card 5", book: book },
-  { id: 6, title: "Card 6", book: book2 },
+  { id: 4, title: "Card 4", book: book4 },
+  { id: 5, title: "Card 5", book: book5 },
+  { id: 6, title: "Card 6", book: book6 },
   { id: 7, title: "Card 7", book: book3 },
   { id: 8, title: "Card 8", book: book },
   { id: 9, title: "Card 9", book: book2 },
+  { id: 10, title: "Card 10", book: book4 },
+  { id: 11, title: "Card 11", book: book5 },
+  { id: 12, title: "Card 12", book: book6 },
 ];
 
 export default function HeroCarousel() {
@@ -87,8 +90,8 @@ export default function HeroCarousel() {
         </CarouselContent>
 
         {/* SAME BUTTON POSITIONS AS YOUR ORIGINAL */}
-        <CarouselPrevious className="absolute right-full top-[90%] bg-[#e8aa05] text-white p-5" />
-        <CarouselNext className="absolute left-full top-[90%] bg-[#e8aa05] text-white p-5" />
+        <CarouselPrevious className="absolute right-full top-[77%] bg-[#e8aa05] text-white p-5" />
+        <CarouselNext className="absolute left-full top-[77%] bg-[#e8aa05] text-white p-5" />
       </Carousel>
     </div>
   );

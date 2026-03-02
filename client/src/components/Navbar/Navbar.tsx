@@ -59,10 +59,10 @@ const Navbar = () => {
               menu-open={`${menuOpen}`}
             >
               <ul className="flex gap-3">
-                <li>magazine</li>
-                <li>books</li>
-                <li>podcast</li>
-                <li>events</li>
+                <li className="cursor-pointer">magazine</li>
+                <li className="cursor-pointer">books</li>
+                <li className="cursor-pointer">podcast</li>
+                <li className="cursor-pointer">events</li>
 
                 <div className="responsive-contact hidden">
                   <button>+91 83289 76521</button>
