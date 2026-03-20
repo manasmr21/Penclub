@@ -89,7 +89,6 @@ export default function HeroCarousel() {
           ))}
         </CarouselContent>
 
-        {/* SAME BUTTON POSITIONS AS YOUR ORIGINAL */}
         <CarouselPrevious className="absolute right-full top-[77%] bg-[#e8aa05] text-white p-5" />
         <CarouselNext className="absolute left-full top-[77%] bg-[#e8aa05] text-white p-5" />
       </Carousel>
