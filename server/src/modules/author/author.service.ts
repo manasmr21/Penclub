@@ -1,7 +1,7 @@
-import { ConflictException, Injectable } from "@nestjs/common";
+import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { AuthorRegisterDto } from "./dto/register.dto";
+import { AuthorDto } from "./dto/register.dto";
 import { AuthorEntity } from "./entities/author.entity";
 import bcrypt from "bcryptjs"
 import { JwtService } from "@nestjs/jwt";
@@ -16,7 +16,7 @@ export class AuthorService {
     ) { }
 
 
-    async register(authorRegisterDto: AuthorRegisterDto, res: Response) {
+    async register(authorRegisterDto: AuthorDto, res: Response) {
         try {
             const { name, penName, email, password } = authorRegisterDto;
 
@@ -60,8 +60,22 @@ export class AuthorService {
         }
     }
 
-    async updateProfile(){
-        
+    async updateProfile(id: string,authorUpdate: Partial<AuthorDto>){
+        const author = await this.authorRepository.update(id, authorUpdate);
+
+        if(author.affected === 0){
+            throw new NotFoundException({
+                success: false,
+                message: "Author not found"
+            });
+        }
+
+        return {
+            success: true,
+            message: "Update successfully",
+            author
+        }
+
     }
 
     async authorLogin(email: string, password: string, res: Response) {
