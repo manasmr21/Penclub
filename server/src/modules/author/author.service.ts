@@ -1,7 +1,7 @@
-import { ConflictException, Injectable } from "@nestjs/common";
+import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { AuthorRegisterDto } from "./dto/register.dto";
+import { AuthorDto } from "./dto/register.dto";
 import { AuthorEntity } from "./entities/author.entity";
 import bcrypt from "bcryptjs"
 import { JwtService } from "@nestjs/jwt";
@@ -15,8 +15,23 @@ export class AuthorService {
         private jwtService: JwtService
     ) { }
 
+    async getAllAuthors(){
+        const authors = await this.authorRepository.find()
 
-    async register(authorRegisterDto: AuthorRegisterDto, res: Response) {
+        return {
+            success: true,
+            message: "Authors fetched successfully",
+            authors
+        }
+    }
+
+    async getAuthor(id: any){
+        const author = await this.authorRepository.query(
+            ``
+        )
+    }
+
+    async register(authorRegisterDto: AuthorDto, res: Response) {
         try {
             const { name, penName, email, password } = authorRegisterDto;
 
@@ -60,8 +75,25 @@ export class AuthorService {
         }
     }
 
-    async updateProfile(){
-        
+    async updateProfile(id: any,authorUpdate: Partial<AuthorDto>){
+
+        console.log(authorUpdate, id);
+
+        const author = await this.authorRepository.update(id, authorUpdate);
+
+        if(author.affected === 0){
+            throw new NotFoundException({
+                success: false,
+                message: "Author not found"
+            });
+        }
+
+        return {
+            success: true,
+            message: "Update successfully",
+            author
+        }
+
     }
 
     async authorLogin(email: string, password: string, res: Response) {
