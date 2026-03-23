@@ -27,8 +27,23 @@ export class AuthorService {
 
     async getAuthor(id: any){
         const author = await this.authorRepository.query(
-            ``
+            `SELECT * FROM authors WHERE ID = $1`, [id]
         )
+
+        if(author.length === 0) throw new NotFoundException({
+            success: false,
+            message: "Author Not found"
+        })
+
+        return{
+            success: true,
+            message: "Author Fetched Successfully",
+            author: {
+                ...author, 
+                password: undefined
+            }
+        }
+
     }
 
     async register(authorRegisterDto: AuthorDto, res: Response) {
@@ -140,5 +155,7 @@ export class AuthorService {
             throw error;
         }
     }
+
+    
 
 }

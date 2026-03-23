@@ -13,6 +13,11 @@ export class AuthorController{
       return await this.authorService.getAllAuthors();
    }
 
+   @Get("get-author/:authorId")
+   async getAuthorById(@Param("authorId") id: any){
+      return await this.authorService.getAuthor(id);
+   }
+
    @Post("create")
    async createAuthor(@Body() dto: AuthorDto, res: Response){
       return await this.authorService.register(dto, res); 
