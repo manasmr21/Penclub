@@ -87,7 +87,24 @@
     transition: 0.3s ease;
   }
 
+  .responsive-contact a {
+    display: inline-block;
+    padding: 14px 34px;
+    border-radius: 999px;
+    border: 2px solid white;
+    background: transparent;
+    font-weight: 600;
+    font-size: 16px;
+    color: white;
+    transition: 0.3s ease;
+  }
+
   .responsive-contact button:hover {
+    background: white;
+    color: black;
+  }
+
+  .responsive-contact a:hover {
     background: white;
     color: black;
   }
@@ -135,6 +152,10 @@
   padding: 8px;
   border-radius: 15px;
   transition: all 0.2s ease-out;
+}
+
+.menu-items ul li a {
+  display: block;
 }
 
 .menu-items ul li:hover{

@@ -22,9 +22,11 @@ const personImages = [
 
 
 const Testimonials = () => {
-  console.log(personImages.length)
   return (
-    <div className="section-testimonials bg-white py-20 overflow-hidden main-container">
+    <div
+      id="events"
+      className="section-testimonials bg-white py-20 overflow-hidden main-container"
+    >
       <div className=" max-w-[1400px] m-auto relative">
         <div className="background bg-transparent flex justify-between transform-[translateX(-45%)] md:transform-[translateX(-35%)] lg:transform-none">
           <div className=" transform-[translateY(-110px)]">

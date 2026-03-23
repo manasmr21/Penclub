@@ -4,6 +4,7 @@ import CategoryCarousel from "@/src/components/Carousels/CategoryCarousel";
 const Category = () => {
   return (
     <div
+      id="books"
       className="section-category py-20"
       style={{ background: `url(${categoryBG.src}) no-repeat center/cover` }}
     >
