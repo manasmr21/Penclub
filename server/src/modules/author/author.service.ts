@@ -48,7 +48,7 @@ export class AuthorService {
             success: true,
             message: "Author Fetched Successfully",
             author: {
-                ...author, 
+                ...author[0], 
                 password: undefined
             }
         }
@@ -74,7 +74,9 @@ export class AuthorService {
                 [name, penName, email, hashedPassword, otpHash, otpExpiresAt, false]
             )
 
-            if (result.length === 0) throw new ConflictException("Email already exists");
+            const rows = Array.isArray(result[0]) ? result[0] : result;
+
+            if (rows.length === 0) throw new ConflictException("Email already exists");
 
             await this.mailService.sendMailService(
                 email,
@@ -85,7 +87,7 @@ export class AuthorService {
             return {
                 success: true,
                 message: "OTP sent to your email. Please verify to complete registration.",
-                data: result[0],
+                data: rows[0],
                 otpExpiresInMinutes: 10
             }
 
@@ -212,7 +214,8 @@ export class AuthorService {
                 [author.id]
             );
 
-            const payload = updated[0];
+            const rows = Array.isArray(updated[0]) ? updated[0] : updated;
+            const payload = rows[0];
             const token = this.jwtService.sign(payload);
 
             res.cookie("author", token, {
