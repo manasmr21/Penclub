@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Res } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, Res } from "@nestjs/common";
 import { AuthorService } from "./author.service";
 import { AuthorDto } from "./dto/register.dto";
 import { VerifyOtpDto } from "./dto/verify-otp.dto";
@@ -46,6 +46,11 @@ export class AuthorController{
    @Put("update/:authorId")
    async updateAuthor(@Param("authorId") id: any, @Body() dto: Partial<AuthorDto>){
       return await this.authorService.updateProfile(id, dto);
+   }
+
+   @Delete("delete/:authorId")
+   async deleteAuthor(@Param("authorId") id: any){
+      return await this.authorService.deleteAuthor(id);
    }
    
 }
