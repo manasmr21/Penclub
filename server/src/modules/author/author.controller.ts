@@ -35,6 +35,11 @@ export class AuthorController{
       return await this.authorService.authorLogin(credentials.email, credentials.password, res)
    }
 
+   @Post("logout")
+   async logout(@Res({ passthrough: true }) res: Response){
+      return await this.authorService.logout(res);
+   }
+
    @Post("verify-otp")
    async verifyOtp(
       @Body() dto: VerifyOtpDto,
