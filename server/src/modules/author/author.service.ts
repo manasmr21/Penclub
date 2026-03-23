@@ -119,6 +119,22 @@ export class AuthorService {
 
     }
 
+    async deleteAuthor(id: any){
+        const result = await this.authorRepository.delete(id);
+
+        if(result.affected === 0){
+            throw new NotFoundException({
+                success: false,
+                message: "Author not found"
+            });
+        }
+
+        return {
+            success: true,
+            message: "Author deleted successfully"
+        };
+    }
+
     async authorLogin(email: string, password: string, res: Response) {
         try {
 
