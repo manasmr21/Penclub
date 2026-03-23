@@ -183,6 +183,19 @@ export class AuthorService {
         }
     }
 
+    async logout(res: Response) {
+        res.clearCookie("author", {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax"
+        });
+
+        return {
+            success: true,
+            message: "Logged out successfully"
+        };
+    }
+
     async verifyOtp(dto: VerifyOtpDto, res: Response) {
         try {
             const { email, otp } = dto;
