@@ -8,6 +8,11 @@ export class AuthorController{
       private authorService: AuthorService
    ){}
 
+   @Get("get-authors")
+   async getAuthors(){
+      return await this.authorService.getAllAuthors();
+   }
+
    @Post("create")
    async createAuthor(@Body() dto: AuthorDto, res: Response){
       return await this.authorService.register(dto, res); 
@@ -18,8 +23,8 @@ export class AuthorController{
       return await this.authorService.authorLogin(credentials.email, credentials.password, res)
    }
 
-   @Put("update/:id")
-   async updateAuthor(@Param("authorId")id: string, @Body() dto: Partial<AuthorDto>){
+   @Put("update/:authorId")
+   async updateAuthor(@Param("authorId") id: any, @Body() dto: Partial<AuthorDto>){
       return await this.authorService.updateProfile(id, dto);
    }
    
