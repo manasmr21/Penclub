@@ -8,7 +8,10 @@ import "./Hero.css";
 
 const Hero = () => {
   return (
-    <section className="hero bg-background min-h-screen flex flex-col justify-between">
+    <section
+      id="magazine"
+      className="hero bg-background min-h-screen flex flex-col justify-between"
+    >
       <div className="section-hero pt-6 md:pt-10 flex flex-col flex-1">
         <div className="main-container">
           {/* CLOUDS */}

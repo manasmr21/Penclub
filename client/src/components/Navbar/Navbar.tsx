@@ -1,11 +1,20 @@
 "use client";
 
-import { logo, contact } from "@/public/images";
+import { logo } from "@/public/images";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import "./Navbar.css";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { ImCross } from "react-icons/im";
+
+const navLinks = [
+  { href: "#magazine", label: "Magazine" },
+  { href: "#books", label: "Books" },
+  { href: "#podcast", label: "Podcast" },
+  { href: "#events", label: "Events" },
+  { href: "#contact", label: "Contact Us" },
+];
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -29,6 +38,8 @@ const Navbar = () => {
     }
   }, [menuOpen]);
 
+  const closeMenu = () => setMenuOpen(false);
+
   return (
     <>
       <nav
@@ -38,13 +49,13 @@ const Navbar = () => {
       >
         <div className="main-container relative flex items-center justify-between py-2 font-inter">
           {/* LOGO */}
-          <div className="logo">
+          <Link href="/" className="logo" onClick={closeMenu}>
             <Image
               src={logo}
               alt="logo"
               className="w-[30px] md:w-[65px] h-auto"
             />
-          </div>
+          </Link>
 
           {/* CENTER MENU */}
           <div className="nav-menu text-primary">
@@ -59,14 +70,19 @@ const Navbar = () => {
               menu-open={`${menuOpen}`}
             >
               <ul className="flex gap-3">
-                <li className="cursor-pointer">magazine</li>
-                <li className="cursor-pointer">books</li>
-                <li className="cursor-pointer">podcast</li>
-                <li className="cursor-pointer">events</li>
+                {navLinks.map((link) => (
+                  <li key={link.href}>
+                    <a href={link.href} onClick={closeMenu}>
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
 
-                <div className="responsive-contact hidden">
-                  <button>+91 83289 76521</button>
-                </div>
+                <li className="responsive-contact hidden">
+                  <Link href="/sign-in" onClick={closeMenu}>
+                    Sign in
+                  </Link>
+                </li>
               </ul>
 
               <div
@@ -80,14 +96,12 @@ const Navbar = () => {
 
           {/* CONTACTS (DESKTOP) */}
           <div className="contacts flex items-center gap-3">
-            <Image
-              src={contact}
-              alt="contact"
-              className="contact-image w-11 hover:rotate-25 duration-300"
-            />
-            <button className="cursor-pointer border border-transparent hover:bg-transparent hover:border-primary duration-300 hover:text-primary font-semibold bg-primary py-3 px-5 text-center rounded-full text-white">
-              +91 83289 76521
-            </button>
+            <Link
+              href="/sign-in"
+              className="cursor-pointer border border-transparent hover:bg-transparent hover:border-primary duration-300 hover:text-primary font-medium bg-primary py-2 w-[150px] text-center rounded-full text-white text-lg"
+            >
+              Sign in
+            </Link>
           </div>
 
           {/* BURGER */}
