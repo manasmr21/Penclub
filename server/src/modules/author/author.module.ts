@@ -4,11 +4,13 @@ import { AuthorService } from "./author.service";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { AuthorEntity } from "./entities/author.entity";
 import { JwtAuthModule } from "../JWT/jwt.module";
+import { MailModule } from "src/utils/mail.module";
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([AuthorEntity]),
-        JwtAuthModule
+        JwtAuthModule,
+        MailModule
     ],
     providers: [AuthorService],
     controllers: [AuthorController]

@@ -26,6 +26,15 @@ export class AuthorEntity{
     @Column()
     password: string;
 
+    @Column({ nullable: true })
+    otpHash: string;
+
+    @Column({ type: "timestamptz", nullable: true })
+    otpExpiresAt: Date;
+
+    @Column({ default: false })
+    isEmailVerified: boolean;
+
     @Column({nullable:true, type:"text"})
     bio: string
 

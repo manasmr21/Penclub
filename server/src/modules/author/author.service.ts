@@ -1,10 +1,14 @@
-import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ConflictException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { AuthorDto } from "./dto/register.dto";
+import { VerifyOtpDto } from "./dto/verify-otp.dto";
 import { AuthorEntity } from "./entities/author.entity";
 import bcrypt from "bcryptjs"
 import { JwtService } from "@nestjs/jwt";
+import { MailService } from "src/utils/sendMails";
+import type { Response } from "express";
+import { randomInt } from "crypto";
 
 @Injectable()
 export class AuthorService {
@@ -12,8 +16,13 @@ export class AuthorService {
     constructor(
         @InjectRepository(AuthorEntity)
         private authorRepository: Repository<AuthorEntity>,
-        private jwtService: JwtService
+        private jwtService: JwtService,
+        private mailService : MailService
     ) { }
+
+    private generateOtp(): string {
+        return randomInt(100000, 1000000).toString();
+    }
 
     async getAllAuthors(){
         const authors = await this.authorRepository.find()
@@ -46,41 +55,38 @@ export class AuthorService {
 
     }
 
-    async register(authorRegisterDto: AuthorDto, res: Response) {
+    async register(authorRegisterDto: AuthorDto) {
         try {
             const { name, penName, email, password } = authorRegisterDto;
 
             if (!name || !penName || !email || !password) throw new Error("All fields are required");
 
             const hashedPassword = await bcrypt.hash(password, 12)
-
+            const otp = this.generateOtp();
+            const otpHash = await bcrypt.hash(otp, 10);
+            const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
             const result = await this.authorRepository.query(
-                `INSERT INTO authors ("name", "penName", "email", "password")
-                VALUES ($1, $2, $3, $4)
+                `INSERT INTO authors ("name", "penName", "email", "password", "otpHash", "otpExpiresAt", "isEmailVerified")
+                VALUES ($1, $2, $3, $4, $5, $6, $7)
                 ON CONFLICT ("email") DO NOTHING
                 RETURNING "id", "email", "penName"`,
-                [name, penName, email, hashedPassword]
+                [name, penName, email, hashedPassword, otpHash, otpExpiresAt, false]
             )
 
-            if (result.length == 0) throw new ConflictException("Email already exists");
+            if (result.length === 0) throw new ConflictException("Email already exists");
 
-            const payload = result[0]
-
-            const token = this.jwtService.sign(payload)
-
-            //@ts-expect-error
-            res.cookie("author", token, {
-                httpOnly: true,
-                maxAge: 24 * 60 * 60 * 1000,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: "lax"
-            })
+            await this.mailService.sendMailService(
+                email,
+                "Verify your account",
+                `Your OTP is ${otp}. It expires in 10 minutes.`
+            );
 
             return {
                 success: true,
-                message: "Author registered successfully",
-                data: result[0]
+                message: "OTP sent to your email. Please verify to complete registration.",
+                data: result[0],
+                otpExpiresInMinutes: 10
             }
 
         } catch (error) {
@@ -115,7 +121,7 @@ export class AuthorService {
         try {
 
             const result = await this.authorRepository.query(
-                `SELECT "id", "email", "penName", "password" 
+                `SELECT "id", "email", "penName", "password", "isEmailVerified" 
                 FROM authors 
                 WHERE "email" = $1`,
                 [email]
@@ -129,6 +135,10 @@ export class AuthorService {
 
             if (!isMatch) return false;
 
+            if (!result[0].isEmailVerified) {
+                throw new UnauthorizedException("Email not verified");
+            }
+
             const payload = {
                 id: result[0].id,
                 email: result[0].email,
@@ -137,7 +147,6 @@ export class AuthorService {
 
             const token = this.jwtService.sign(payload)
 
-            //@ts-expect-error
             res.cookie("author", token, {
                 httpOnly: true,
                 maxAge: 24 * 60 * 60 * 1000,
@@ -156,6 +165,71 @@ export class AuthorService {
         }
     }
 
-    
+    async verifyOtp(dto: VerifyOtpDto, res: Response) {
+        try {
+            const { email, otp } = dto;
 
+            if (!email || !otp) {
+                throw new BadRequestException("Email and OTP are required");
+            }
+
+            const result = await this.authorRepository.query(
+                `SELECT "id", "email", "penName", "otpHash", "otpExpiresAt", "isEmailVerified"
+                FROM authors
+                WHERE "email" = $1`,
+                [email]
+            );
+
+            if (result.length === 0) {
+                throw new NotFoundException("Author not found");
+            }
+
+            const author = result[0];
+
+            if (author.isEmailVerified) {
+                throw new ConflictException("Email already verified");
+            }
+
+            if (!author.otpHash || !author.otpExpiresAt) {
+                throw new BadRequestException("OTP not generated or expired");
+            }
+
+            const expiresAt = new Date(author.otpExpiresAt);
+            if (expiresAt.getTime() < Date.now()) {
+                throw new BadRequestException("OTP expired");
+            }
+
+            const isMatch = await bcrypt.compare(otp, author.otpHash);
+            if (!isMatch) {
+                throw new UnauthorizedException("Invalid OTP");
+            }
+
+            const updated = await this.authorRepository.query(
+                `UPDATE authors
+                SET "isEmailVerified" = true, "otpHash" = NULL, "otpExpiresAt" = NULL
+                WHERE "id" = $1
+                RETURNING "id", "email", "penName"`,
+                [author.id]
+            );
+
+            const payload = updated[0];
+            const token = this.jwtService.sign(payload);
+
+            res.cookie("author", token, {
+                httpOnly: true,
+                maxAge: 24 * 60 * 60 * 1000,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "lax"
+            });
+
+            return {
+                success: true,
+                message: "Email verified successfully",
+                data: payload
+            };
+
+        } catch (error) {
+            throw error;
+        }
+    }
 }
