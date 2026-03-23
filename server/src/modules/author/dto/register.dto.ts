@@ -41,5 +41,4 @@ export class AuthorDto {
         example: ["https://twitter/johndoe", "https://facebook/johndoe"]
     })
     socialLinks?: string[]
-
 }

@@ -15,6 +15,21 @@ export class AuthorService {
         private jwtService: JwtService
     ) { }
 
+    async getAllAuthors(){
+        const authors = await this.authorRepository.find()
+
+        return {
+            success: true,
+            message: "Authors fetched successfully",
+            authors
+        }
+    }
+
+    async getAuthor(id: any){
+        const author = await this.authorRepository.query(
+            ``
+        )
+    }
 
     async register(authorRegisterDto: AuthorDto, res: Response) {
         try {
@@ -60,7 +75,10 @@ export class AuthorService {
         }
     }
 
-    async updateProfile(id: string,authorUpdate: Partial<AuthorDto>){
+    async updateProfile(id: any,authorUpdate: Partial<AuthorDto>){
+
+        console.log(authorUpdate, id);
+
         const author = await this.authorRepository.update(id, authorUpdate);
 
         if(author.affected === 0){
