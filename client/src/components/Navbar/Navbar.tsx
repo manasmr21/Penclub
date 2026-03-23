@@ -7,6 +7,7 @@ import Link from "next/link";
 import "./Navbar.css";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { ImCross } from "react-icons/im";
+import { getStoredUser, type AuthUser } from "@/src/lib/auth";
 
 const navLinks = [
   { href: "#magazine", label: "Magazine" },
@@ -19,6 +20,7 @@ const navLinks = [
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [user, setUser] = useState<AuthUser | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -29,7 +31,6 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Lock body scroll when menu open
   useEffect(() => {
     if (menuOpen) {
       document.body.style.overflow = "hidden";
@@ -38,7 +39,37 @@ const Navbar = () => {
     }
   }, [menuOpen]);
 
+  useEffect(() => {
+    const syncUser = () => setUser(getStoredUser());
+
+    syncUser();
+    window.addEventListener("penclub-auth-change", syncUser);
+    return () => window.removeEventListener("penclub-auth-change", syncUser);
+  }, []);
+
   const closeMenu = () => setMenuOpen(false);
+
+  const profileChip = (
+    <Link
+      href="/profile"
+      className="flex items-center gap-3 rounded-full border border-primary/15 bg-white/80 px-3 py-2 text-primary transition hover:border-primary"
+      onClick={closeMenu}
+    >
+      <span className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-slate-100">
+        {user?.profilePicture ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={user.profilePicture}
+            alt={user.name}
+            className="h-full w-full object-cover"
+          />
+        ) : null}
+      </span>
+      <span className="max-w-[120px] truncate text-sm font-semibold">
+        {user?.name}
+      </span>
+    </Link>
+  );
 
   return (
     <>
@@ -48,7 +79,6 @@ const Navbar = () => {
         }`}
       >
         <div className="main-container relative flex items-center justify-between py-2 font-inter">
-          {/* LOGO */}
           <Link href="/" className="logo" onClick={closeMenu}>
             <Image
               src={logo}
@@ -57,7 +87,6 @@ const Navbar = () => {
             />
           </Link>
 
-          {/* CENTER MENU */}
           <div className="nav-menu text-primary">
             <div>
               <h3 className="uppercase text-center md:text-3xl font-bold text-2xl font-logo">
@@ -79,9 +108,13 @@ const Navbar = () => {
                 ))}
 
                 <li className="responsive-contact hidden">
-                  <Link href="/sign-in" onClick={closeMenu}>
-                    Sign in
-                  </Link>
+                  {user ? (
+                    profileChip
+                  ) : (
+                    <Link href="/sign-in" onClick={closeMenu}>
+                      Sign in
+                    </Link>
+                  )}
                 </li>
               </ul>
 
@@ -94,17 +127,19 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* CONTACTS (DESKTOP) */}
           <div className="contacts flex items-center gap-3">
-            <Link
-              href="/sign-in"
-              className="cursor-pointer border border-transparent hover:bg-transparent hover:border-primary duration-300 hover:text-primary font-medium bg-primary py-2 w-[150px] text-center rounded-full text-white text-lg"
-            >
-              Sign in
-            </Link>
+            {user ? (
+              profileChip
+            ) : (
+              <Link
+                href="/sign-in"
+                className="cursor-pointer border border-transparent hover:bg-transparent hover:border-primary duration-300 hover:text-primary font-medium bg-primary py-2 w-[150px] text-center rounded-full text-white text-lg"
+              >
+                Sign in
+              </Link>
+            )}
           </div>
 
-          {/* BURGER */}
           <div
             className="burger-menu hidden text-3xl"
             onClick={() => setMenuOpen(true)}
