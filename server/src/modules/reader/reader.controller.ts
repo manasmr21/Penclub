@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Res } from "@nestjs/common";
+import { Body, Controller, Delete, Param, Post, Put, Res } from "@nestjs/common";
 import { ReaderService } from "./reader.service";
 import { ReaderDto } from "./dto/reader.dto";
 import { VerifyOtpDto } from "../author/dto/verify-otp.dto";
@@ -11,15 +11,46 @@ export class ReaderController {
     ) {}
 
     @Post("register")
-    async register(@Body() dto: ReaderDto) {
-        return await this.readerService.readerRegister(dto);
-    }
-
-    @Post("verify-otp")
-    async verifyOtp(
-        @Body() dto: VerifyOtpDto,
+    async register(
+        @Body() dto: ReaderDto,
         @Res({ passthrough: true }) res: Response
     ) {
-        return await this.readerService.verifyOtp(dto, res);
+        return await this.readerService.readerRegister(dto, res);
+    }
+
+    @Post("login")
+    async login(
+        @Body() credentials: { email: string, password: string },
+        @Res({ passthrough: true }) res: Response
+    ) {
+        return await this.readerService.readerLogin(credentials.email, credentials.password, res);
+    }
+
+    @Post("logout")
+    async logout(@Res({ passthrough: true }) res: Response) {
+        return await this.readerService.logout(res);
+    }
+
+    @Post("verify-email")
+    async verifyEmail(@Body() dto: VerifyOtpDto) {
+        return await this.readerService.verifyEmail(dto);
+    }
+
+    @Post("verify-otp-only")
+    async verifyOtpOnly(@Body() dto: VerifyOtpDto) {
+        return await this.readerService.verifyOtpOnly(dto);
+    }
+
+    @Put("update/:readerId")
+    async updateReader(
+        @Param("readerId") id: any,
+        @Body() dto: Partial<ReaderDto>
+    ) {
+        return await this.readerService.updateProfile(id, dto);
+    }
+
+    @Delete("delete/:readerId")
+    async deleteReader(@Param("readerId") id: any) {
+        return await this.readerService.deleteReader(id);
     }
 }

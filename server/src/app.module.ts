@@ -9,7 +9,9 @@ import { ReaderModule } from './modules/reader/reader.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({isGlobal: true}),
+    ConfigModule.forRoot({isGlobal: true,
+      envFilePath: ["server/.env", ".env"]
+    }),
     TypeOrmModule.forRoot(dataSource.options),
     AuthorModule,
     ReaderModule

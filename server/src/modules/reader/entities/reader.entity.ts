@@ -7,7 +7,7 @@ import {
     Index
 } from "typeorm";
 
-@Entity()
+@Entity("readers")
 @Index(['username'])
 export class Reader {
     @PrimaryGeneratedColumn('uuid')
@@ -25,11 +25,11 @@ export class Reader {
     @Column()
     password: string;
 
-    @Column({ nullable: true })
-    otpHash: string
+    @Column({ type: "varchar", nullable: true })
+    otpHash: string | null
 
     @Column({ type: "timestamptz", nullable: true })
-    otpExpiresAt: Date;
+    otpExpiresAt: Date | null;
 
     @Column({ default: false })
     isEmailVerified: boolean;
