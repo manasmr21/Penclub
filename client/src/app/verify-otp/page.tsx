@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AxiosError } from "axios";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import AuthField from "@/src/components/auth/AuthField";
 import AuthShell from "@/src/components/auth/AuthShell";
 import { authInputClassName } from "@/src/components/auth/auth-styles";
@@ -11,7 +11,7 @@ import { formatTimeLeft, type UserRole } from "@/src/lib/auth";
 import { resendUserOtp, verifyUserOtp } from "@/src/lib/auth-api";
 import { useAuthStore } from "@/src/store/auth-store";
 
-export default function VerifyOtpPage() {
+function VerifyOtpContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pendingOtpUser = useAuthStore((state) => state.pendingOtpUser);
@@ -179,5 +179,13 @@ export default function VerifyOtpPage() {
         </div>
       </div>
     </AuthShell>
+  );
+}
+
+export default function VerifyOtpPage() {
+  return (
+    <Suspense fallback={null}>
+      <VerifyOtpContent />
+    </Suspense>
   );
 }
