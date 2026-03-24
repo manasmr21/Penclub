@@ -186,14 +186,14 @@ export class AuthorService {
         };
     }
 
-    async authorLogin(email: string, password: string, res: Response) {
+    async authorLogin(identifier: string, password: string, res: Response) {
         try {
 
             const result = await this.authorRepository.query(
                 `SELECT "id", "email", "penName", "password", "isEmailVerified" 
                 FROM authors 
-                WHERE "email" = $1`,
-                [email]
+                WHERE "email" = $1 OR "penName" = $1`,
+                [identifier]
             )
 
             if (result.length == 0) return false;

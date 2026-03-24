@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Res } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Delete, Get, Param, Post, Put, Res } from "@nestjs/common";
 import { AuthorService } from "./author.service";
 import { AuthorDto } from "./dto/register.dto";
 import { VerifyOtpDto } from "./dto/verify-otp.dto";
@@ -29,10 +29,15 @@ export class AuthorController{
 
    @Post("login")
    async login(
-      @Body() credentials: {email: string, password: string},
+      @Body() credentials: { email?: string, penName?: string, identifier?: string, password: string },
       @Res({ passthrough: true }) res: Response
    ){
-      return await this.authorService.authorLogin(credentials.email, credentials.password, res)
+      const identifier = credentials.email ?? credentials.penName ?? credentials.identifier;
+      if (!identifier) {
+         throw new BadRequestException("Email or penName is required");
+      }
+
+      return await this.authorService.authorLogin(identifier, credentials.password, res)
    }
 
    @Post("logout")

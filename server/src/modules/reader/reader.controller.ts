@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Param, Post, Put, Res } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Delete, Param, Post, Put, Res } from "@nestjs/common";
 import { ReaderService } from "./reader.service";
 import { ReaderDto } from "./dto/reader.dto";
 import { VerifyOtpDto } from "../author/dto/verify-otp.dto";
@@ -20,10 +20,15 @@ export class ReaderController {
 
     @Post("login")
     async login(
-        @Body() credentials: { email: string, password: string },
+        @Body() credentials: { email?: string, username?: string, identifier?: string, password: string },
         @Res({ passthrough: true }) res: Response
     ) {
-        return await this.readerService.readerLogin(credentials.email, credentials.password, res);
+        const identifier = credentials.email ?? credentials.username ?? credentials.identifier;
+        if (!identifier) {
+            throw new BadRequestException("Email or username is required");
+        }
+
+        return await this.readerService.readerLogin(identifier, credentials.password, res);
     }
 
     @Post("logout")

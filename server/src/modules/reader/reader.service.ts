@@ -97,13 +97,13 @@ export class ReaderService {
 
     }
 
-    async readerLogin(email: string, password: string, res: Response) {
+    async readerLogin(identifier: string, password: string, res: Response) {
         try {
             const result = await this.readerRepository.query(
                 `SELECT "id", "email", "username", "password", "isEmailVerified"
                 FROM readers
-                WHERE "email" = $1`,
-                [email]
+                WHERE "email" = $1 OR "username" = $1`,
+                [identifier]
             );
 
             if (result.length === 0) return false;
@@ -223,7 +223,6 @@ export class ReaderService {
         return reader;
     }
 
-    // Independent endpoint for email verification during registration.
     async verifyEmail(dto: VerifyOtpDto) {
         const reader = await this.verifyOtpInternal(dto.email, dto.otp, true);
 
@@ -240,7 +239,6 @@ export class ReaderService {
     }
 
     async verifyOtpOnly(dto: VerifyOtpDto) {
-        // Intentionally does NOT check isEmailVerified; used for email/password change flows.
         await this.verifyOtpInternal(dto.email, dto.otp, false);
 
         return {
