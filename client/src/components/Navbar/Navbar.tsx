@@ -8,7 +8,7 @@ import { usePathname } from "next/navigation";
 import "./Navbar.css";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { ImCross } from "react-icons/im";
-import { getStoredUser, type AuthUser } from "@/src/lib/auth";
+import { useAuthStore } from "@/src/store/auth-store";
 
 const navLinks = [
   { href: "#magazine", label: "Magazine" },
@@ -22,7 +22,8 @@ const Navbar = () => {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [user, setUser] = useState<AuthUser | null>(null);
+  const user = useAuthStore((state) => state.user);
+  const hydrated = useAuthStore((state) => state.hydrated);
   const isHomePage = pathname === "/";
   const showSolidNavbar = !isHomePage || scrolled;
 
@@ -42,14 +43,6 @@ const Navbar = () => {
       document.body.style.overflow = "";
     }
   }, [menuOpen]);
-
-  useEffect(() => {
-    const syncUser = () => setUser(getStoredUser());
-
-    syncUser();
-    window.addEventListener("penclub-auth-change", syncUser);
-    return () => window.removeEventListener("penclub-auth-change", syncUser);
-  }, []);
 
   const closeMenu = () => setMenuOpen(false);
 
@@ -79,7 +72,7 @@ const Navbar = () => {
     <>
       <nav
         className={`navbar fixed w-full top-0 z-[999] transition-all duration-300 ${
-          showSolidNavbar ? "bg-background shadow-md" : "bg-transparent"
+          showSolidNavbar ? "bg-background" : "bg-transparent"
         }`}
       >
         <div className="main-container relative flex items-center justify-between py-2 font-inter">
@@ -112,7 +105,7 @@ const Navbar = () => {
                 ))}
 
                 <li className="responsive-contact hidden">
-                  {user ? (
+                  {hydrated && user ? (
                     profileChip
                   ) : (
                     <Link href="/sign-in" onClick={closeMenu}>
@@ -132,7 +125,7 @@ const Navbar = () => {
           </div>
 
           <div className="contacts flex items-center gap-3">
-            {user ? (
+            {hydrated && user ? (
               profileChip
             ) : (
               <Link

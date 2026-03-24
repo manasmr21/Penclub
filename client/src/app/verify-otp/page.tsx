@@ -2,103 +2,109 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { AxiosError } from "axios";
+import { useEffect, useState } from "react";
 import AuthField from "@/src/components/auth/AuthField";
 import AuthShell from "@/src/components/auth/AuthShell";
 import { authInputClassName } from "@/src/components/auth/auth-styles";
-import {
-  clearPendingOtpUser,
-  formatTimeLeft,
-  getPendingOtpUser,
-  setStoredUser,
-} from "@/src/lib/auth";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "/api";
+import { formatTimeLeft, type UserRole } from "@/src/lib/auth";
+import { resendUserOtp, verifyUserOtp } from "@/src/lib/auth-api";
+import { useAuthStore } from "@/src/store/auth-store";
 
 export default function VerifyOtpPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const email = searchParams.get("email") ?? "";
+  const pendingOtpUser = useAuthStore((state) => state.pendingOtpUser);
+  const setUser = useAuthStore((state) => state.setUser);
+  const setPendingOtpUser = useAuthStore((state) => state.setPendingOtpUser);
+
+  const email = searchParams.get("email") ?? pendingOtpUser?.email ?? "";
+  const role = (searchParams.get("role") as UserRole | null) ?? pendingOtpUser?.role ?? "author";
+
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
   const [timeLeft, setTimeLeft] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const pendingUser = useMemo(() => getPendingOtpUser(), []);
+  const [resending, setResending] = useState(false);
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
-    if (!pendingUser) return;
+    if (!pendingOtpUser) return;
 
     const updateTimer = () => {
-      const remaining = pendingUser.expiresAt - Date.now();
+      const remaining = pendingOtpUser.expiresAt - Date.now();
       if (remaining <= 0) {
-        clearPendingOtpUser();
         setTimeLeft("00:00");
-        setError("OTP expired. Please sign up again.");
         return;
       }
-
       setTimeLeft(formatTimeLeft(remaining));
     };
 
     updateTimer();
     const timer = window.setInterval(updateTimer, 1000);
-
     return () => window.clearInterval(timer);
-  }, [pendingUser]);
+  }, [pendingOtpUser]);
 
   const handleVerify = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!pendingUser || pendingUser.email !== email) {
+    if (!pendingOtpUser || pendingOtpUser.email !== email) {
       setError("Verification session not found. Please sign up again.");
-      return;
-    }
-
-    if (pendingUser.expiresAt < Date.now()) {
-      clearPendingOtpUser();
-      setError("OTP expired. Please sign up again.");
       return;
     }
 
     try {
       setLoading(true);
-      const response = await fetch(`${API_URL}/authors/verify-otp`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          email,
-          otp: otp.trim(),
-        }),
+      setError("");
+      const data = await verifyUserOtp(role, email, otp.trim());
+
+      setUser({
+        ...pendingOtpUser,
+        id: data?.data?.id ?? pendingOtpUser.id,
+        email: data?.data?.email ?? pendingOtpUser.email,
+        penName: data?.data?.penName ?? pendingOtpUser.penName,
+        username: data?.data?.username ?? pendingOtpUser.username,
+        isEmailVerified: true,
       });
-
-      const data = await response.json().catch(() => null);
-
-      if (!response.ok || !data?.success) {
-        setError(data?.message ?? "OTP does not match. Please try again.");
-        return;
-      }
-
-      setStoredUser({
-        id: data?.data?.id ?? pendingUser.id,
-        name: pendingUser.name,
-        email: pendingUser.email,
-        role: pendingUser.role,
-        penName: data?.data?.penName ?? pendingUser.penName,
-        username: pendingUser.username,
-        profilePicture: pendingUser.profilePicture,
-        phoneNumber: pendingUser.phoneNumber,
-        interests: pendingUser.interests,
-        bio: pendingUser.bio,
-      });
-      clearPendingOtpUser();
+      setPendingOtpUser(null);
       router.push("/");
       router.refresh();
+    } catch (error) {
+      const message =
+        error instanceof AxiosError
+          ? error.response?.data?.message
+          : "OTP does not match. Please try again.";
+      setError(message ?? "OTP does not match. Please try again.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleResend = async () => {
+    if (!email) return;
+
+    try {
+      setResending(true);
+      setError("");
+      const data = await resendUserOtp(role, email);
+      setPendingOtpUser(
+        pendingOtpUser
+          ? {
+              ...pendingOtpUser,
+              expiresAt: Date.now() + (data?.otpExpiresInMinutes ?? 10) * 60 * 1000,
+              devOtp: data?.devOtp,
+            }
+          : null,
+      );
+      setMessage("OTP resent to your email.");
+    } catch (error) {
+      const message =
+        error instanceof AxiosError
+          ? error.response?.data?.message
+          : "Could not resend OTP.";
+      setError(message ?? "Could not resend OTP.");
+    } finally {
+      setResending(false);
     }
   };
 
@@ -115,6 +121,11 @@ export default function VerifyOtpPage() {
           <p className="mt-3 text-sm text-slate-600">
             Enter the OTP sent to <span className="font-semibold">{email}</span>.
           </p>
+          {pendingOtpUser?.devOtp ? (
+            <p className="mt-2 text-sm font-medium text-amber-700">
+              Development OTP: {pendingOtpUser.devOtp}
+            </p>
+          ) : null}
         </div>
 
         <div className="mt-4 flex w-full justify-center">
@@ -130,6 +141,7 @@ export default function VerifyOtpPage() {
                   onChange={(event) => {
                     setOtp(event.target.value.replace(/\D/g, ""));
                     setError("");
+                    setMessage("");
                   }}
                   className={`${authInputClassName} text-center tracking-[0.5em]`}
                   placeholder="000000"
@@ -137,6 +149,7 @@ export default function VerifyOtpPage() {
               </AuthField>
 
               {error ? <p className="text-sm text-red-600">{error}</p> : null}
+              {message ? <p className="text-sm text-green-700">{message}</p> : null}
 
               <button
                 type="submit"
@@ -144,6 +157,15 @@ export default function VerifyOtpPage() {
                 className="w-full rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
               >
                 {loading ? "Verifying..." : "Verify OTP"}
+              </button>
+
+              <button
+                type="button"
+                onClick={handleResend}
+                disabled={resending}
+                className="w-full rounded-xl border border-primary/20 bg-white px-4 py-2.5 text-sm font-semibold text-primary transition hover:bg-primary/5"
+              >
+                {resending ? "Sending..." : "Resend OTP"}
               </button>
             </form>
 

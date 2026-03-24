@@ -1,0 +1,23 @@
+.signin-page .auth-shell {
+  padding-top: 5.75rem;
+}
+
+.signin-page .auth-shell-card {
+  max-width: 30rem;
+}
+
+@media (min-width: 640px) {
+  .signin-page .auth-shell {
+    padding-top: 6.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .signin-page .auth-shell-book {
+    transform: translate(1.25rem, -50%);
+  }
+
+  .signin-page .auth-shell-pen {
+    transform: translate(-0.5rem, -50%);
+  }
+}
