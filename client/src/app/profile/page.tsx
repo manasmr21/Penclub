@@ -2,6 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import { ChangeEvent, useEffect, useState } from "react";
+import AuthField from "@/src/components/auth/AuthField";
+import AuthShell from "@/src/components/auth/AuthShell";
+import { authInputClassName } from "@/src/components/auth/auth-styles";
 import {
   clearStoredUser,
   getStoredUser,
@@ -139,126 +142,110 @@ export default function ProfilePage() {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_top,_#fff8cf,_#faf8e3_52%,_#efe7b8)] px-5 pb-6 pt-24 md:px-8 md:pb-8 md:pt-28">
-      <div className="mx-auto w-full max-w-2xl rounded-[2rem] border border-white/70 bg-white/85 p-6 shadow-[0_30px_80px_rgba(13,56,125,0.12)] backdrop-blur md:p-8">
-        <div className="text-center">
-          <h1 className="text-2xl font-semibold text-primary md:text-4xl">
-            Your profile
-          </h1>
-          <p className="mt-3 text-sm text-slate-600">
-            Update your phone number, interests, and profile picture.
-          </p>
-        </div>
+    <AuthShell maxWidthClassName="max-w-2xl">
+      <div className="text-center">
+        <h1 className="text-2xl font-semibold text-primary md:text-4xl">
+          Your profile
+        </h1>
+        <p className="mt-3 text-sm text-slate-600">
+          Update your phone number, interests, and profile picture.
+        </p>
+      </div>
 
-        <form onSubmit={handleSave} className="mt-8 space-y-4">
-          <div className="flex flex-col items-center gap-3">
-            <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-slate-100">
-              {profilePicture ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={profilePicture}
-                  alt="Profile"
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <span className="text-sm text-slate-400">Blank</span>
-              )}
-            </div>
-            <input
-              type="file"
-              accept=".jpg,.jpeg,.png,image/jpeg,image/png"
-              onChange={handleProfilePictureChange}
-              className="w-full max-w-sm rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm"
-            />
-            {errors.profilePicture ? (
-              <p className="text-sm text-red-600">{errors.profilePicture}</p>
+      <form onSubmit={handleSave} className="mt-8 space-y-4">
+        <div className="flex flex-col items-center gap-3">
+          <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-slate-100">
+            {profilePicture ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={profilePicture}
+                alt="Profile"
+                className="h-full w-full object-cover"
+              />
             ) : (
-              <p className="text-xs text-slate-500">
-                JPG, JPEG, PNG only. Max size 500 KB.
-              </p>
+              <span className="text-sm text-slate-400">Blank</span>
             )}
           </div>
+          <input
+            type="file"
+            accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+            onChange={handleProfilePictureChange}
+            className="w-full max-w-sm rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm"
+          />
+          {errors.profilePicture ? (
+            <p className="text-sm text-red-600">{errors.profilePicture}</p>
+          ) : (
+            <p className="text-xs text-slate-500">
+              JPG, JPEG, PNG only. Max size 500 KB.
+            </p>
+          )}
+        </div>
 
-          <div>
-            <label htmlFor="phoneNumber" className="mb-1 block text-sm font-medium text-slate-700">
-              Phone number
-            </label>
-            <input
-              id="phoneNumber"
-              type="tel"
-              value={phoneNumber}
-              onChange={(event) => {
-                setPhoneNumber(event.target.value);
-                setErrors((current) => ({ ...current, phoneNumber: undefined }));
-                setMessage("");
-              }}
-              className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm outline-none transition focus:border-primary"
-              placeholder="Add your phone number"
-            />
-            {errors.phoneNumber ? (
-              <p className="mt-1 text-sm text-red-600">{errors.phoneNumber}</p>
-            ) : null}
-          </div>
+        <AuthField
+          id="phoneNumber"
+          label="Phone number"
+          error={errors.phoneNumber}
+        >
+          <input
+            id="phoneNumber"
+            type="tel"
+            value={phoneNumber}
+            onChange={(event) => {
+              setPhoneNumber(event.target.value);
+              setErrors((current) => ({ ...current, phoneNumber: undefined }));
+              setMessage("");
+            }}
+            className={authInputClassName}
+            placeholder="Add your phone number"
+          />
+        </AuthField>
 
-          <div>
-            <label htmlFor="interests" className="mb-1 block text-sm font-medium text-slate-700">
-              Interests
-            </label>
-            <input
-              id="interests"
-              type="text"
-              value={interests}
-              onChange={(event) => {
-                setInterests(event.target.value);
-                setMessage("");
-              }}
-              className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm outline-none transition focus:border-primary"
-              placeholder="Poetry, Fiction, Mystery"
-            />
-            {errors.interests ? (
-              <p className="mt-1 text-sm text-red-600">{errors.interests}</p>
-            ) : null}
-          </div>
+        <AuthField id="interests" label="Interests" error={errors.interests}>
+          <input
+            id="interests"
+            type="text"
+            value={interests}
+            onChange={(event) => {
+              setInterests(event.target.value);
+              setMessage("");
+            }}
+            className={authInputClassName}
+            placeholder="Poetry, Fiction, Mystery"
+          />
+        </AuthField>
 
-          <div>
-            <label htmlFor="bio" className="mb-1 block text-sm font-medium text-slate-700">
-              Short bio
-            </label>
-            <textarea
-              id="bio"
-              value={bio}
-              onChange={(event) => {
-                setBio(event.target.value);
-                setMessage("");
-              }}
-              className="min-h-28 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm outline-none transition focus:border-primary"
-              placeholder="Write a short bio"
-            />
-            {errors.bio ? (
-              <p className="mt-1 text-sm text-red-600">{errors.bio}</p>
-            ) : null}
-          </div>
+        <AuthField id="bio" label="Short bio" error={errors.bio}>
+          <textarea
+            id="bio"
+            value={bio}
+            onChange={(event) => {
+              setBio(event.target.value);
+              setMessage("");
+            }}
+            className={`${authInputClassName} min-h-28`}
+            placeholder="Write a short bio"
+          />
+        </AuthField>
 
-          {message ? <p className="text-sm text-green-700">{message}</p> : null}
+        {message ? <p className="text-sm text-green-700">{message}</p> : null}
 
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
-            >
-              {loading ? "Saving..." : "Save profile"}
-            </button>
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="w-full rounded-xl border border-primary/20 bg-white px-4 py-2.5 text-sm font-semibold text-primary transition hover:bg-primary/5"
-            >
-              Logout
-            </button>
-          </div>
-        </form>
-      </div>
-    </main>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
+          >
+            {loading ? "Saving..." : "Save profile"}
+          </button>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="w-full rounded-xl border border-primary/20 bg-white px-4 py-2.5 text-sm font-semibold text-primary transition hover:bg-primary/5"
+          >
+            Logout
+          </button>
+        </div>
+      </form>
+    </AuthShell>
   );
 }

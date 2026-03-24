@@ -4,6 +4,7 @@ import { logo } from "@/public/images";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import "./Navbar.css";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { ImCross } from "react-icons/im";
@@ -18,9 +19,12 @@ const navLinks = [
 ];
 
 const Navbar = () => {
+  const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [user, setUser] = useState<AuthUser | null>(null);
+  const isHomePage = pathname === "/";
+  const showSolidNavbar = !isHomePage || scrolled;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -75,7 +79,7 @@ const Navbar = () => {
     <>
       <nav
         className={`navbar fixed w-full top-0 z-[999] transition-all duration-300 ${
-          scrolled ? "bg-background shadow-md" : "bg-transparent"
+          showSolidNavbar ? "bg-background shadow-md" : "bg-transparent"
         }`}
       >
         <div className="main-container relative flex items-center justify-between py-2 font-inter">

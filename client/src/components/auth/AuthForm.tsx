@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import {
   setPendingOtpUser,
@@ -10,6 +9,11 @@ import {
   type AuthUser,
   type UserRole,
 } from "@/src/lib/auth";
+import AuthField from "./AuthField";
+import AuthShell from "./AuthShell";
+import PasswordField from "./PasswordField";
+import RoleToggle from "./RoleToggle";
+import { authInputClassName } from "./auth-styles";
 
 type AuthMode = "sign-in" | "sign-up";
 type Role = UserRole;
@@ -76,26 +80,28 @@ function getValidationErrors(
 
 export default function AuthForm({ mode }: { mode: AuthMode }) {
   const router = useRouter();
-  const [role, setRole] = useState<Role>("author");
+  const [role, setRole] = useState<Role>("reader");
   const [values, setValues] = useState<FormValues>(initialValues);
   const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const isSignUp = mode === "sign-up";
   const heading = isSignUp ? "Create your account" : "Welcome back";
+  const identifierLabel = isSignUp
+    ? "Email"
+    : role === "reader"
+      ? "Email / Username"
+      : "Email / Pen name";
+  const identifierPlaceholder = isSignUp
+    ? "Enter your email"
+    : role === "reader"
+      ? "Enter your email or username"
+      : "Enter your email or pen name";
 
   const handleChange = (field: keyof FormValues, value: string) => {
     setValues((current) => ({ ...current, [field]: value }));
     setErrors((current) => ({ ...current, [field]: "", form: "" }));
-    setMessage("");
-  };
-
-  const handleRoleChange = (nextRole: Role) => {
-    setRole(nextRole);
-    setErrors({});
     setMessage("");
   };
 
@@ -211,266 +217,132 @@ export default function AuthForm({ mode }: { mode: AuthMode }) {
     }
   };
 
-  const inputClassName =
-    "w-full rounded-xl border border-slate-200 bg-white/85 px-3.5 py-2.5 text-sm outline-none transition focus:border-primary focus:bg-white";
-
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_top,_#fff8cf,_#faf8e3_52%,_#efe7b8)] px-5 py-3 md:px-8 md:py-6">
-      <div
-        className={`relative mx-auto w-full overflow-hidden rounded-[2rem] border border-white/70 bg-white/80 shadow-[0_30px_80px_rgba(13,56,125,0.12)] backdrop-blur ${
-          isSignUp ? "max-w-[36rem]" : "max-w-lg"
-        }`}
-      >
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.14]"
-          style={{
-            backgroundImage: "url('/images/pensignup.png')",
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-            backgroundSize: isSignUp ? "78%" : "66%",
-          }}
-        />
+    <AuthShell
+      maxWidthClassName={isSignUp ? "max-w-[25rem]" : "max-w-lg"}
+      backgroundSize={isSignUp ? "70%" : "60%"}
+    >
+      <div className="flex flex-col items-center">
+        <div className="w-full text-center">
+          <h1 className="text-xl font-semibold text-primary md:text-3xl">
+            {heading}
+          </h1>
+        </div>
 
-        <section className="relative z-10 flex flex-col items-center px-6 py-6 md:px-6 md:py-5">
-          <div className="w-full text-center">
-            <h1 className="text-xl font-semibold text-primary md:text-4xl">
-              {heading}
-            </h1>
-          </div>
+        <div className="mt-3 flex w-full justify-center">
+          <div className="w-full max-w-md">
+            <RoleToggle role={role} onChange={setRole} />
 
-          <div className="mt-4 flex w-full justify-center">
-            <div className="w-full max-w-md">
-              <div className="mb-3 flex rounded-full bg-[#f4efcf] p-1">
-                <button
-                  type="button"
-                  onClick={() => handleRoleChange("author")}
-                  suppressHydrationWarning
-                  className={`flex-1 rounded-full px-4 py-2 text-sm font-semibold transition ${
-                    role === "author"
-                      ? "bg-primary text-white shadow-sm"
-                      : "text-primary"
-                  }`}
-                >
-                  Author
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleRoleChange("reader")}
-                  suppressHydrationWarning
-                  className={`flex-1 rounded-full px-4 py-2 text-sm font-semibold transition ${
-                    role === "reader"
-                      ? "bg-primary text-white shadow-sm"
-                      : "text-primary"
-                  }`}
-                >
-                  Reader
-                </button>
+            <form onSubmit={handleSubmit} className="space-y-0" noValidate>
+              <div className="space-y-1">
+                {isSignUp ? (
+                  <AuthField id="name" label="Full name" error={errors.name}>
+                    <input
+                      id="name"
+                      type="text"
+                      suppressHydrationWarning
+                      value={values.name}
+                      onChange={(event) => handleChange("name", event.target.value)}
+                      className={authInputClassName}
+                      placeholder="Enter your full name"
+                    />
+                  </AuthField>
+                ) : null}
+
+                {isSignUp && role === "author" ? (
+                  <AuthField id="penName" label="Pen name">
+                    <input
+                      id="penName"
+                      type="text"
+                      suppressHydrationWarning
+                      value={values.penName}
+                      onChange={(event) => handleChange("penName", event.target.value)}
+                      className={authInputClassName}
+                      placeholder="Choose your pen name"
+                    />
+                  </AuthField>
+                ) : null}
+
+                {isSignUp && role === "reader" ? (
+                  <AuthField
+                    id="username"
+                    label="Username"
+                    error={errors.username}
+                  >
+                    <input
+                      id="username"
+                      type="text"
+                      suppressHydrationWarning
+                      value={values.username}
+                      onChange={(event) => handleChange("username", event.target.value)}
+                      className={authInputClassName}
+                      placeholder="Choose a username"
+                    />
+                  </AuthField>
+                ) : null}
+
+                <AuthField id="email" label={identifierLabel} error={errors.email}>
+                  <input
+                    id="email"
+                    type={isSignUp ? "email" : "text"}
+                    suppressHydrationWarning
+                    value={values.email}
+                    onChange={(event) => handleChange("email", event.target.value)}
+                    className={authInputClassName}
+                    placeholder={identifierPlaceholder}
+                  />
+                </AuthField>
+
+                <PasswordField
+                  id="password"
+                  label="Password"
+                  value={values.password}
+                  onChange={(value) => handleChange("password", value)}
+                  placeholder="Enter your password"
+                  error={errors.password}
+                />
+
+                {isSignUp ? (
+                  <PasswordField
+                    id="confirmPassword"
+                    label="Confirm password"
+                    value={values.confirmPassword}
+                    onChange={(value) => handleChange("confirmPassword", value)}
+                    placeholder="Confirm your password"
+                    error={errors.confirmPassword}
+                  />
+                ) : null}
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-                <div className="space-y-3">
-                  {isSignUp && (
-                    <div>
-                      <label
-                        htmlFor="name"
-                        className="mb-1 block text-sm font-medium text-slate-700"
-                      >
-                        Full name
-                      </label>
-                      <input
-                        id="name"
-                        type="text"
-                        suppressHydrationWarning
-                        value={values.name}
-                        onChange={(event) => handleChange("name", event.target.value)}
-                        className={inputClassName}
-                        placeholder="Enter your full name"
-                      />
-                      {errors.name ? (
-                        <p className="mt-1 text-sm text-red-600">{errors.name}</p>
-                      ) : null}
-                    </div>
-                  )}
+              {errors.form ? (
+                <p className="text-sm text-red-600">{errors.form}</p>
+              ) : null}
+              {message ? (
+                <p className="text-sm text-green-700">{message}</p>
+              ) : null}
 
-                  {isSignUp && role === "author" && (
-                    <div>
-                      <label
-                        htmlFor="penName"
-                        className="mb-1 block text-sm font-medium text-slate-700"
-                      >
-                        Pen name (optional)
-                      </label>
-                      <input
-                        id="penName"
-                        type="text"
-                        suppressHydrationWarning
-                        value={values.penName}
-                        onChange={(event) => handleChange("penName", event.target.value)}
-                        className={inputClassName}
-                        placeholder="Choose your pen name"
-                      />
-                    </div>
-                  )}
+              <button
+                type="submit"
+                disabled={loading}
+                suppressHydrationWarning
+                className="w-full rounded-xl bg-primary px-4 py-2 mt-2 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {loading ? "Please wait..." : isSignUp ? "Sign up" : "Sign in"}
+              </button>
+            </form>
 
-                  {isSignUp && role === "reader" && (
-                    <div>
-                      <label
-                        htmlFor="username"
-                        className="mb-1 block text-sm font-medium text-slate-700"
-                      >
-                        Username
-                      </label>
-                      <input
-                        id="username"
-                        type="text"
-                        suppressHydrationWarning
-                        value={values.username}
-                        onChange={(event) => handleChange("username", event.target.value)}
-                        className={inputClassName}
-                        placeholder="Choose a username"
-                      />
-                      {errors.username ? (
-                        <p className="mt-1 text-sm text-red-600">{errors.username}</p>
-                      ) : null}
-                    </div>
-                  )}
-
-                  <div>
-                    <label
-                      htmlFor="email"
-                      className="mb-1 block text-sm font-medium text-slate-700"
-                    >
-                      Email
-                    </label>
-                    <input
-                      id="email"
-                      type="email"
-                      suppressHydrationWarning
-                      value={values.email}
-                      onChange={(event) => handleChange("email", event.target.value)}
-                      className={inputClassName}
-                      placeholder="Enter your email"
-                    />
-                    {errors.email ? (
-                      <p className="mt-1 text-sm text-red-600">{errors.email}</p>
-                    ) : null}
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="password"
-                      className="mb-1 block text-sm font-medium text-slate-700"
-                    >
-                      Password
-                    </label>
-                    <div className="relative">
-                      <input
-                        id="password"
-                        type={showPassword ? "text" : "password"}
-                        suppressHydrationWarning
-                        value={values.password}
-                        onChange={(event) => handleChange("password", event.target.value)}
-                        className={`${inputClassName} pr-11`}
-                        placeholder="Enter your password"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword((current) => !current)}
-                        suppressHydrationWarning
-                        className="absolute inset-y-0 right-0 flex items-center px-3 text-slate-500 transition hover:text-primary"
-                        aria-label={showPassword ? "Hide password" : "Show password"}
-                      >
-                        {showPassword ? (
-                          <EyeOff className="h-4 w-4" />
-                        ) : (
-                          <Eye className="h-4 w-4" />
-                        )}
-                      </button>
-                    </div>
-                    {errors.password ? (
-                      <p className="mt-1 text-sm text-red-600">{errors.password}</p>
-                    ) : null}
-                  </div>
-
-                  {isSignUp && (
-                    <div>
-                      <label
-                        htmlFor="confirmPassword"
-                        className="mb-1 block text-sm font-medium text-slate-700"
-                      >
-                        Confirm password
-                      </label>
-                      <div className="relative">
-                        <input
-                          id="confirmPassword"
-                          type={showConfirmPassword ? "text" : "password"}
-                          suppressHydrationWarning
-                          value={values.confirmPassword}
-                          onChange={(event) =>
-                            handleChange("confirmPassword", event.target.value)
-                          }
-                          className={`${inputClassName} pr-11`}
-                          placeholder="Confirm your password"
-                        />
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setShowConfirmPassword((current) => !current)
-                          }
-                          suppressHydrationWarning
-                          className="absolute inset-y-0 right-0 flex items-center px-3 text-slate-500 transition hover:text-primary"
-                          aria-label={
-                            showConfirmPassword
-                              ? "Hide confirm password"
-                              : "Show confirm password"
-                          }
-                        >
-                          {showConfirmPassword ? (
-                            <EyeOff className="h-4 w-4" />
-                          ) : (
-                            <Eye className="h-4 w-4" />
-                          )}
-                        </button>
-                      </div>
-                      {errors.confirmPassword ? (
-                        <p className="mt-1 text-sm text-red-600">
-                          {errors.confirmPassword}
-                        </p>
-                      ) : null}
-                    </div>
-                  )}
-                </div>
-
-                {errors.form ? (
-                  <p className="text-sm text-red-600">{errors.form}</p>
-                ) : null}
-                {message ? (
-                  <p className="text-sm text-green-700">{message}</p>
-                ) : null}
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  suppressHydrationWarning
-                  className="w-full rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
-                >
-                  {loading ? "Please wait..." : isSignUp ? "Sign up" : "Sign in"}
-                </button>
-              </form>
-
-              <p className="mt-6 text-center text-sm text-slate-600">
-                {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
-                <Link
-                  href={isSignUp ? "/sign-in" : "/sign-up"}
-                  className="font-semibold text-primary"
-                >
-                  {isSignUp ? "Sign in" : "Sign up"}
-                </Link>
-              </p>
-            </div>
+            <p className="mt-4 text-center text-sm text-slate-600">
+              {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
+              <Link
+                href={isSignUp ? "/sign-in" : "/sign-up"}
+                className="font-semibold text-primary"
+              >
+                {isSignUp ? "Sign in" : "Sign up"}
+              </Link>
+            </p>
           </div>
-        </section>
+        </div>
       </div>
-    </main>
+    </AuthShell>
   );
 }
