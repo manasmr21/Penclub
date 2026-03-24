@@ -5,7 +5,7 @@ import "./auth.css";
 type AuthShellProps = {
   children: ReactNode;
   mode?: "sign-in" | "sign-up";
-  maxWidthClassName: string
+  maxWidthClassName?: string
 };
 
 export default function AuthShell({
