@@ -48,6 +48,11 @@ export class AuthorController{
       return await this.authorService.verifyOtp(dto, res);
    }
 
+   @Post("resend-otp")
+   async resendOtp(@Body("email") email: string){
+      return await this.authorService.resendEmail(email);
+   }
+
    @Put("update/:authorId")
    async updateAuthor(@Param("authorId") id: any, @Body() dto: Partial<AuthorDto>){
       return await this.authorService.updateProfile(id, dto);

@@ -74,6 +74,17 @@ export class AuthorService {
                 [name, penName, email, hashedPassword, otpHash, otpExpiresAt, false]
             )
 
+            const penNameExist = await this.authorRepository.find({
+                where:{
+                    penName
+                }
+            })
+
+            if(penNameExist) throw new ConflictException({
+                success: false,
+                message: "This pen name already exists"
+            })
+
             const rows = Array.isArray(result[0]) ? result[0] : result;
 
             if (rows.length === 0) throw new ConflictException("Email already exists");
@@ -115,6 +126,46 @@ export class AuthorService {
             success: true,
             message: "Update successfully",
             author
+        }
+
+    }
+
+    async resendEmail(email: string){
+        const result = await this.authorRepository.findOne({
+            where:{
+                email: email
+            }
+        })
+
+        if(!result) throw new NotFoundException({
+            success: false,
+            message: "This email is not registered"
+        });
+
+        if(result.isEmailVerified) throw new ConflictException({
+            success: false,
+            message: "This email is already verified."
+        })
+
+        const otp = this.generateOtp();
+        const otpHash = await bcrypt.hash(otp, 10);
+        const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+        await this.authorRepository.update(result.id, {
+            otpHash,
+            otpExpiresAt
+        });
+
+        await this.mailService.sendMailService(
+            email,
+            "Verify your account",
+            `Your OTP is ${otp}. It expires in 10 minutes.`
+        );
+
+        return {
+            success: true,
+            message: "OTP resent to your email",
+            otpExpiresInMinutes: 10
         }
 
     }
@@ -209,7 +260,7 @@ export class AuthorService {
                 FROM authors
                 WHERE "email" = $1`,
                 [email]
-            );
+            );  
 
             if (result.length === 0) {
                 throw new NotFoundException("Author not found");

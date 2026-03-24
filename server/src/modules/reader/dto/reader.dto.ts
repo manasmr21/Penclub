@@ -12,4 +12,10 @@ export class ReaderDto {
 
     @ApiProperty({ description: "Reader's password", example: "securePass123", required: true })
     password: string;
+
+    @ApiProperty({ description: "Reader's interests", example: ["fiction", "mystery"], required: true })
+    interest: string[]
+
+    @ApiProperty({ description: "Reader's profile bio/description", example: "Avid reader of mystery novels.", required: false })
+    profile: string
 }
