@@ -45,6 +45,7 @@ export class AuthorController{
       return await this.authorService.logout(res);
    }
 
+
    @Post("verify-otp")
    async verifyOtp(
       @Body() dto: VerifyOtpDto,
@@ -58,19 +59,9 @@ export class AuthorController{
       return await this.authorService.resendEmail(email);
    }
 
-   @Post("resend-otp")
-   async resendOtp(@Body("email") email: string){
-      return await this.authorService.resendEmail(email);
-   }
-
    @Put("update/:authorId")
    async updateAuthor(@Param("authorId") id: any, @Body() dto: Partial<AuthorDto>){
       return await this.authorService.updateProfile(id, dto);
-   }
-
-   @Delete("delete/:authorId")
-   async deleteAuthor(@Param("authorId") id: any){
-      return await this.authorService.deleteAuthor(id);
    }
 
    @Delete("delete/:authorId")
