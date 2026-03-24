@@ -1,51 +1,45 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useMemo, useState } from "react";
+import { AxiosError } from "axios";
 import AuthField from "@/src/components/auth/AuthField";
 import AuthShell from "@/src/components/auth/AuthShell";
 import { authInputClassName } from "@/src/components/auth/auth-styles";
-import {
-  clearStoredUser,
-  getStoredUser,
-  setStoredUser,
-  type AuthUser,
-} from "@/src/lib/auth";
+import { resendUserOtp, updateUserProfile, logoutUser } from "@/src/lib/auth-api";
+import { useAuthStore } from "@/src/store/auth-store";
 
 type ProfileErrors = {
   phoneNumber?: string;
   interests?: string;
   profilePicture?: string;
   bio?: string;
+  form?: string;
 };
 
 export default function ProfilePage() {
   const router = useRouter();
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [interests, setInterests] = useState("");
-  const [bio, setBio] = useState("");
-  const [profilePicture, setProfilePicture] = useState("");
+  const user = useAuthStore((state) => state.user);
+  const updateUser = useAuthStore((state) => state.updateUser);
+  const clearAuth = useAuthStore((state) => state.clearAuth);
+
+  const [phoneNumber, setPhoneNumber] = useState(user?.phoneNumber ?? "");
+  const [interests, setInterests] = useState(user?.interests ?? "");
+  const [bio, setBio] = useState(user?.bio ?? "");
+  const [profilePicture, setProfilePicture] = useState(user?.profilePicture ?? "");
   const [errors, setErrors] = useState<ProfileErrors>({});
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [verifying, setVerifying] = useState(false);
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "/api";
-
-  useEffect(() => {
-    const storedUser = getStoredUser();
-    if (!storedUser) return;
-
-    setUser(storedUser);
-    setPhoneNumber(storedUser.phoneNumber ?? "");
-    setInterests(storedUser.interests ?? "");
-    setBio(storedUser.bio ?? "");
-    setProfilePicture(storedUser.profilePicture ?? "");
-  }, []);
+  const canVerifyEmail = useMemo(
+    () => Boolean(user?.email && !user?.isEmailVerified),
+    [user],
+  );
 
   const handleProfilePictureChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    setErrors((current) => ({ ...current, profilePicture: undefined }));
+    setErrors((current) => ({ ...current, profilePicture: undefined, form: undefined }));
     setMessage("");
 
     if (!file) {
@@ -78,67 +72,79 @@ export default function ProfilePage() {
   const handleSave = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    if (!user) return;
+
     const nextErrors: ProfileErrors = {};
     if (phoneNumber.trim() && !/^[0-9+\-\s()]{7,20}$/.test(phoneNumber.trim())) {
       nextErrors.phoneNumber = "Enter a valid phone number.";
     }
 
-    if (Object.keys(nextErrors).length > 0 || !user) {
+    if (Object.keys(nextErrors).length > 0) {
       setErrors(nextErrors);
       return;
     }
 
-    const nextUser: AuthUser = {
-      ...user,
-      phoneNumber: phoneNumber.trim() || undefined,
-      interests: interests.trim() || undefined,
-      bio: bio.trim() || undefined,
-      profilePicture: profilePicture || undefined,
-    };
-
     try {
       setLoading(true);
+      setErrors({});
+      await updateUserProfile(user, {
+        phoneNumber: phoneNumber.trim() || undefined,
+        interests: interests
+          .split(",")
+          .map((item) => item.trim())
+          .filter(Boolean),
+        bio: bio.trim() || undefined,
+        profilePicture: profilePicture || undefined,
+      });
 
-      if (user.role === "author" && user.id) {
-        const response = await fetch(`${API_URL}/authors/update/${user.id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({
-            interests: interests
-              .split(",")
-              .map((item) => item.trim())
-              .filter(Boolean),
-            bio: bio.trim() || undefined,
-            profilePicture: profilePicture || undefined,
-          }),
-        });
-
-        const data = await response.json().catch(() => null);
-        if (!response.ok || data?.success === false) {
-          setMessage("");
-          setErrors((current) => ({
-            ...current,
-            interests: data?.message ?? "Could not update profile.",
-          }));
-          return;
-        }
-      }
-
-      setStoredUser(nextUser);
-      setUser(nextUser);
+      updateUser({
+        phoneNumber: phoneNumber.trim() || undefined,
+        interests: interests.trim() || undefined,
+        bio: bio.trim() || undefined,
+        profilePicture: profilePicture || undefined,
+      });
       setMessage("Profile updated successfully.");
+    } catch (error) {
+      const message =
+        error instanceof AxiosError
+          ? error.response?.data?.message
+          : "Could not update profile.";
+      setErrors({ form: message ?? "Could not update profile." });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleLogout = () => {
-    clearStoredUser();
+  const handleLogout = async () => {
+    if (user) {
+      await logoutUser(user.role);
+    }
+    clearAuth();
     router.push("/");
     router.refresh();
+  };
+
+  const handleVerifyEmail = async () => {
+    if (!user?.email) return;
+
+    try {
+      setVerifying(true);
+      setErrors({});
+      const data = await resendUserOtp(user.role, user.email);
+      useAuthStore.getState().setPendingOtpUser({
+        ...user,
+        expiresAt: Date.now() + (data?.otpExpiresInMinutes ?? 10) * 60 * 1000,
+      });
+      router.push(`/verify-otp?email=${encodeURIComponent(user.email)}&role=${user.role}`);
+    } catch (error) {
+      const message =
+        error instanceof AxiosError
+          ? error.response?.data?.message
+          : "Could not send verification email.";
+      setErrors({ form: message ?? "Could not send verification email." });
+    } finally {
+      setVerifying(false);
+    }
   };
 
   return (
@@ -148,7 +154,7 @@ export default function ProfilePage() {
           Your profile
         </h1>
         <p className="mt-3 text-sm text-slate-600">
-          Update your phone number, interests, and profile picture.
+          Update your phone number, interests, short bio, and profile picture.
         </p>
       </div>
 
@@ -181,18 +187,14 @@ export default function ProfilePage() {
           )}
         </div>
 
-        <AuthField
-          id="phoneNumber"
-          label="Phone number"
-          error={errors.phoneNumber}
-        >
+        <AuthField id="phoneNumber" label="Phone number" error={errors.phoneNumber}>
           <input
             id="phoneNumber"
             type="tel"
             value={phoneNumber}
             onChange={(event) => {
               setPhoneNumber(event.target.value);
-              setErrors((current) => ({ ...current, phoneNumber: undefined }));
+              setErrors((current) => ({ ...current, phoneNumber: undefined, form: undefined }));
               setMessage("");
             }}
             className={authInputClassName}
@@ -207,6 +209,7 @@ export default function ProfilePage() {
             value={interests}
             onChange={(event) => {
               setInterests(event.target.value);
+              setErrors((current) => ({ ...current, form: undefined }));
               setMessage("");
             }}
             className={authInputClassName}
@@ -220,6 +223,7 @@ export default function ProfilePage() {
             value={bio}
             onChange={(event) => {
               setBio(event.target.value);
+              setErrors((current) => ({ ...current, form: undefined }));
               setMessage("");
             }}
             className={`${authInputClassName} min-h-28`}
@@ -227,7 +231,19 @@ export default function ProfilePage() {
           />
         </AuthField>
 
+        {errors.form ? <p className="text-sm text-red-600">{errors.form}</p> : null}
         {message ? <p className="text-sm text-green-700">{message}</p> : null}
+
+        {canVerifyEmail ? (
+          <button
+            type="button"
+            onClick={handleVerifyEmail}
+            disabled={verifying}
+            className="w-full rounded-xl border border-primary/20 bg-white px-4 py-2.5 text-sm font-semibold text-primary transition hover:bg-primary/5"
+          >
+            {verifying ? "Sending..." : "Verify email"}
+          </button>
+        ) : null}
 
         <div className="flex flex-col gap-3 sm:flex-row">
           <button

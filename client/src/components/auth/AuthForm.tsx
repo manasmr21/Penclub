@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { AxiosError } from "axios";
 import { useState } from "react";
 import {
-  setPendingOtpUser,
-  setStoredUser,
-  type AuthUser,
-  type UserRole,
-} from "@/src/lib/auth";
+  registerUser,
+  loginUser,
+} from "@/src/lib/auth-api";
+import { type AuthUser, type UserRole } from "@/src/lib/auth";
+import { useAuthStore } from "@/src/store/auth-store";
 import AuthField from "./AuthField";
 import AuthShell from "./AuthShell";
 import PasswordField from "./PasswordField";
@@ -16,13 +17,12 @@ import RoleToggle from "./RoleToggle";
 import { authInputClassName } from "./auth-styles";
 
 type AuthMode = "sign-in" | "sign-up";
-type Role = UserRole;
 
 type FormValues = {
   name: string;
   penName: string;
   username: string;
-  email: string;
+  identifier: string;
   password: string;
   confirmPassword: string;
 };
@@ -33,16 +33,14 @@ const initialValues: FormValues = {
   name: "",
   penName: "",
   username: "",
-  email: "",
+  identifier: "",
   password: "",
   confirmPassword: "",
 };
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "/api";
-
 function getValidationErrors(
   mode: AuthMode,
-  role: Role,
+  role: UserRole,
   values: FormValues,
 ): FormErrors {
   const errors: FormErrors = {};
@@ -51,14 +49,21 @@ function getValidationErrors(
     errors.name = "Full name is required.";
   }
 
+  if (mode === "sign-up" && role === "author" && !values.penName.trim()) {
+    errors.penName = "Pen name is required.";
+  }
+
   if (mode === "sign-up" && role === "reader" && !values.username.trim()) {
     errors.username = "Username is required.";
   }
 
-  if (!values.email.trim()) {
-    errors.email = "Email is required.";
-  } else if (!/^\S+@\S+\.\S+$/.test(values.email)) {
-    errors.email = "Enter a valid email address.";
+  if (!values.identifier.trim()) {
+    errors.identifier = "This field is required.";
+  } else if (
+    mode === "sign-up" &&
+    !/^\S+@\S+\.\S+$/.test(values.identifier.trim())
+  ) {
+    errors.identifier = "Enter a valid email address.";
   }
 
   if (!values.password) {
@@ -80,11 +85,13 @@ function getValidationErrors(
 
 export default function AuthForm({ mode }: { mode: AuthMode }) {
   const router = useRouter();
-  const [role, setRole] = useState<Role>("reader");
+  const setUser = useAuthStore((state) => state.setUser);
+  const setPendingOtpUser = useAuthStore((state) => state.setPendingOtpUser);
+
+  const [role, setRole] = useState<UserRole>("reader");
   const [values, setValues] = useState<FormValues>(initialValues);
   const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
 
   const isSignUp = mode === "sign-up";
   const heading = isSignUp ? "Create your account" : "Welcome back";
@@ -102,25 +109,6 @@ export default function AuthForm({ mode }: { mode: AuthMode }) {
   const handleChange = (field: keyof FormValues, value: string) => {
     setValues((current) => ({ ...current, [field]: value }));
     setErrors((current) => ({ ...current, [field]: "", form: "" }));
-    setMessage("");
-  };
-
-  const buildUser = (): AuthUser => {
-    return role === "author"
-      ? {
-          id: undefined,
-          name: values.name.trim(),
-          email: values.email.trim(),
-          role,
-          penName: values.penName.trim() || undefined,
-        }
-      : {
-          id: undefined,
-          name: values.name.trim(),
-          email: values.email.trim(),
-          role,
-          username: values.username.trim(),
-        };
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -134,83 +122,65 @@ export default function AuthForm({ mode }: { mode: AuthMode }) {
 
     setLoading(true);
     setErrors({});
-    setMessage("");
 
     try {
-      const endpoint =
-        role === "author"
-          ? isSignUp
-            ? "/authors/create"
-            : "/authors/login"
-          : isSignUp
-            ? "/readers/create"
-            : "/readers/login";
-
-      const payload = isSignUp
-        ? role === "author"
-          ? {
-              name: values.name.trim(),
-              penName: values.penName.trim() || undefined,
-              email: values.email.trim(),
-              password: values.password,
-            }
-          : {
-              name: values.name.trim(),
-              username: values.username.trim(),
-              email: values.email.trim(),
-              password: values.password,
-            }
-        : {
-            email: values.email.trim(),
-            password: values.password,
-          };
-
-      const response = await fetch(`${API_URL}${endpoint}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(payload),
-      });
-
-      const data = await response.json().catch(() => null);
-
-      if (!response.ok) {
-        setErrors({
-          form:
-            data?.message ??
-            "Something went wrong. Please check your details and try again.",
-        });
-        return;
-      }
-
-      const user = buildUser();
-
       if (isSignUp) {
-        setPendingOtpUser({
-          ...user,
-          id: data?.data?.id,
-          penName: data?.data?.penName ?? user.penName,
-          expiresAt:
-            Date.now() + (data?.otpExpiresInMinutes ?? 10) * 60 * 1000,
+        const data = await registerUser(role, {
+          name: values.name.trim(),
+          penName: role === "author" ? values.penName.trim() : undefined,
+          username: role === "reader" ? values.username.trim() : undefined,
+          email: values.identifier.trim(),
+          password: values.password,
         });
 
-        router.push(`/verify-otp?email=${encodeURIComponent(user.email)}`);
+        const pendingUser: AuthUser = {
+          id: data?.data?.id,
+          name: values.name.trim(),
+          email: values.identifier.trim(),
+          role,
+          penName: role === "author" ? data?.data?.penName ?? values.penName.trim() : undefined,
+          username: role === "reader" ? data?.data?.username ?? values.username.trim() : undefined,
+          isEmailVerified: false,
+        };
+
+        setPendingOtpUser({
+          ...pendingUser,
+          expiresAt: Date.now() + (data?.otpExpiresInMinutes ?? 10) * 60 * 1000,
+          devOtp: data?.devOtp,
+        });
+
+        router.push(`/verify-otp?email=${encodeURIComponent(pendingUser.email)}&role=${role}`);
         return;
       }
 
-      setStoredUser({
-        ...user,
-        id: data?.data?.id,
-        penName: data?.data?.penName ?? user.penName,
+      const data = await loginUser(role, {
+        identifier: values.identifier.trim(),
+        password: values.password,
       });
-      setMessage(data?.message ?? "Authentication successful.");
+
+      setUser({
+        id: data?.data?.id,
+        name:
+          data?.data?.name ??
+          (role === "author" ? data?.data?.penName : data?.data?.username) ??
+          values.identifier.trim(),
+        email: data?.data?.email ?? values.identifier.trim(),
+        role,
+        penName: data?.data?.penName,
+        username: data?.data?.username,
+        isEmailVerified: true,
+      });
+
       router.push("/");
       router.refresh();
-    } catch {
+    } catch (error) {
+      const message =
+        error instanceof AxiosError
+          ? error.response?.data?.message
+          : "Something went wrong. Please check your details and try again.";
+
       setErrors({
-        form: "Could not connect to the server. Please make sure the backend is running.",
+        form: message ?? "Something went wrong. Please check your details and try again.",
       });
     } finally {
       setLoading(false);
@@ -218,23 +188,20 @@ export default function AuthForm({ mode }: { mode: AuthMode }) {
   };
 
   return (
-    <AuthShell
-      maxWidthClassName={isSignUp ? "max-w-[25rem]" : "max-w-lg"}
-      backgroundSize={isSignUp ? "70%" : "60%"}
-    >
-      <div className="flex flex-col items-center">
-        <div className="w-full text-center">
-          <h1 className="text-xl font-semibold text-primary md:text-3xl">
+    <AuthShell mode={mode}>
+      <div className="auth-form-root">
+        <div className="auth-form-header">
+          <h1 className="text-xl font-semibold text-primary sm:text-2xl md:text-3xl">
             {heading}
           </h1>
         </div>
 
-        <div className="mt-3 flex w-full justify-center">
-          <div className="w-full max-w-md">
+        <div className="auth-form-panel">
+          <div className="auth-form-panel-inner">
             <RoleToggle role={role} onChange={setRole} />
 
             <form onSubmit={handleSubmit} className="space-y-0" noValidate>
-              <div className="space-y-1">
+              <div className="auth-form-fields">
                 {isSignUp ? (
                   <AuthField id="name" label="Full name" error={errors.name}>
                     <input
@@ -250,7 +217,7 @@ export default function AuthForm({ mode }: { mode: AuthMode }) {
                 ) : null}
 
                 {isSignUp && role === "author" ? (
-                  <AuthField id="penName" label="Pen name">
+                  <AuthField id="penName" label="Pen name" error={errors.penName}>
                     <input
                       id="penName"
                       type="text"
@@ -264,11 +231,7 @@ export default function AuthForm({ mode }: { mode: AuthMode }) {
                 ) : null}
 
                 {isSignUp && role === "reader" ? (
-                  <AuthField
-                    id="username"
-                    label="Username"
-                    error={errors.username}
-                  >
+                  <AuthField id="username" label="Username" error={errors.username}>
                     <input
                       id="username"
                       type="text"
@@ -281,13 +244,17 @@ export default function AuthForm({ mode }: { mode: AuthMode }) {
                   </AuthField>
                 ) : null}
 
-                <AuthField id="email" label={identifierLabel} error={errors.email}>
+                <AuthField
+                  id="identifier"
+                  label={identifierLabel}
+                  error={errors.identifier}
+                >
                   <input
-                    id="email"
+                    id="identifier"
                     type={isSignUp ? "email" : "text"}
                     suppressHydrationWarning
-                    value={values.email}
-                    onChange={(event) => handleChange("email", event.target.value)}
+                    value={values.identifier}
+                    onChange={(event) => handleChange("identifier", event.target.value)}
                     className={authInputClassName}
                     placeholder={identifierPlaceholder}
                   />
@@ -314,28 +281,23 @@ export default function AuthForm({ mode }: { mode: AuthMode }) {
                 ) : null}
               </div>
 
-              {errors.form ? (
-                <p className="text-sm text-red-600">{errors.form}</p>
-              ) : null}
-              {message ? (
-                <p className="text-sm text-green-700">{message}</p>
-              ) : null}
+              {errors.form ? <p className="auth-form-error">{errors.form}</p> : null}
 
               <button
                 type="submit"
                 disabled={loading}
                 suppressHydrationWarning
-                className="w-full rounded-xl bg-primary px-4 py-2 mt-2 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
+                className="auth-form-submit"
               >
                 {loading ? "Please wait..." : isSignUp ? "Sign up" : "Sign in"}
               </button>
             </form>
 
-            <p className="mt-4 text-center text-sm text-slate-600">
+            <p className="auth-form-footer">
               {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
               <Link
                 href={isSignUp ? "/sign-in" : "/sign-up"}
-                className="font-semibold text-primary"
+                className="auth-form-link"
               >
                 {isSignUp ? "Sign in" : "Sign up"}
               </Link>

@@ -7,19 +7,31 @@ async function forwardRequest(
   { params }: { params: Promise<{ path: string[] }> },
 ) {
   const { path } = await params;
-  const target = new URL(path.join("/"), `${BACKEND_URL}/`);
   const method = request.method;
   const body =
     method === "GET" || method === "HEAD" ? undefined : await request.text();
+  const pathname = path.join("/");
 
-  const backendResponse = await fetch(target, {
-    method,
-    headers: {
-      "content-type": request.headers.get("content-type") ?? "application/json",
-      cookie: request.headers.get("cookie") ?? "",
-    },
-    body,
-  });
+  let backendResponse: Response;
+
+  try {
+    const target = new URL(pathname, `${BACKEND_URL}/`);
+    backendResponse = await fetch(target, {
+      method,
+      headers: {
+        "content-type": request.headers.get("content-type") ?? "application/json",
+        cookie: request.headers.get("cookie") ?? "",
+      },
+      body,
+    });
+  } catch {
+    return NextResponse.json(
+      {
+        message: "Backend server is unavailable. Make sure the Nest server is running.",
+      },
+      { status: 502 },
+    );
+  }
 
   const responseText = await backendResponse.text();
   const response = new NextResponse(responseText, {

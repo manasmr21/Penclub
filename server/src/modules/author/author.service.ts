@@ -85,6 +85,17 @@ export class AuthorService {
                 message: "This pen name already exists"
             })
 
+            const penNameExist = await this.authorRepository.find({
+                where:{
+                    penName
+                }
+            })
+
+            if(penNameExist) throw new ConflictException({
+                success: false,
+                message: "This pen name already exists"
+            })
+
             const rows = Array.isArray(result[0]) ? result[0] : result;
 
             if (rows.length === 0) throw new ConflictException("Email already exists");
@@ -247,6 +258,19 @@ export class AuthorService {
         };
     }
 
+    async logout(res: Response) {
+        res.clearCookie("author", {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax"
+        });
+
+        return {
+            success: true,
+            message: "Logged out successfully"
+        };
+    }
+
     async verifyOtp(dto: VerifyOtpDto, res: Response) {
         try {
             const { email, otp } = dto;
@@ -260,6 +284,7 @@ export class AuthorService {
                 FROM authors
                 WHERE "email" = $1`,
                 [email]
+            );  
             );  
 
             if (result.length === 0) {

@@ -5,6 +5,7 @@ export type AuthUser = {
   name: string;
   email: string;
   role: UserRole;
+  isEmailVerified?: boolean;
   penName?: string;
   username?: string;
   profilePicture?: string;
@@ -15,6 +16,7 @@ export type AuthUser = {
 
 export type PendingOtpUser = AuthUser & {
   expiresAt: number;
+  devOtp?: string;
 };
 
 const AUTH_USER_KEY = "penclub-auth-user";

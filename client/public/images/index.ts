@@ -2,7 +2,7 @@ import logo from './logo.png';
 import contact from './contact.png';
 import cloud from './cloud.png';
 import cloud2 from './cloud-2.png';
-import book from './book.png';
+import book from './book.jpeg';
 import book2 from "./book-2.png"
 import book3 from "./book-3.png"
 import book4 from "./book-4.jpeg"

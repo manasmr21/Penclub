@@ -1,0 +1,205 @@
+.auth-shell {
+  display: flex;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at top, #fff8cf, #faf8e3 52%, #efe7b8);
+  padding: 4.5rem 1rem 5rem;
+}
+
+.auth-shell-inner {
+  position: relative;
+  margin: 0 auto;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-shell-book {
+  pointer-events: none;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  display: none;
+  transform: translate(4.25rem, -50%);
+  opacity: 0.14;
+  z-index: 1;
+}
+
+.auth-shell-pen {
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  display: none;
+  transform: translate(-3rem, -50%);
+  opacity: 0.14;
+  z-index: 1;
+}
+
+.auth-shell-book-image {
+  width: 11.5rem;
+  height: auto;
+  object-fit: contain;
+}
+
+.auth-shell-pen-image {
+  width: 10rem;
+  height: auto;
+  object-fit: contain;
+}
+
+.auth-shell-card {
+  position: relative;
+  width: min(92vw, 34rem);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 2rem;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 30px 80px rgba(13, 56, 125, 0.12);
+  backdrop-filter: blur(10px);
+}
+
+.auth-shell-backdrop {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background-image: url("/images/pensignup.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.14;
+}
+
+.auth-shell-backdrop-sign-up {
+  background-size: 70%;
+}
+
+.auth-shell-backdrop-sign-in {
+  background-size: 60%;
+}
+
+.auth-form-root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.auth-form-header {
+  width: 100%;
+  text-align: center;
+}
+
+.auth-form-panel {
+  margin-top: 0.75rem;
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+
+.auth-form-panel-inner {
+  width: 100%;
+  max-width: 28rem;
+}
+
+.auth-shell-content {
+  position: relative;
+  z-index: 10;
+  padding-top: 1.9rem;
+  padding-right: 2rem;
+  padding-bottom: 1.15rem;
+  padding-left: 2rem;
+}
+
+.auth-form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.auth-form-error {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: rgb(220 38 38);
+}
+
+.auth-form-submit {
+  margin-top: 0.5rem;
+  width: 100%;
+  border-radius: 0.75rem;
+  background: var(--color-primary, #0d387d);
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: white;
+  transition: opacity 0.2s ease;
+}
+
+.auth-form-submit:hover {
+  opacity: 0.9;
+}
+
+.auth-form-submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.auth-form-footer {
+  margin-top: 1rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: rgb(71 85 105);
+}
+
+.auth-form-link {
+  font-weight: 600;
+  color: var(--color-primary, #0d387d);
+}
+
+@media (min-width: 640px) {
+  .auth-shell {
+    padding: 4.75rem 1.5rem 5.25rem;
+  }
+
+  .auth-shell-card {
+    width: min(28rem, 100%);
+  }
+}
+
+@media (min-width: 1024px) {
+  .auth-shell {
+    padding: 5rem 2rem;
+  }
+
+  .auth-shell-book,
+  .auth-shell-pen {
+    display: block;
+  }
+}
+
+@media (min-width: 1280px) {
+  .auth-shell-book {
+    transform: translate(5.5rem, -50%);
+  }
+
+  .auth-shell-pen {
+    transform: translate(-4rem, -50%);
+  }
+
+  .auth-shell-book-image {
+    width: 13rem;
+  }
+
+  .auth-shell-pen-image {
+    width: 11rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .auth-shell-content {
+    padding-top: 1.5rem;
+    padding-right: 1rem;
+    padding-bottom: 0.95rem;
+    padding-left: 1rem;
+  }
+}
