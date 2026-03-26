@@ -28,8 +28,83 @@ type ProfileErrors = {
   form?: string;
 };
 
+const MAX_PROFILE_PICTURE_BYTES = 350 * 1024;
+
 function isValidProfilePicture(value: string) {
-  return /^https?:\/\/.+/i.test(value);
+  return /^https?:\/\/.+/i.test(value) || /^data:image\/[a-zA-Z0-9.+-]+;base64,/i.test(value);
+}
+
+function getApproximateDataUrlBytes(value: string) {
+  const [, base64 = ""] = value.split(",", 2);
+  return Math.floor((base64.length * 3) / 4);
+}
+
+function readFileAsDataUrl(file: File) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        resolve(reader.result);
+        return;
+      }
+
+      reject(new Error("Could not read file."));
+    };
+
+    reader.onerror = () => reject(new Error("Could not read file."));
+    reader.readAsDataURL(file);
+  });
+}
+
+function loadImageFromDataUrl(dataUrl: string) {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    const image = new Image();
+
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error("Could not load image."));
+    image.src = dataUrl;
+  });
+}
+
+function canvasToDataUrl(canvas: HTMLCanvasElement, quality: number) {
+  return canvas.toDataURL("image/jpeg", quality);
+}
+
+async function compressProfileImage(file: File) {
+  const originalDataUrl = await readFileAsDataUrl(file);
+  const image = await loadImageFromDataUrl(originalDataUrl);
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+
+  if (!context) {
+    throw new Error("Could not prepare image.");
+  }
+
+  const maxDimension = 512;
+  const scale = Math.min(1, maxDimension / Math.max(image.width, image.height));
+  canvas.width = Math.max(1, Math.round(image.width * scale));
+  canvas.height = Math.max(1, Math.round(image.height * scale));
+
+  context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+  const qualities = [0.82, 0.72, 0.62, 0.52, 0.42];
+
+  for (const quality of qualities) {
+    const compressedDataUrl = canvasToDataUrl(canvas, quality);
+
+    if (getApproximateDataUrlBytes(compressedDataUrl) <= MAX_PROFILE_PICTURE_BYTES) {
+      return compressedDataUrl;
+    }
+  }
+
+  const smallestDataUrl = canvasToDataUrl(canvas, 0.35);
+
+  if (getApproximateDataUrlBytes(smallestDataUrl) <= MAX_PROFILE_PICTURE_BYTES) {
+    return smallestDataUrl;
+  }
+
+  throw new Error("Image is still too large after compression.");
 }
 
 export default function ProfilePage() {
@@ -81,6 +156,12 @@ export default function ProfilePage() {
     if (normalizedProfilePicture && !isValidProfilePicture(normalizedProfilePicture)) {
       nextErrors.profilePicture = "Enter a valid image URL.";
     }
+    if (
+      normalizedProfilePicture.startsWith("data:image/") &&
+      getApproximateDataUrlBytes(normalizedProfilePicture) > MAX_PROFILE_PICTURE_BYTES
+    ) {
+      nextErrors.profilePicture = "Uploaded image is too large. Please choose a smaller image.";
+    }
 
     if (Object.keys(nextErrors).length > 0) {
       setErrors(nextErrors);
@@ -116,6 +197,42 @@ export default function ProfilePage() {
       setErrors({ form: message ?? "Could not update profile." });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleProfilePictureUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setErrors((current) => ({ ...current, profilePicture: "Please choose an image file." }));
+      event.target.value = "";
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setErrors((current) => ({
+        ...current,
+        profilePicture: "Please choose an image smaller than 5 MB.",
+      }));
+      event.target.value = "";
+      return;
+    }
+
+    try {
+      const dataUrl = await compressProfileImage(file);
+      setProfilePicture(dataUrl);
+      setImagePreviewFailed(false);
+      setErrors((current) => ({ ...current, profilePicture: undefined, form: undefined }));
+      setMessage("");
+    } catch {
+      setErrors((current) => ({
+        ...current,
+        profilePicture: "Could not process the selected image.",
+      }));
+    } finally {
+      event.target.value = "";
     }
   };
 
@@ -183,19 +300,39 @@ export default function ProfilePage() {
         </div>
 
         <AuthField id="profilePicture" label="Profile picture URL" error={errors.profilePicture}>
-          <input
-            id="profilePicture"
-            type="url"
-            value={profilePicture}
-            onChange={(event) => {
-              setProfilePicture(event.target.value);
-              setImagePreviewFailed(false);
-              setErrors((current) => ({ ...current, profilePicture: undefined, form: undefined }));
-              setMessage("");
-            }}
-            className={authInputClassName}
-            placeholder="https://example.com/profile.jpg"
-          />
+          <div className="space-y-3">
+            <input
+              id="profilePicture"
+              type="url"
+              value={profilePicture}
+              onChange={(event) => {
+                setProfilePicture(event.target.value);
+                setImagePreviewFailed(false);
+                setErrors((current) => ({ ...current, profilePicture: undefined, form: undefined }));
+                setMessage("");
+              }}
+              className={authInputClassName}
+              placeholder="https://example.com/profile.jpg"
+            />
+            <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-3">
+              <label
+                htmlFor="profilePictureUpload"
+                className="inline-flex cursor-pointer rounded-lg border border-primary/20 bg-white px-4 py-2 text-sm font-medium text-primary transition hover:bg-primary/5"
+              >
+                Upload image
+              </label>
+              <input
+                id="profilePictureUpload"
+                type="file"
+                accept="image/*"
+                onChange={handleProfilePictureUpload}
+                className="hidden"
+              />
+              <p className="mt-2 text-xs text-slate-500">
+                Choose a JPG, PNG, or WEBP image up to 5 MB. We will compress it before upload.
+              </p>
+            </div>
+          </div>
         </AuthField>
 
         {isReader ? (
