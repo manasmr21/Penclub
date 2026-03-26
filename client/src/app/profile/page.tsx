@@ -1,13 +1,24 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { ChangeEvent, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import AuthField from "@/src/components/auth/AuthField";
 import AuthShell from "@/src/components/auth/AuthShell";
 import { authInputClassName } from "@/src/components/auth/auth-styles";
 import { resendUserOtp, updateUserProfile, logoutUser } from "@/src/lib/auth-api";
 import { useAuthStore } from "@/src/store/auth-store";
+
+const INTEREST_OPTIONS = [
+  "fiction",
+  "mystery",
+  "poetry",
+  "romance",
+  "fantasy",
+  "science fiction",
+  "biography",
+  "self help",
+];
 
 type ProfileErrors = {
   phoneNumber?: string;
@@ -17,6 +28,10 @@ type ProfileErrors = {
   form?: string;
 };
 
+function isValidProfilePicture(value: string) {
+  return /^https?:\/\/.+/i.test(value);
+}
+
 export default function ProfilePage() {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
@@ -24,49 +39,34 @@ export default function ProfilePage() {
   const clearAuth = useAuthStore((state) => state.clearAuth);
 
   const [phoneNumber, setPhoneNumber] = useState(user?.phoneNumber ?? "");
-  const [interests, setInterests] = useState(user?.interests ?? "");
+  const [interests, setInterests] = useState<string[]>(user?.interests ?? []);
   const [bio, setBio] = useState(user?.bio ?? "");
   const [profilePicture, setProfilePicture] = useState(user?.profilePicture ?? "");
   const [errors, setErrors] = useState<ProfileErrors>({});
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [verifying, setVerifying] = useState(false);
+  const [imagePreviewFailed, setImagePreviewFailed] = useState(false);
+
+  const isReader = user?.role === "reader";
+  const normalizedProfilePicture = profilePicture.trim();
+  const showProfilePreview = Boolean(
+    normalizedProfilePicture && isValidProfilePicture(normalizedProfilePicture) && !imagePreviewFailed,
+  );
 
   const canVerifyEmail = useMemo(
     () => Boolean(user?.email && !user?.isEmailVerified),
     [user],
   );
 
-  const handleProfilePictureChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    setErrors((current) => ({ ...current, profilePicture: undefined, form: undefined }));
+  const toggleInterest = (interest: string) => {
+    setInterests((current) =>
+      current.includes(interest)
+        ? current.filter((item) => item !== interest)
+        : [...current, interest],
+    );
+    setErrors((current) => ({ ...current, interests: undefined, form: undefined }));
     setMessage("");
-
-    if (!file) {
-      setProfilePicture("");
-      return;
-    }
-
-    const validTypes = ["image/jpeg", "image/jpg", "image/png"];
-    if (!validTypes.includes(file.type)) {
-      setErrors((current) => ({
-        ...current,
-        profilePicture: "Only JPG, JPEG, and PNG files are allowed.",
-      }));
-      return;
-    }
-
-    if (file.size > 500 * 1024) {
-      setErrors((current) => ({
-        ...current,
-        profilePicture: "Image size must be below 500 KB.",
-      }));
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = () => setProfilePicture(String(reader.result ?? ""));
-    reader.readAsDataURL(file);
   };
 
   const handleSave = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -75,8 +75,11 @@ export default function ProfilePage() {
     if (!user) return;
 
     const nextErrors: ProfileErrors = {};
-    if (phoneNumber.trim() && !/^[0-9+\-\s()]{7,20}$/.test(phoneNumber.trim())) {
+    if (isReader && phoneNumber.trim() && !/^[0-9+\-\s()]{7,20}$/.test(phoneNumber.trim())) {
       nextErrors.phoneNumber = "Enter a valid phone number.";
+    }
+    if (normalizedProfilePicture && !isValidProfilePicture(normalizedProfilePicture)) {
+      nextErrors.profilePicture = "Enter a valid image URL.";
     }
 
     if (Object.keys(nextErrors).length > 0) {
@@ -87,22 +90,23 @@ export default function ProfilePage() {
     try {
       setLoading(true);
       setErrors({});
-      await updateUserProfile(user, {
-        phoneNumber: phoneNumber.trim() || undefined,
-        interests: interests
-          .split(",")
-          .map((item) => item.trim())
-          .filter(Boolean),
+      const payload = {
+        interests: interests.length ? interests : undefined,
         bio: bio.trim() || undefined,
-        profilePicture: profilePicture || undefined,
-      });
+        profilePicture: normalizedProfilePicture || undefined,
+        ...(isReader ? { phoneNumber: phoneNumber.trim() || undefined } : {}),
+      };
+
+      await updateUserProfile(user, payload);
 
       updateUser({
-        phoneNumber: phoneNumber.trim() || undefined,
-        interests: interests.trim() || undefined,
+        ...(isReader ? { phoneNumber: phoneNumber.trim() || undefined } : {}),
+        interests: interests.length ? interests : undefined,
         bio: bio.trim() || undefined,
-        profilePicture: profilePicture || undefined,
+        profilePicture: normalizedProfilePicture || undefined,
       });
+      setProfilePicture(normalizedProfilePicture);
+      setImagePreviewFailed(false);
       setMessage("Profile updated successfully.");
     } catch (error) {
       const message =
@@ -134,6 +138,7 @@ export default function ProfilePage() {
       useAuthStore.getState().setPendingOtpUser({
         ...user,
         expiresAt: Date.now() + (data?.otpExpiresInMinutes ?? 10) * 60 * 1000,
+        devOtp: data?.devOtp,
       });
       router.push(`/verify-otp?email=${encodeURIComponent(user.email)}&role=${user.role}`);
     } catch (error) {
@@ -148,73 +153,107 @@ export default function ProfilePage() {
   };
 
   return (
-    <AuthShell maxWidthClassName="max-w-2xl">
+    <AuthShell>
       <div className="text-center">
         <h1 className="text-2xl font-semibold text-primary md:text-4xl">
           Your profile
         </h1>
         <p className="mt-3 text-sm text-slate-600">
-          Update your phone number, interests, short bio, and profile picture.
+          {isReader
+            ? "Update your phone number, interests, short bio, and profile picture."
+            : "Update your interests, short bio, and profile picture."}
         </p>
       </div>
 
       <form onSubmit={handleSave} className="mt-8 space-y-4">
         <div className="flex flex-col items-center gap-3">
           <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-slate-100">
-            {profilePicture ? (
+            {showProfilePreview ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={profilePicture}
+                src={normalizedProfilePicture}
                 alt="Profile"
                 className="h-full w-full object-cover"
+                onError={() => setImagePreviewFailed(true)}
               />
             ) : (
               <span className="text-sm text-slate-400">Blank</span>
             )}
           </div>
-          <input
-            type="file"
-            accept=".jpg,.jpeg,.png,image/jpeg,image/png"
-            onChange={handleProfilePictureChange}
-            className="w-full max-w-sm rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm"
-          />
-          {errors.profilePicture ? (
-            <p className="text-sm text-red-600">{errors.profilePicture}</p>
-          ) : (
-            <p className="text-xs text-slate-500">
-              JPG, JPEG, PNG only. Max size 500 KB.
-            </p>
-          )}
         </div>
 
-        <AuthField id="phoneNumber" label="Phone number" error={errors.phoneNumber}>
+        <AuthField id="profilePicture" label="Profile picture URL" error={errors.profilePicture}>
           <input
-            id="phoneNumber"
-            type="tel"
-            value={phoneNumber}
+            id="profilePicture"
+            type="url"
+            value={profilePicture}
             onChange={(event) => {
-              setPhoneNumber(event.target.value);
-              setErrors((current) => ({ ...current, phoneNumber: undefined, form: undefined }));
+              setProfilePicture(event.target.value);
+              setImagePreviewFailed(false);
+              setErrors((current) => ({ ...current, profilePicture: undefined, form: undefined }));
               setMessage("");
             }}
             className={authInputClassName}
-            placeholder="Add your phone number"
+            placeholder="https://example.com/profile.jpg"
           />
         </AuthField>
 
+        {isReader ? (
+          <AuthField id="phoneNumber" label="Phone number" error={errors.phoneNumber}>
+            <input
+              id="phoneNumber"
+              type="tel"
+              value={phoneNumber}
+              onChange={(event) => {
+                setPhoneNumber(event.target.value);
+                setErrors((current) => ({ ...current, phoneNumber: undefined, form: undefined }));
+                setMessage("");
+              }}
+              className={authInputClassName}
+              placeholder="Add your phone number"
+            />
+          </AuthField>
+        ) : null}
+
+       {/* ✅ SELECTED INTERESTS (CHIPS BOX) */}
+        {interests.length > 0 && (
+          <div className="flex flex-wrap gap-2 rounded-xl border border-primary/20 bg-primary/5 p-3">
+            {interests.map((interest) => (
+              <div
+                key={interest}
+                className="flex items-center gap-2 rounded-full bg-primary px-3 py-1 text-white text-sm"
+              >
+                <span className="capitalize">{interest}</span>
+                <button
+                  type="button"
+                  onClick={() => toggleInterest(interest)}
+                  className="text-white hover:opacity-80"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* ✅ CHECKBOX LIST */}
         <AuthField id="interests" label="Interests" error={errors.interests}>
-          <input
-            id="interests"
-            type="text"
-            value={interests}
-            onChange={(event) => {
-              setInterests(event.target.value);
-              setErrors((current) => ({ ...current, form: undefined }));
-              setMessage("");
-            }}
-            className={authInputClassName}
-            placeholder="Poetry, Fiction, Mystery"
-          />
+          <div className="grid grid-cols-2 gap-3 rounded-xl border border-slate-200 bg-white p-4 sm:grid-cols-3">
+            {INTEREST_OPTIONS.map((interest) => (
+              <label
+                key={interest}
+                className="flex items-center gap-2 text-sm text-slate-700"
+              >
+                <input
+                  type="checkbox"
+                  checked={interests.includes(interest)}
+                  onChange={() => toggleInterest(interest)}
+                  className="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary"
+                />
+                <span className="capitalize">{interest}</span>
+              </label>
+            ))}
+          </div>
         </AuthField>
 
         <AuthField id="bio" label="Short bio" error={errors.bio}>

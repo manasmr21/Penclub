@@ -10,12 +10,17 @@ type AuthPayload = {
   identifier?: string;
 };
 
-type UpdateProfilePayload = {
+type SharedProfilePayload = {
   interests?: string[];
   profilePicture?: string;
   bio?: string;
+};
+
+type ReaderProfilePayload = SharedProfilePayload & {
   phoneNumber?: string;
 };
+
+type AuthorProfilePayload = SharedProfilePayload;
 
 function rolePath(role: UserRole) {
   return role === "author" ? "authors" : "readers";
@@ -44,7 +49,10 @@ export async function resendUserOtp(role: UserRole, email: string) {
   return data;
 }
 
-export async function updateUserProfile(user: AuthUser, payload: UpdateProfilePayload) {
+export async function updateUserProfile(
+  user: AuthUser,
+  payload: ReaderProfilePayload | AuthorProfilePayload,
+) {
   const { data } = await api.put(`/${rolePath(user.role)}/update/${user.id}`, payload);
   return data;
 }
