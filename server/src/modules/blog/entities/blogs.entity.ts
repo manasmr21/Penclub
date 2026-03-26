@@ -19,7 +19,7 @@ export class Blog {
   tags: string[];
 
   @Column({ nullable: true })
-  coverImage: string;
+  coverImage: string ;
 
   @Column({ nullable: true })
   coverImageId: string;

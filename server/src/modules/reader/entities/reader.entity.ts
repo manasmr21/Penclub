@@ -30,12 +30,13 @@ export class Reader {
 
     @Column({
         default: "reader",
-        enum: ["reader", "author", "admin"]
+        enum: ["reader", "author", "admin"],
+        enumName: "user_roles_enum"
     })
     role: string
 
     @ManyToMany(() => AuthorEntity)
-    @JoinTable()
+    @JoinTable({ name: "readers_following_authors" })
     following: AuthorEntity[];
 
     @Column({ default: 0 })

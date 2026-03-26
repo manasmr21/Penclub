@@ -8,6 +8,7 @@ import { AuthorModule } from './modules/author/author.module';
 import { ReaderModule } from './modules/reader/reader.module';
 import { CloudinaryModule } from './utils/cloudinary/cloudinary.module';
 import { BlogModule } from './modules/blog/blog.module';
+import { BooksModule } from './modules/books/books.module';
 
 @Module({
   imports: [
@@ -18,7 +19,8 @@ import { BlogModule } from './modules/blog/blog.module';
     AuthorModule,
     ReaderModule,
     CloudinaryModule,
-    BlogModule
+    BlogModule,
+    BooksModule
   ],
   controllers: [AppController],
   providers: [AppService],

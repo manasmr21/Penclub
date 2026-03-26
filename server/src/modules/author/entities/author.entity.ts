@@ -30,7 +30,8 @@ export class AuthorEntity {
 
     @Column({
         default: "author",
-        enum: ["reader", "author", "admin"]
+        enum: ["reader", "author", "admin"],
+        enumName: "user_roles_enum"
     })
     role: string
 

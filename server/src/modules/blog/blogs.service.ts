@@ -81,7 +81,7 @@ export class BlogsService {
 
                 const cloudinaryResponse = await this.cloudinaryService.uploadImage(file, organization, folder);
 
-                dto.coverImage = cloudinaryResponse.secure_url;
+                var coverImage = cloudinaryResponse.secure_url;
 
                 var coverImageId = cloudinaryResponse.public_id;
             }
@@ -90,6 +90,7 @@ export class BlogsService {
                 ...dto,
                 author: { id: dto.authorId } as AuthorEntity,
                 status: status || "posted",
+                coverImage,
                 coverImageId
             });
 
@@ -141,7 +142,7 @@ export class BlogsService {
 
             if (dto.removeCoverImage) await this.cloudinaryService.deleteImage(dto.coverImageId);
 
-            blog.status = "edited"
+            dto.status = "edited"
 
             const updatedBlog = this.blogsRepository.merge(blog, dto)
 
