@@ -23,6 +23,11 @@ export class AuthorDto {
     password: string;
 
     @ApiProperty({
+        example:"reader"
+    })
+    role:string
+
+    @ApiProperty({
         example: "Hello, I am John Doe"
     })
     bio?: string;
