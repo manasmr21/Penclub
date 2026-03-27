@@ -1,10 +1,13 @@
+import { AuthorEntity } from "src/modules/author/entities/author.entity";
 import {
     Entity,
     PrimaryGeneratedColumn,
     Column,
     CreateDateColumn,
     UpdateDateColumn,
-    Index
+    Index,
+    JoinTable,
+    ManyToMany
 } from "typeorm";
 
 @Entity("readers")
@@ -25,6 +28,20 @@ export class Reader {
     @Column()
     password: string;
 
+    @Column({
+        default: "reader",
+        enum: ["reader", "author", "admin"],
+        enumName: "user_roles_enum"
+    })
+    role: string
+
+    @ManyToMany(() => AuthorEntity)
+    @JoinTable({ name: "readers_following_authors" })
+    following: AuthorEntity[];
+
+    @Column({ default: 0 })
+    followingCount: number;
+
     @Column({ type: "varchar", nullable: true })
     otpHash: string | null
 
@@ -39,6 +56,9 @@ export class Reader {
 
     @Column({ nullable: true })
     profile?: string;
+
+    @Column({ nullable: true })
+    profilePicture?: string;
 
     @CreateDateColumn()
     createdAt: Date;

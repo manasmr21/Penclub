@@ -18,4 +18,7 @@ export class ReaderDto {
 
     @ApiProperty({ description: "Reader's profile bio/description", example: "Avid reader of mystery novels.", required: false })
     profile: string
+
+    @ApiProperty({ description: "Reader's profile picture URL", example: "https://profileimage.com/johndoe", required: false })
+    profilePicture?: string;
 }

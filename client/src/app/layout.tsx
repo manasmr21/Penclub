@@ -24,9 +24,10 @@ const interFont = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
 });
+
 const rougeScript = Rouge_Script({
   subsets: ["latin"],
-  weight: "400", // Rogue Script only has 400
+  weight: "400",
   variable: "--font-rouge",
   display: "swap",
 });

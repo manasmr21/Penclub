@@ -5,12 +5,14 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { AuthorEntity } from "./entities/author.entity";
 import { JwtAuthModule } from "../JWT/jwt.module";
 import { MailModule } from "src/utils/mail.module";
+import { CloudinaryModule } from "src/utils/cloudinary/cloudinary.module";
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([AuthorEntity]),
         JwtAuthModule,
-        MailModule
+        MailModule,
+        CloudinaryModule
     ],
     providers: [AuthorService],
     controllers: [AuthorController]

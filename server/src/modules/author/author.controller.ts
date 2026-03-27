@@ -1,4 +1,5 @@
-import { BadRequestException, Body, Controller, Delete, Get, Param, Post, Put, Res } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Delete, Get, Param, Post, Put, Res, UploadedFile, UseInterceptors } from "@nestjs/common";
+import { FileInterceptor } from "@nestjs/platform-express";
 import { AuthorService } from "./author.service";
 import { AuthorDto } from "./dto/register.dto";
 import { VerifyOtpDto } from "./dto/verify-otp.dto";
@@ -21,10 +22,12 @@ export class AuthorController{
    }
 
    @Post("create")
+   @UseInterceptors(FileInterceptor("profilePicture"))
    async createAuthor(
-      @Body() dto: AuthorDto
+      @Body() dto: AuthorDto,
+      @UploadedFile() file?: Express.Multer.File
    ){
-      return await this.authorService.register(dto); 
+      return await this.authorService.register(dto, file); 
    }
 
    @Post("login")
@@ -60,13 +63,13 @@ export class AuthorController{
    }
 
    @Put("update/:authorId")
-   async updateAuthor(@Param("authorId") id: any, @Body() dto: Partial<AuthorDto>){
-      return await this.authorService.updateProfile(id, dto);
-   }
-
-   @Delete("delete/:authorId")
-   async deleteAuthor(@Param("authorId") id: any){
-      return await this.authorService.deleteAuthor(id);
+   @UseInterceptors(FileInterceptor("profilePicture"))
+   async updateAuthor(
+      @Param("authorId") id: any,
+      @Body() dto: Partial<AuthorDto>,
+      @UploadedFile() file?: Express.Multer.File
+   ){
+      return await this.authorService.updateProfile(id, dto, file);
    }
    
 }

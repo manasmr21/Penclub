@@ -1,3 +1,4 @@
+import { Blog } from "src/modules/blog/entities/blogs.entity";
 import {
     Entity,
     PrimaryGeneratedColumn,
@@ -9,22 +10,33 @@ import {
 } from "typeorm";
 
 @Entity("authors")
-export class AuthorEntity{
+export class AuthorEntity {
     @PrimaryGeneratedColumn("uuid")
     id: string
 
-    @Column({length: 50})
+    @Column({ length: 50 })
     name: string
 
-    @Column({unique: true, length: 50})
+    @Column({ unique: true, length: 50 })
     @Index()
     penName: string;
 
-    @Column({unique: true, length: 100})
+    @Column({ unique: true, length: 100 })
+    @Index()
     email: string;
-    
+
     @Column()
     password: string;
+
+    @Column({
+        default: "author",
+        enum: ["reader", "author", "admin"],
+        enumName: "user_roles_enum"
+    })
+    role: string
+
+    @OneToMany(()=> Blog, (blog)=> blog.author)
+    blogs: Blog[]
 
     @Column({ nullable: true })
     otpHash: string;
@@ -35,16 +47,16 @@ export class AuthorEntity{
     @Column({ default: false })
     isEmailVerified: boolean;
 
-    @Column({nullable:true, type:"text"})
+    @Column({ nullable: true, type: "text" })
     bio: string
 
-    @Column({type:"simple-array", nullable:true})
+    @Column({ type: "simple-array", nullable: true })
     interests: string[]
 
-    @Column({nullable:true})
+    @Column({ nullable: true })
     profilePicture: string;
 
-    @Column({type:"simple-array", nullable:true})
+    @Column({ type: "simple-array", nullable: true })
     socialLinks: string[]
 
     @CreateDateColumn()

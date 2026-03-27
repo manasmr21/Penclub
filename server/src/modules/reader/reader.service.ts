@@ -1,4 +1,4 @@
-import { Injectable, Inject, BadRequestException, UnauthorizedException, NotFoundException, ConflictException } from "@nestjs/common";
+import { Injectable, BadRequestException, UnauthorizedException, NotFoundException, ConflictException, InternalServerErrorException, HttpException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Reader } from "./entities/reader.entity";
@@ -9,6 +9,7 @@ import { MailService } from "src/utils/sendMails";
 import { randomInt } from "crypto";
 import { VerifyOtpDto } from "../author/dto/verify-otp.dto";
 import type { Response } from "express";
+import { CloudinaryService } from "src/utils/cloudinary/cloudinary.service";
 
 
 @Injectable()
@@ -17,7 +18,8 @@ export class ReaderService {
         @InjectRepository(Reader)
         private readerRepository: Repository<Reader>,
         private jwtService: JwtService,
-        private mailService: MailService
+        private mailService: MailService,
+        private cloudinaryService: CloudinaryService
     ) { }
 
     private generateOtp(): string {
@@ -36,63 +38,76 @@ export class ReaderService {
         return reader;
     }
 
-    async readerRegister(dto: ReaderDto, res: Response) {
-        const { name, email, username, password } = dto
+    async readerRegister(dto: ReaderDto, res: Response, file?: Express.Multer.File) {
+        try {
+            const { name, email, username, password } = dto
 
-        if (!email || !name || !username || !password) throw new BadRequestException({
-            success: false,
-            message: "All fields are required"
-        });
-
-        const existingUser = await this.readerRepository.findOne({
-            where: [
-                { email },
-                { username }
-            ],
-        });
-
-        if (existingUser) {
-            let message = "User already exists";
-
-            if (existingUser.email === email) {
-                message = "Email already in use";
-            } else if (existingUser.username === username) {
-                message = "Username already taken";
-            }
-
-            throw new BadRequestException({
+            if (!email || !name || !username || !password) throw new BadRequestException({
                 success: false,
-                message,
+                message: "All fields are required"
             });
 
-        }
+            const existingUser = await this.readerRepository.findOne({
+                where: [
+                    { email },
+                    { username }
+                ],
+            });
 
-        const otp = this.generateOtp();
-        const otpHash = await bcrypt.hash(otp, 10);
-        const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
+            if (existingUser) {
+                let message = "User already exists";
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+                if (existingUser.email === email) {
+                    message = "Email already in use";
+                } else if (existingUser.username === username) {
+                    message = "Username already taken";
+                }
 
-        const user = this.readerRepository.create({
-            ...dto,
-            password: hashedPassword,
-            otpHash,
-            otpExpiresAt
-        })
+                throw new BadRequestException({
+                    success: false,
+                    message,
+                });
 
-        const reader = await this.readerRepository.save(user);
-
-        await this.mailService.sendMailService(email,
-            "Verify your account",
-            `Your OTP is ${otp}. It expires in 10 minutes.`)
-
-        return {
-            success: true,
-            message: "OTP sent to your email. Please verify to complete registration.",
-            reader: {
-                ...reader,
-                password: undefined
             }
+
+            const otp = this.generateOtp();
+            const otpHash = await bcrypt.hash(otp, 10);
+            const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+            const hashedPassword = await bcrypt.hash(password, 10);
+
+            let profilePicture = dto.profilePicture;
+            if (file) {
+                const folder = "readers";
+                const organization = "penclub";
+                const cloudinaryResponse = await this.cloudinaryService.uploadImage(file, organization, folder);
+                profilePicture = cloudinaryResponse.secure_url;
+            }
+
+            const user = this.readerRepository.create({
+                ...dto,
+                profilePicture,
+                password: hashedPassword,
+                otpHash,
+                otpExpiresAt
+            })
+
+            const reader = await this.readerRepository.save(user);
+
+            await this.mailService.sendMailService(email,
+                "Verify your account",
+                `Your OTP is ${otp}. It expires in 10 minutes.`)
+
+            return {
+                success: true,
+                message: "OTP sent to your email. Please verify to complete registration.",
+                reader: {
+                    ...reader,
+                    password: undefined
+                }
+            }
+        } catch (error) {
+            this.handleServiceError(error);
         }
 
     }
@@ -140,59 +155,78 @@ export class ReaderService {
                 data: payload
             };
         } catch (error) {
-            throw error;
+            this.handleServiceError(error);
         }
     }
 
-    async updateProfile(id: any, readerUpdate: Partial<ReaderDto>) {
-        if(readerUpdate?.email || readerUpdate?.password) throw new BadRequestException({
-            success: false,
-            message: "Cannot update email or password without verification"
-        })
-
-        const reader = await this.readerRepository.update(id, readerUpdate);
-
-        if (reader.affected === 0) {
-            throw new NotFoundException({
+    async updateProfile(id: any, readerUpdate: Partial<ReaderDto>, file?: Express.Multer.File) {
+        try {
+            if(readerUpdate?.email || readerUpdate?.password) throw new BadRequestException({
                 success: false,
-                message: "Reader not found"
-            });
-        }
+                message: "Cannot update email or password without verification"
+            })
 
-        return {
-            success: true,
-            message: "Update successfully",
-            reader
+            if (file) {
+                const folder = "readers";
+                const organization = "penclub";
+                const cloudinaryResponse = await this.cloudinaryService.uploadImage(file, organization, folder);
+                readerUpdate.profilePicture = cloudinaryResponse.secure_url;
+            }
+
+            const reader = await this.readerRepository.update(id, readerUpdate);
+
+            if (reader.affected === 0) {
+                throw new NotFoundException({
+                    success: false,
+                    message: "Reader not found"
+                });
+            }
+
+            return {
+                success: true,
+                message: "Update successfully",
+                reader
+            }
+        } catch (error) {
+            this.handleServiceError(error);
         }
     }
 
     async deleteReader(id: any) {
-        const result = await this.readerRepository.delete(id);
+        try {
+            const result = await this.readerRepository.delete(id);
 
-        if (result.affected === 0) {
-            throw new NotFoundException({
-                success: false,
-                message: "Reader not found"
-            });
+            if (result.affected === 0) {
+                throw new NotFoundException({
+                    success: false,
+                    message: "Reader not found"
+                });
+            }
+
+            return {
+                success: true,
+                message: "Reader deleted successfully"
+            };
+        } catch (error) {
+            this.handleServiceError(error);
         }
-
-        return {
-            success: true,
-            message: "Reader deleted successfully"
-        };
     }
 
     async logout(res: Response) {
-        res.clearCookie("reader", {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "lax"
-        });
+        try {
+            res.clearCookie("reader", {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "lax"
+            });
 
-        return {
-            success: true,
-            message: "Logged out successfully"
-        };
+            return {
+                success: true,
+                message: "Logged out successfully"
+            };
+        } catch (error) {
+            this.handleServiceError(error);
+        }
     }
 
     private async verifyOtpInternal(email: string, otp: string, requireUnverified = false) {
@@ -224,67 +258,91 @@ export class ReaderService {
     }
 
     async verifyEmail(dto: VerifyOtpDto) {
-        const reader = await this.verifyOtpInternal(dto.email, dto.otp, true);
+        try {
+            const reader = await this.verifyOtpInternal(dto.email, dto.otp, true);
 
-        await this.readerRepository.update(reader.id, {
-            isEmailVerified: true,
-            otpHash: null,
-            otpExpiresAt: null
-        });
+            await this.readerRepository.update(reader.id, {
+                isEmailVerified: true,
+                otpHash: null,
+                otpExpiresAt: null
+            });
 
-        return {
-            success: true,
-            message: "Email verified successfully"
-        };
+            return {
+                success: true,
+                message: "Email verified successfully"
+            };
+        } catch (error) {
+            this.handleServiceError(error);
+        }
     }
 
     async verifyOtpOnly(dto: VerifyOtpDto) {
-        await this.verifyOtpInternal(dto.email, dto.otp, false);
+        try {
+            await this.verifyOtpInternal(dto.email, dto.otp, false);
 
-        return {
-            success: true,
-            message: "OTP verified successfully"
-        };
+            return {
+                success: true,
+                message: "OTP verified successfully"
+            };
+        } catch (error) {
+            this.handleServiceError(error);
+        }
     }
 
     async resendEmail(email: string) {
-        const result = await this.readerRepository.findOne({
-            where: {
-                email: email
+        try {
+            const result = await this.readerRepository.findOne({
+                where: {
+                    email: email
+                }
+            })
+
+            if (!result) throw new NotFoundException({
+                success: false,
+                message: "This email is not registered"
+            });
+
+            if (result.isEmailVerified) throw new ConflictException({
+                success: false,
+                message: "This email is already verified."
+            })
+
+            const otp = this.generateOtp();
+            const otpHash = await bcrypt.hash(otp, 10);
+            const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+            await this.readerRepository.update(result.id, {
+                otpHash,
+                otpExpiresAt
+            });
+
+            await this.mailService.sendMailService(
+                email,
+                "Verify your account",
+                `Your OTP is ${otp}. It expires in 10 minutes.`
+            );
+
+            return {
+                success: true,
+                message: "OTP resent to your email",
+                otpExpiresInMinutes: 10
             }
-        })
-
-        if (!result) throw new NotFoundException({
-            success: false,
-            message: "This email is not registered"
-        });
-
-        if (result.isEmailVerified) throw new ConflictException({
-            success: false,
-            message: "This email is already verified."
-        })
-
-        const otp = this.generateOtp();
-        const otpHash = await bcrypt.hash(otp, 10);
-        const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
-
-        await this.readerRepository.update(result.id, {
-            otpHash,
-            otpExpiresAt
-        });
-
-        await this.mailService.sendMailService(
-            email,
-            "Verify your account",
-            `Your OTP is ${otp}. It expires in 10 minutes.`
-        );
-
-        return {
-            success: true,
-            message: "OTP resent to your email",
-            otpExpiresInMinutes: 10
+        } catch (error) {
+            this.handleServiceError(error);
         }
 
+    }
+
+    private handleServiceError(error: unknown): never {
+        if (error instanceof HttpException) {
+            throw error;
+        }
+
+        console.error(error);
+        throw new InternalServerErrorException({
+            success: false,
+            message: "Internal server error"
+        });
     }
 
 }
