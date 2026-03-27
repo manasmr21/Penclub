@@ -1,4 +1,5 @@
-import { BadRequestException, Body, Controller, Delete, Param, Post, Put, Res } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Delete, Param, Post, Put, Res, UploadedFile, UseInterceptors } from "@nestjs/common";
+import { FileInterceptor } from "@nestjs/platform-express";
 import { ReaderService } from "./reader.service";
 import { ReaderDto } from "./dto/reader.dto";
 import { VerifyOtpDto } from "../author/dto/verify-otp.dto";
@@ -11,11 +12,13 @@ export class ReaderController {
     ) {}
 
     @Post("register")
+    @UseInterceptors(FileInterceptor("profilePicture"))
     async register(
         @Body() dto: ReaderDto,
-        @Res({ passthrough: true }) res: Response
+        @Res({ passthrough: true }) res: Response,
+        @UploadedFile() file?: Express.Multer.File
     ) {
-        return await this.readerService.readerRegister(dto, res);
+        return await this.readerService.readerRegister(dto, res, file);
     }
 
     @Post("login")
@@ -47,11 +50,13 @@ export class ReaderController {
     }
 
     @Put("update/:readerId")
+    @UseInterceptors(FileInterceptor("profilePicture"))
     async updateReader(
         @Param("readerId") id: any,
-        @Body() dto: Partial<ReaderDto>
+        @Body() dto: Partial<ReaderDto>,
+        @UploadedFile() file?: Express.Multer.File
     ) {
-        return await this.readerService.updateProfile(id, dto);
+        return await this.readerService.updateProfile(id, dto, file);
     }
 
     @Delete("delete/:readerId")

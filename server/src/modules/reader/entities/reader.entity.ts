@@ -57,6 +57,9 @@ export class Reader {
     @Column({ nullable: true })
     profile?: string;
 
+    @Column({ nullable: true })
+    profilePicture?: string;
+
     @CreateDateColumn()
     createdAt: Date;
 

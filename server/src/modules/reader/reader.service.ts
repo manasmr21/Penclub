@@ -9,6 +9,7 @@ import { MailService } from "src/utils/sendMails";
 import { randomInt } from "crypto";
 import { VerifyOtpDto } from "../author/dto/verify-otp.dto";
 import type { Response } from "express";
+import { CloudinaryService } from "src/utils/cloudinary/cloudinary.service";
 
 
 @Injectable()
@@ -17,7 +18,8 @@ export class ReaderService {
         @InjectRepository(Reader)
         private readerRepository: Repository<Reader>,
         private jwtService: JwtService,
-        private mailService: MailService
+        private mailService: MailService,
+        private cloudinaryService: CloudinaryService
     ) { }
 
     private generateOtp(): string {
@@ -36,7 +38,7 @@ export class ReaderService {
         return reader;
     }
 
-    async readerRegister(dto: ReaderDto, res: Response) {
+    async readerRegister(dto: ReaderDto, res: Response, file?: Express.Multer.File) {
         try {
             const { name, email, username, password } = dto
 
@@ -74,8 +76,17 @@ export class ReaderService {
 
             const hashedPassword = await bcrypt.hash(password, 10);
 
+            let profilePicture = dto.profilePicture;
+            if (file) {
+                const folder = "readers";
+                const organization = "penclub";
+                const cloudinaryResponse = await this.cloudinaryService.uploadImage(file, organization, folder);
+                profilePicture = cloudinaryResponse.secure_url;
+            }
+
             const user = this.readerRepository.create({
                 ...dto,
+                profilePicture,
                 password: hashedPassword,
                 otpHash,
                 otpExpiresAt
@@ -148,12 +159,19 @@ export class ReaderService {
         }
     }
 
-    async updateProfile(id: any, readerUpdate: Partial<ReaderDto>) {
+    async updateProfile(id: any, readerUpdate: Partial<ReaderDto>, file?: Express.Multer.File) {
         try {
             if(readerUpdate?.email || readerUpdate?.password) throw new BadRequestException({
                 success: false,
                 message: "Cannot update email or password without verification"
             })
+
+            if (file) {
+                const folder = "readers";
+                const organization = "penclub";
+                const cloudinaryResponse = await this.cloudinaryService.uploadImage(file, organization, folder);
+                readerUpdate.profilePicture = cloudinaryResponse.secure_url;
+            }
 
             const reader = await this.readerRepository.update(id, readerUpdate);
 

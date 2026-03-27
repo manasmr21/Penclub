@@ -9,6 +9,7 @@ import { JwtService } from "@nestjs/jwt";
 import { MailService } from "src/utils/sendMails";
 import type { Response } from "express";
 import { randomInt } from "crypto";
+import { CloudinaryService } from "src/utils/cloudinary/cloudinary.service";
 
 @Injectable()
 export class AuthorService {
@@ -17,7 +18,8 @@ export class AuthorService {
         @InjectRepository(AuthorEntity)
         private authorRepository: Repository<AuthorEntity>,
         private jwtService: JwtService,
-        private mailService : MailService
+        private mailService : MailService,
+        private cloudinaryService: CloudinaryService
     ) { }
 
     private generateOtp(): string {
@@ -63,11 +65,19 @@ export class AuthorService {
 
     }
 
-    async register(authorRegisterDto: AuthorDto) {
+    async register(authorRegisterDto: AuthorDto, file?: Express.Multer.File) {
         try {
             const { name, penName, email, password } = authorRegisterDto;
 
             if (!name || !penName || !email || !password) throw new BadRequestException("All fields are required");
+
+            let profilePicture = authorRegisterDto.profilePicture;
+            if (file) {
+                const folder = "authors";
+                const organization = "penclub";
+                const cloudinaryResponse = await this.cloudinaryService.uploadImage(file, organization, folder);
+                profilePicture = cloudinaryResponse.secure_url;
+            }
 
             const hashedPassword = await bcrypt.hash(password, 12)
             const otp = this.generateOtp();
@@ -75,11 +85,11 @@ export class AuthorService {
             const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
             const result = await this.authorRepository.query(
-                `INSERT INTO authors ("name", "penName", "email", "password", "otpHash", "otpExpiresAt", "isEmailVerified")
-                VALUES ($1, $2, $3, $4, $5, $6, $7)
+                `INSERT INTO authors ("name", "penName", "email", "password", "otpHash", "otpExpiresAt", "isEmailVerified", "profilePicture")
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
                 ON CONFLICT ("email") DO NOTHING
-                RETURNING "id", "email", "penName"`,
-                [name, penName, email, hashedPassword, otpHash, otpExpiresAt, false]
+                RETURNING "id", "email", "penName", "profilePicture"`,
+                [name, penName, email, hashedPassword, otpHash, otpExpiresAt, false, profilePicture]
             )
 
             const penNameExist = await this.authorRepository.find({
@@ -115,8 +125,14 @@ export class AuthorService {
         }
     }
 
-    async updateProfile(id: any,authorUpdate: Partial<AuthorDto>){
+    async updateProfile(id: any,authorUpdate: Partial<AuthorDto>, file?: Express.Multer.File){
         try {
+            if (file) {
+                const folder = "authors";
+                const organization = "penclub";
+                const cloudinaryResponse = await this.cloudinaryService.uploadImage(file, organization, folder);
+                authorUpdate.profilePicture = cloudinaryResponse.secure_url;
+            }
 
             const author = await this.authorRepository.update(id, authorUpdate);
 
