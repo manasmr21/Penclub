@@ -1,4 +1,4 @@
-import { Blog } from "src/modules/blog/entities/blogs.entity";
+import { Blog } from "../../blog/entities/blogs.entity";
 import {
     Entity,
     PrimaryGeneratedColumn,
