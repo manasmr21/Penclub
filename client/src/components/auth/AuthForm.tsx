@@ -15,6 +15,7 @@ import AuthShell from "./AuthShell";
 import PasswordField from "./PasswordField";
 import RoleToggle from "./RoleToggle";
 import { authInputClassName } from "./auth-styles";
+import { Button } from "@/src/components/ui/button";
 
 type AuthMode = "sign-in" | "sign-up";
 
@@ -283,14 +284,14 @@ export default function AuthForm({ mode }: { mode: AuthMode }) {
 
               {errors.form ? <p className="auth-form-error">{errors.form}</p> : null}
 
-              <button
+              <Button
                 type="submit"
                 disabled={loading}
                 suppressHydrationWarning
-                className="auth-form-submit"
+                className="mt-2 w-full rounded-xl text-sm font-semibold"
               >
                 {loading ? "Please wait..." : isSignUp ? "Sign up" : "Sign in"}
-              </button>
+              </Button>
             </form>
 
             <p className="auth-form-footer">
