@@ -4,8 +4,8 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { ReaderService } from "./reader.service";
 import { ReaderController } from "./reader.controller";
 import { JwtAuthModule } from "../JWT/jwt.module";
-import { MailModule } from "src/utils/mail.module";
-import { CloudinaryModule } from "src/utils/cloudinary/cloudinary.module";
+import { MailModule } from "../../utils/mail.module";
+import { CloudinaryModule } from "../../utils/cloudinary/cloudinary.module";
 
 @Module({
     imports: [

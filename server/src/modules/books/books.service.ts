@@ -4,7 +4,7 @@ import { Repository } from "typeorm";
 import { Book } from "./entities/books.entity";
 import { CreateBookDto } from "./dto/create-book.dto";
 import { AuthorEntity } from "../author/entities/author.entity";
-import { CloudinaryService } from "src/utils/cloudinary/cloudinary.service";
+import { CloudinaryService } from "../../utils/cloudinary/cloudinary.service";
 import { UpdateBookDto } from "./dto/update-book.dto";
 
 @Injectable()

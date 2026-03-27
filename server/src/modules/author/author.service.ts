@@ -6,10 +6,10 @@ import { VerifyOtpDto } from "./dto/verify-otp.dto";
 import { AuthorEntity } from "./entities/author.entity";
 import bcrypt from "bcryptjs"
 import { JwtService } from "@nestjs/jwt";
-import { MailService } from "src/utils/sendMails";
+import { MailService } from "../../utils/sendMails";
 import type { Response } from "express";
 import { randomInt } from "crypto";
-import { CloudinaryService } from "src/utils/cloudinary/cloudinary.service";
+import { CloudinaryService } from "../../utils/cloudinary/cloudinary.service";
 
 @Injectable()
 export class AuthorService {

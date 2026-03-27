@@ -3,7 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Blog } from "./entities/blogs.entity";
 import { CreateBlogDto } from "./dto/create-blog.dto";
-import { CloudinaryService } from "src/utils/cloudinary/cloudinary.service";
+import { CloudinaryService } from "../../utils/cloudinary/cloudinary.service";
 import { AuthorEntity } from "../author/entities/author.entity";
 import { UpdateBlogDto } from "./dto/update-blog.dto";
 

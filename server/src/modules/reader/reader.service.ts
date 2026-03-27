@@ -5,11 +5,11 @@ import { Reader } from "./entities/reader.entity";
 import { ReaderDto } from "./dto/reader.dto";
 import bcrypt from "bcryptjs";
 import { JwtService } from "@nestjs/jwt";
-import { MailService } from "src/utils/sendMails";
+import { MailService } from "../../utils/sendMails";
 import { randomInt } from "crypto";
 import { VerifyOtpDto } from "../author/dto/verify-otp.dto";
 import type { Response } from "express";
-import { CloudinaryService } from "src/utils/cloudinary/cloudinary.service";
+import { CloudinaryService } from "../../utils/cloudinary/cloudinary.service";
 
 
 @Injectable()

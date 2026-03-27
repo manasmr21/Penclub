@@ -4,8 +4,8 @@ import { AuthorService } from "./author.service";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { AuthorEntity } from "./entities/author.entity";
 import { JwtAuthModule } from "../JWT/jwt.module";
-import { MailModule } from "src/utils/mail.module";
-import { CloudinaryModule } from "src/utils/cloudinary/cloudinary.module";
+import { MailModule } from "../../utils/mail.module";
+import { CloudinaryModule } from "../../utils/cloudinary/cloudinary.module";
 
 @Module({
     imports: [
