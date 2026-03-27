@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
+import { BadRequestException, ConflictException, Injectable, NotFoundException, UnauthorizedException, InternalServerErrorException, HttpException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { AuthorDto } from "./dto/register.dto";
@@ -9,6 +9,7 @@ import { JwtService } from "@nestjs/jwt";
 import { MailService } from "src/utils/sendMails";
 import type { Response } from "express";
 import { randomInt } from "crypto";
+import { CloudinaryService } from "src/utils/cloudinary/cloudinary.service";
 
 @Injectable()
 export class AuthorService {
@@ -17,7 +18,8 @@ export class AuthorService {
         @InjectRepository(AuthorEntity)
         private authorRepository: Repository<AuthorEntity>,
         private jwtService: JwtService,
-        private mailService : MailService
+        private mailService : MailService,
+        private cloudinaryService: CloudinaryService
     ) { }
 
     private generateOtp(): string {
@@ -25,41 +27,57 @@ export class AuthorService {
     }
 
     async getAllAuthors(){
-        const authors = await this.authorRepository.find()
+        try {
+            const authors = await this.authorRepository.find()
 
-        return {
-            success: true,
-            message: "Authors fetched successfully",
-            authors
+            return {
+                success: true,
+                message: "Authors fetched successfully",
+                authors
+            }
+        } catch (error) {
+            this.handleServiceError(error);
         }
     }
 
     async getAuthor(id: any){
-        const author = await this.authorRepository.query(
-            `SELECT * FROM authors WHERE ID = $1`, [id]
-        )
+        try {
+            const author = await this.authorRepository.query(
+                `SELECT * FROM authors WHERE ID = $1`, [id]
+            )
 
-        if(author.length === 0) throw new NotFoundException({
-            success: false,
-            message: "Author Not found"
-        })
+            if(author.length === 0) throw new NotFoundException({
+                success: false,
+                message: "Author Not found"
+            })
 
-        return{
-            success: true,
-            message: "Author Fetched Successfully",
-            author: {
-                ...author[0], 
-                password: undefined
+            return{
+                success: true,
+                message: "Author Fetched Successfully",
+                author: {
+                    ...author[0], 
+                    password: undefined
+                }
             }
+        } catch (error) {
+            this.handleServiceError(error);
         }
 
     }
 
-    async register(authorRegisterDto: AuthorDto) {
+    async register(authorRegisterDto: AuthorDto, file?: Express.Multer.File) {
         try {
             const { name, penName, email, password } = authorRegisterDto;
 
-            if (!name || !penName || !email || !password) throw new Error("All fields are required");
+            if (!name || !penName || !email || !password) throw new BadRequestException("All fields are required");
+
+            let profilePicture = authorRegisterDto.profilePicture;
+            if (file) {
+                const folder = "authors";
+                const organization = "penclub";
+                const cloudinaryResponse = await this.cloudinaryService.uploadImage(file, organization, folder);
+                profilePicture = cloudinaryResponse.secure_url;
+            }
 
             const hashedPassword = await bcrypt.hash(password, 12)
             const otp = this.generateOtp();
@@ -67,11 +85,11 @@ export class AuthorService {
             const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
             const result = await this.authorRepository.query(
-                `INSERT INTO authors ("name", "penName", "email", "password", "otpHash", "otpExpiresAt", "isEmailVerified")
-                VALUES ($1, $2, $3, $4, $5, $6, $7)
+                `INSERT INTO authors ("name", "penName", "email", "password", "otpHash", "otpExpiresAt", "isEmailVerified", "profilePicture")
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
                 ON CONFLICT ("email") DO NOTHING
-                RETURNING "id", "email", "penName"`,
-                [name, penName, email, hashedPassword, otpHash, otpExpiresAt, false]
+                RETURNING "id", "email", "penName", "profilePicture"`,
+                [name, penName, email, hashedPassword, otpHash, otpExpiresAt, false, profilePicture]
             )
 
             const penNameExist = await this.authorRepository.find({
@@ -103,97 +121,111 @@ export class AuthorService {
             }
 
         } catch (error) {
-
-            throw error;
-
+            this.handleServiceError(error);
         }
     }
 
-    async updateProfile(id: any,authorUpdate: Partial<AuthorDto>){
+    async updateProfile(id: any,authorUpdate: Partial<AuthorDto>, file?: Express.Multer.File){
+        try {
+            if (file) {
+                const folder = "authors";
+                const organization = "penclub";
+                const cloudinaryResponse = await this.cloudinaryService.uploadImage(file, organization, folder);
+                authorUpdate.profilePicture = cloudinaryResponse.secure_url;
+            }
 
-        console.log(authorUpdate, id);
+            const author = await this.authorRepository.update(id, authorUpdate);
 
-        const author = await this.authorRepository.update(id, authorUpdate);
+            if(author.affected === 0){
+                throw new NotFoundException({
+                    success: false,
+                    message: "Author not found"
+                });
+            }
 
-        if(author.affected === 0){
-            throw new NotFoundException({
-                success: false,
-                message: "Author not found"
-            });
-        }
-
-        return {
-            success: true,
-            message: "Update successfully",
-            author
+            return {
+                success: true,
+                message: "Update successfully",
+                author
+            }
+        } catch (error) {
+            this.handleServiceError(error);
         }
 
     }
 
     async resendEmail(email: string){
-        const result = await this.authorRepository.findOne({
-            where:{
-                email: email
+        try {
+            const result = await this.authorRepository.findOne({
+                where:{
+                    email: email
+                }
+            })
+
+            if(!result) throw new NotFoundException({
+                success: false,
+                message: "This email is not registered"
+            });
+
+            if(result.isEmailVerified) throw new ConflictException({
+                success: false,
+                message: "This email is already verified."
+            })
+
+            const otp = this.generateOtp();
+            const otpHashMns = await bcrypt.hash(otp, 10);
+            const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+            await this.authorRepository.update(result.id, {
+                otpHash : otpHashMns,
+                otpExpiresAt
+            });
+
+            await this.mailService.sendMailService(
+                email,
+                "Verify your account",
+                `Your OTP is ${otp}. It expires in 10 minutes.`
+            );
+
+            return {
+                success: true,
+                message: "OTP resent to your email",
+                otpExpiresInMinutes: 10
             }
-        })
-
-        if(!result) throw new NotFoundException({
-            success: false,
-            message: "This email is not registered"
-        });
-
-        if(result.isEmailVerified) throw new ConflictException({
-            success: false,
-            message: "This email is already verified."
-        })
-
-        const otp = this.generateOtp();
-        const otpHash = await bcrypt.hash(otp, 10);
-        const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
-
-        await this.authorRepository.update(result.id, {
-            otpHash,
-            otpExpiresAt
-        });
-
-        await this.mailService.sendMailService(
-            email,
-            "Verify your account",
-            `Your OTP is ${otp}. It expires in 10 minutes.`
-        );
-
-        return {
-            success: true,
-            message: "OTP resent to your email",
-            otpExpiresInMinutes: 10
+        } catch (error) {
+            this.handleServiceError(error);
         }
 
     }
 
     async deleteAuthor(id: any){
-        const result = await this.authorRepository.delete(id);
+        try {
+            const result = await this.authorRepository.delete(id);
 
-        if(result.affected === 0){
-            throw new NotFoundException({
-                success: false,
-                message: "Author not found"
-            });
+            if(result.affected === 0){
+                throw new NotFoundException({
+                    success: false,
+                    message: "Author not found"
+                });
+            }
+
+            return {
+                success: true,
+                message: "Author deleted successfully"
+            };
+        } catch (error) {
+            this.handleServiceError(error);
         }
-
-        return {
-            success: true,
-            message: "Author deleted successfully"
-        };
     }
 
-    async authorLogin(email: string, password: string, res: Response) {
+    async authorLogin(identifier: string, password: string, res: Response) {
         try {
 
             const result = await this.authorRepository.query(
                 `SELECT "id", "email", "penName", "password", "isEmailVerified" 
                 FROM authors 
-                WHERE "email" = $1`,
-                [email]
+                WHERE "email" = $1 OR "penName" = $1`,
+                [identifier]
             )
 
             if (result.length == 0) return false;
@@ -214,9 +246,9 @@ export class AuthorService {
                 penName: result[0].penName
             }
 
-            const token = this.jwtService.sign(payload)
+            const tokenMns = this.jwtService.sign(payload)
 
-            res.cookie("author", token, {
+            res.cookie("author", tokenMns, {
                 httpOnly: true,
                 maxAge: 24 * 60 * 60 * 1000,
                 secure: process.env.NODE_ENV === 'production',
@@ -230,21 +262,25 @@ export class AuthorService {
             }
 
         } catch (error) {
-            throw error;
+            this.handleServiceError(error);
         }
     }
 
     async logout(res: Response) {
-        res.clearCookie("author", {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "lax"
-        });
+        try {
+            res.clearCookie("author", {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "lax"
+            });
 
-        return {
-            success: true,
-            message: "Logged out successfully"
-        };
+            return {
+                success: true,
+                message: "Logged out successfully"
+            };
+        } catch (error) {
+            this.handleServiceError(error);
+        }
     }
 
     async verifyOtp(dto: VerifyOtpDto, res: Response) {
@@ -312,7 +348,25 @@ export class AuthorService {
             };
 
         } catch (error) {
-            throw error;
+            this.handleServiceError(error);
         }
     }
+
+
+    
+    //Error handler - to maker sure that errors does not make my server crash
+    private handleServiceError(error: unknown): never {
+        if (error instanceof HttpException) {
+            throw error;
+        }
+
+        console.error(error);
+        throw new InternalServerErrorException({
+            success: false,
+            message: "Internal server error"
+        });
+    }
+
+    
+
 }
