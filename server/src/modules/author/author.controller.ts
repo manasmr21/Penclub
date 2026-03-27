@@ -25,7 +25,7 @@ export class AuthorController{
    @UseInterceptors(FileInterceptor("profilePicture"))
    async createAuthor(
       @Body() dto: AuthorDto,
-      @UploadedFile() file?: Express.Multer.File
+      @UploadedFile() file?: any
    ){
       return await this.authorService.register(dto, file); 
    }
@@ -67,7 +67,7 @@ export class AuthorController{
    async updateAuthor(
       @Param("authorId") id: any,
       @Body() dto: Partial<AuthorDto>,
-      @UploadedFile() file?: Express.Multer.File
+      @UploadedFile() file?: any
    ){
       return await this.authorService.updateProfile(id, dto, file);
    }

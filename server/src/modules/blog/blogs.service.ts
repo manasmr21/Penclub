@@ -66,7 +66,7 @@ export class BlogsService {
 
     }
 
-    async createBlog(dto: CreateBlogDto, file?: Express.Multer.File) {
+    async createBlog(dto: CreateBlogDto, file?: any) {
         try {
             const { title, content, status } = dto;
 
@@ -107,7 +107,7 @@ export class BlogsService {
     }
 
 
-    async updateBlog(id: string, dto: UpdateBlogDto, file?: Express.Multer.File) {
+    async updateBlog(id: string, dto: UpdateBlogDto, file?: any) {
 
         try {
             if (!dto) throw new BadRequestException({

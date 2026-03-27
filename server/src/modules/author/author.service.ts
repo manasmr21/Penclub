@@ -65,7 +65,7 @@ export class AuthorService {
 
     }
 
-    async register(authorRegisterDto: AuthorDto, file?: Express.Multer.File) {
+    async register(authorRegisterDto: AuthorDto, file?: any) {
         try {
             const { name, penName, email, password } = authorRegisterDto;
 
@@ -125,7 +125,7 @@ export class AuthorService {
         }
     }
 
-    async updateProfile(id: any,authorUpdate: Partial<AuthorDto>, file?: Express.Multer.File){
+    async updateProfile(id: any,authorUpdate: Partial<AuthorDto>, file?: any){
         try {
             if (file) {
                 const folder = "authors";

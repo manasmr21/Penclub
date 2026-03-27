@@ -4,7 +4,7 @@ import { v2 as Cloudinary } from "cloudinary"
 @Injectable()
 export class CloudinaryService {
 
-    async uploadImage(file: Express.Multer.File, organization:string, folder: string): Promise<any> {
+    async uploadImage(file: any, organization:string, folder: string): Promise<any> {
 
         return new Promise((resolve, reject) => {
             Cloudinary.uploader.upload_stream({

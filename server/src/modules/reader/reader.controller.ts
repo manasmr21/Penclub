@@ -16,7 +16,7 @@ export class ReaderController {
     async register(
         @Body() dto: ReaderDto,
         @Res({ passthrough: true }) res: Response,
-        @UploadedFile() file?: Express.Multer.File
+        @UploadedFile() file?: any
     ) {
         return await this.readerService.readerRegister(dto, res, file);
     }
@@ -54,7 +54,7 @@ export class ReaderController {
     async updateReader(
         @Param("readerId") id: any,
         @Body() dto: Partial<ReaderDto>,
-        @UploadedFile() file?: Express.Multer.File
+        @UploadedFile() file?: any
     ) {
         return await this.readerService.updateProfile(id, dto, file);
     }

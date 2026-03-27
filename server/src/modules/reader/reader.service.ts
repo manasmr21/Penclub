@@ -38,7 +38,7 @@ export class ReaderService {
         return reader;
     }
 
-    async readerRegister(dto: ReaderDto, res: Response, file?: Express.Multer.File) {
+    async readerRegister(dto: ReaderDto, res: Response, file?: any) {
         try {
             const { name, email, username, password } = dto
 
@@ -159,7 +159,7 @@ export class ReaderService {
         }
     }
 
-    async updateProfile(id: any, readerUpdate: Partial<ReaderDto>, file?: Express.Multer.File) {
+    async updateProfile(id: any, readerUpdate: Partial<ReaderDto>, file?: any) {
         try {
             if(readerUpdate?.email || readerUpdate?.password) throw new BadRequestException({
                 success: false,

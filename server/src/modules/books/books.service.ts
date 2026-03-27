@@ -56,7 +56,7 @@ export class BooksService {
         }
     }
 
-    async createBook(dto: CreateBookDto, file?: Express.Multer.File) {
+    async createBook(dto: CreateBookDto, file?: any) {
         try {
             const { title, description, genre } = dto;
 
@@ -99,7 +99,7 @@ export class BooksService {
         }
     }
 
-    async updateBook(id: string, dto: UpdateBookDto, file?: Express.Multer.File) {
+    async updateBook(id: string, dto: UpdateBookDto, file?: any) {
         try {
             if (!dto) throw new BadRequestException({
                 success: false,
