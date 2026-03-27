@@ -1,4 +1,4 @@
-import { AuthorEntity } from "src/modules/author/entities/author.entity";
+import { AuthorEntity } from "../../author/entities/author.entity";
 import {
     Entity,
     PrimaryGeneratedColumn,

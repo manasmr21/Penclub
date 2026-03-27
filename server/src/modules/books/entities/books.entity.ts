@@ -6,7 +6,7 @@ import {
     CreateDateColumn,
     UpdateDateColumn
 } from "typeorm";
-import { AuthorEntity } from "src/modules/author/entities/author.entity";
+import { AuthorEntity } from "../../author/entities/author.entity";
 
 @Entity("books")
 export class Book {

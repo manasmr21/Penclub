@@ -2,7 +2,7 @@ import {
   Entity, PrimaryGeneratedColumn, Column,
   ManyToOne
 } from "typeorm";
-import { AuthorEntity } from "src/modules/author/entities/author.entity";
+import { AuthorEntity } from "../../author/entities/author.entity";
 
 @Entity("blogs")
 export class Blog {
