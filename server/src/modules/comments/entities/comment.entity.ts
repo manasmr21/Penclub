@@ -51,6 +51,9 @@ export class Comment {
     @Column({ type: "uuid", nullable: true })
     parentId?: string | null;
 
+    @Column({default:false})
+    edited: Boolean
+
     @CreateDateColumn()
     createdAt: Date;
 

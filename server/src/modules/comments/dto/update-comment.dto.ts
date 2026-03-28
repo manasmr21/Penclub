@@ -11,7 +11,7 @@ export class UpdateCommentDto extends PartialType(CreateCommentDto) {
   @ApiProperty({
     example: "9asd08f2-d9asd0as-da0sd9a0"
   })
-  commentId: string
+  blogId: string
   
   @ApiProperty({
     example: "9asd08f2-d9asd0as-da0sd9a0"

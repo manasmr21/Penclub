@@ -4,6 +4,7 @@ import { Repository } from "typeorm";
 import { Comment } from "./entities/comment.entity";
 import { CreateCommentDto } from "./dto/create-comment.dto";
 import { Blog } from "../blog/entities/blogs.entity";
+import { UpdateCommentDto } from "./dto/update-comment.dto";
 
 @Injectable()
 export class CommentsService {
@@ -38,28 +39,28 @@ export class CommentsService {
                 }
             })
 
-            if(!blog) throw new NotFoundException({
+            if (!blog) throw new NotFoundException({
                 success: false,
                 message: "Blog not found"
             })
 
-            if(dto.parentId) var parent = await this.commentRepository.exists({
-                where:{
+            if (dto.parentId) var parent = await this.commentRepository.exists({
+                where: {
                     id: dto.parentId
                 },
-            }) 
+            })
 
 
             const comment = this.commentRepository.create({
                 content,
                 userId,
                 blogId,
-                parentId : dto.parentId ? dto.parentId : null
+                parentId: dto.parentId ? dto.parentId : null
             })
 
             await this.commentRepository.save(comment);
 
-            return{
+            return {
                 success: true,
                 message: "Commented successfully"
             }
@@ -67,6 +68,61 @@ export class CommentsService {
         } catch (error) {
             throw this.handleServiceError(error);
         }
+
+    }
+
+    async update(id: string, dto: UpdateCommentDto) {
+        try {
+
+            const comment = await this.commentRepository.findOne({
+                where: {
+                    id,
+                    blogId: dto.blogId
+                }
+            })
+
+            if (!comment) throw new NotFoundException({
+                success: false,
+                message: "Could not find the comment."
+            })
+
+            comment.content = dto.content
+            comment.edited = true
+
+            const updatedComment = await this.commentRepository.save(comment);
+
+            return {
+                success: true,
+                message: "Edited successfully",
+                comment: updatedComment
+            }
+
+        } catch (error) {
+            throw this.handleServiceError(error);
+        }
+    }
+
+    async delete(id: string, blogId: string) {
+        try {
+
+            const deleted = await this.commentRepository.delete({
+                id, blogId
+            })
+
+            if (deleted.affected === 0) throw new NotFoundException({
+                success: false,
+                message: "Comment Not Found"
+            })
+
+            return{
+                success: true,
+                message: "Comment deleted successfully."
+            }
+
+        } catch (error) {
+            throw this.handleServiceError(error);
+        }
+
 
     }
 
