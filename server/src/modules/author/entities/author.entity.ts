@@ -17,13 +17,13 @@ export class AuthorEntity {
     @Column({ length: 50 })
     name: string
 
-    @Column({ unique: true, length: 50 })
-    @Index()
-    penName: string;
-
     @Column({ unique: true, length: 100 })
     @Index()
     email: string;
+
+    @Column({ unique: true, length: 50 })
+    @Index()
+    penName: string;
 
     @Column()
     password: string;
