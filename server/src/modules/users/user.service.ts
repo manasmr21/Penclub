@@ -239,7 +239,7 @@ export class UserService {
         }
     }
 
-    async delete(id: any, password: string){
+    async delete(id: any, password: string) {
         try {
 
             const user = await this.userRepository.findOne({
@@ -248,21 +248,21 @@ export class UserService {
                 }
             })
 
-            if(!user) throw new NotFoundException({
+            if (!user) throw new NotFoundException({
                 success: false,
                 message: "User not found"
             })
 
             const isValidPassword = bcrypt.compare(password, user.password);
 
-            if(!isValidPassword) throw new UnauthorizedException({
+            if (!isValidPassword) throw new UnauthorizedException({
                 success: false,
                 message: "Unauthorized user"
             })
 
             await this.userRepository.delete(id);
 
-            return{
+            return {
                 success: true,
                 message: "User deleted successfully"
             }
@@ -272,15 +272,72 @@ export class UserService {
         }
     }
 
-    async verifyMail(email: string, otp: string){
+    async verifyMail(email: string, otp: string) {
         try {
-            
-            if(!email || !otp) throw new BadRequestException(
+
+            const otpValue = String(otp ?? "").trim();
+
+            if (!email || !otpValue) throw new BadRequestException(
                 {
                     success: false,
                     message: "Email and otp both are required"
                 }
             )
+
+            const user = await this.userRepository.findOne({
+                where: {
+                    email
+                }
+            })
+
+            if (!user) throw new NotFoundException({
+                success: false,
+                message: "User not found"
+            })
+
+            if (!user.otpHash || !user.otpExpiresAt) throw new UnauthorizedException({
+                success: false,
+                message: "OTP expired or not requested"
+            })
+
+            if (user.otpExpiresAt < new Date()) {
+                user.otpHash = null
+                user.otpExpiresAt = null
+                await this.userRepository.save(user);
+                throw new UnauthorizedException({
+                    success: false,
+                    message: "OTP expired"
+                })
+            }
+
+            const isValidOtp = await bcrypt.compare(otpValue, user.otpHash);
+
+            if (!isValidOtp) throw new UnauthorizedException({
+                success: false,
+                message: "Invalid otp"
+            })
+
+            if (!user.isEmailVerified) user.isEmailVerified = true
+
+            user.otpExpiresAt = null
+            user.otpHash = null
+
+            await this.userRepository.save(user);
+
+            return {
+                success: true,
+                message: "Otp verified."
+            }
+
+        } catch (error) {
+            throw this.handleServiceError(error);
+        }
+    }
+
+    async resend(email: string) {
+        try {
+
+            const otp = this.generateOtp()
 
             const user = await this.userRepository.findOne({
                 where:{
@@ -293,23 +350,29 @@ export class UserService {
                 message: "User not found"
             })
 
-            const isValidOtp = bcrypt.compare(otp, user.otpHash!);
+            user.otpHash = await bcrypt.hash(otp, 12)
+            user.otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
-            if(!isValidOtp) throw new UnauthorizedException({
-                success:false,
-                message: "Invalid otp"                
-            })
+            await this.userRepository.save(user);
 
-            if(!user.isEmailVerified) user.isEmailVerified = true
+            await this.mailService.sendMailService(
+                email,
+                "Verify your account",
+                `Your OTP is ${otp}. It expires in 10 minutes.`
+            );
+
+
 
             return{
-                success: true,
-                message: "Otp verified."
+                success:true,
+                message: "Otp sent successfully"
             }
+
 
         } catch (error) {
             throw this.handleServiceError(error);
         }
+
     }
 
     //Error handler - to maker sure that errors does not make my server crash

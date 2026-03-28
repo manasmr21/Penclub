@@ -3,6 +3,7 @@ import {
   ManyToOne
 } from "typeorm";
 import { AuthorEntity } from "../../author/entities/author.entity";
+import { User } from "src/modules/users/entities/user.entity";
 
 @Entity("blogs")
 export class Blog {
@@ -24,11 +25,14 @@ export class Blog {
   @Column({ nullable: true })
   coverImageId: string;
 
-  @ManyToOne(() => AuthorEntity, (author) => author.blogs, {
+  @Column({type: "uuid"})
+  userId: string
+
+  @ManyToOne(() => User, (user) => user.blogs, {
     onDelete: "CASCADE",
     onUpdate: "RESTRICT"
   })
-  author: AuthorEntity;
+  user: User;
 
   @Column({
     enum:["posted", "pending", "draft", "deleted", "edited"],

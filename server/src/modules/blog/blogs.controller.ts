@@ -16,9 +16,9 @@ export class BlogsController {
         return await this.blogsService.getAllBlogs();
     }
 
-    @Get("fetch/:authorId")
-    async fetchAuthorsBlogs(@Param("authorId") id: string){
-        return await this.blogsService.getAuthorsBlogs(id);
+    @Get("fetch/:userId")
+    async fetchUsersBlogs(@Param("userId") id: string){
+        return await this.blogsService.getUsersBlogs(id);
     }
 
     @Post("create")

@@ -42,6 +42,15 @@ export class Comment {
     @OneToMany(() => Comment, (comment) => comment.parent)
     replies: Comment[];
 
+    @Column({ type: "uuid" })
+    blogId: string;
+
+    @Column({ type: "uuid" })
+    userId: string;
+
+    @Column({ type: "uuid", nullable: true })
+    parentId?: string | null;
+
     @CreateDateColumn()
     createdAt: Date;
 

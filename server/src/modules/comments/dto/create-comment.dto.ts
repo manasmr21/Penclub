@@ -17,18 +17,4 @@ export class CreateCommentDto {
         description: "Set when replying to an existing comment"
     })
     parentId?: string;
-
-    @ApiProperty({
-        example: "3f1a0d9b-2c3e-4f5a-6b7c-8d9e0f1a2b3c",
-        required: false,
-        description: "Author id (required if commenter is an author)"
-    })
-    authorId?: string;
-
-    @ApiProperty({
-        example: "1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d",
-        required: false,
-        description: "Reader id (required if commenter is a reader)"
-    })
-    readerId?: string;
 }

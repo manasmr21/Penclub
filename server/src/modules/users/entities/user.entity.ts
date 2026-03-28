@@ -39,7 +39,7 @@ export class User {
   })
   role: string;
 
-  @OneToMany(() => Blog, (blog) => blog.author)
+  @OneToMany(() => Blog, (blog) => blog.user)
   blogs: Blog[];
 
   @Column({ nullable: true, type: "text" })
@@ -61,11 +61,11 @@ export class User {
   @Column({ default: 0 })
   followingCount: number;
 
-  @Column({ nullable: true })
-  otpHash?: string;
+  @Column({ type: "text", nullable: true })
+  otpHash?: string | null;
 
   @Column({ type: "timestamptz", nullable: true })
-  otpExpiresAt?: Date;
+  otpExpiresAt?: Date | null;
 
   @Column({ default: false })
   isEmailVerified: boolean;

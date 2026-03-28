@@ -35,7 +35,7 @@ export class AuthorEntity {
     })
     role: string
 
-    @OneToMany(()=> Blog, (blog)=> blog.author)
+    @OneToMany(()=> Blog, (blog)=> blog.user)
     blogs: Blog[]
 
     @Column({ nullable: true })

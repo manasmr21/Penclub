@@ -5,25 +5,32 @@ import { Request } from "express";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "../users/entities/user.entity";
 import { Repository } from "typeorm";
+import { ConfigService } from "@nestjs/config";
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
     constructor(
         @InjectRepository(User)
-        private userRepository: Repository<User>
+        private userRepository: Repository<User>,
+        config: ConfigService
     ) {
-        const secret = process.env.JWT_SECRETE_KEY;
+        const secret =
+            config.get<string>("JWT_SECRETE") ??
+            config.get<string>("JWT_SECRET");
         if (!secret) {
-            throw new NotFoundException("JWT_SECRETE_KEY is not configured");
+            throw new NotFoundException("JWT_SECRETE/JWT_SECRET is not configured");
         }
         super({
             jwtFromRequest: ExtractJwt.fromExtractors([
 
-                (req: Request) => req?.cookies?.access_token,
+                (req: Request) => req?.cookies?.user,
                 ExtractJwt.fromAuthHeaderAsBearerToken(),
             ]),
             secretOrKey: secret
         });
+
+
+
     }
     async validate(jwtPayload: any) {
         const userId = jwtPayload.id ?? jwtPayload.sub;
@@ -35,6 +42,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
             select:[
                 "id",
                 "role",
+                "isEmailVerified"
             ]
         });
 

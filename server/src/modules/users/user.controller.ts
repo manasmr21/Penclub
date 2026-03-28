@@ -10,7 +10,7 @@ import { AuthGuard } from "@nestjs/passport";
 export class UserController {
     constructor(
         private userService: UserService
-    ) {}
+    ) { }
 
     @Post("create")
     @UseInterceptors(FileInterceptor("profilePicture"))
@@ -22,16 +22,16 @@ export class UserController {
     }
 
     @Post("login")
-    async loginUser(@Body() dto: LoginDto, @Response({passthrough:true}) res:any ){
+    async loginUser(@Body() dto: LoginDto, @Response({ passthrough: true }) res: any) {
         return await this.userService.login(dto, res);
     }
 
     @Post("logout")
     @UseGuards(AuthGuard("jwt"))
-    async logoutUser(@Response({passthrough: true}) res: any){
+    async logoutUser(@Response({ passthrough: true }) res: any) {
         return await this.userService.logout(res);
     }
-    
+
     @Put("update/:userId")
     @UseGuards(AuthGuard("jwt"))
     @UseInterceptors(FileInterceptor("profilePicture"))
@@ -39,16 +39,26 @@ export class UserController {
         @Param("userId") id: string,
         @Body() dto: UpdateUserDto,
         @UploadedFile() file?: any
-    ){
+    ) {
         return await this.userService.update(id, dto, file);
     }
-    
+
+    @Post("verify")
+    async verifyUser(@Body() dto: { email: string, otp: string }) {
+        return await this.userService.verifyMail(dto.email, dto.otp);
+    }
+
+    @Post("resend")
+    async resendEmail(@Body() dto: { email: string }) {
+        return await this.userService.resend(dto.email);
+    }
+
     @Delete("delete/:userId")
     @UseGuards(AuthGuard("jwt"))
     async deleteUser(
         @Param("userId") id: any,
         @Body() password: string
-    ){
+    ) {
         return await this.userService.delete(id, password);
     }
 
