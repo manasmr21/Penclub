@@ -12,6 +12,7 @@ import {
   JoinTable,
   Index
 } from "typeorm";
+import { Review } from "src/modules/reviews/entities/review.entity";
 
 @Entity("users")
 export class User {
@@ -84,6 +85,9 @@ export class User {
 
   @OneToMany(() => Comment, (comment) => comment.user)
   comments: Comment[];
+
+  @OneToMany(()=>Review, (review)=> review.user)
+  review: Review[]
 
   @CreateDateColumn()
   createdAt: Date;

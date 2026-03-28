@@ -16,6 +16,62 @@ export class CommentsService {
         private blogRepository: Repository<Blog>
     ) { }
 
+    async getPerUser(userId: string) {
+        try {
+
+            const comment = await this.commentRepository
+                .createQueryBuilder("comment")
+                .leftJoin("comment.blog", "blog")
+                .addSelect([
+                    "blog.id",
+                    "blog.title"
+                ]).where("comment.userId = :userId", { userId })
+                .getMany()
+
+            if(comment.length === 0) throw new NotFoundException({
+                success: false,
+                message: "No comments found"
+            })
+
+            return{
+                success: true,
+                message: "Comments fetched successfully",
+                comment
+            }
+
+        } catch (error) {
+            throw this.handleServiceError(error);
+        }
+    }
+
+    async getPerBlog(blogId: string) {
+        try {
+
+            const comment = await this.commentRepository.createQueryBuilder("comment").leftJoinAndSelect("comment.replies", "replies").leftJoin("comment.user", "user").addSelect([
+                "user.id",
+                "user.name",
+                "user.username",
+                "user.role"
+            ]).where("comment.blogId = :blogId", { blogId }).getMany()
+
+            if(comment.length === 0) throw new NotFoundException({
+                success: false,
+                message: "No comments found."
+            })
+
+
+
+            return {
+                success: true,
+                message: "Comment fetched successfully",
+                comment
+            }
+
+        } catch (error) {
+            throw this.handleServiceError(error);
+        }
+    }
+
     async create(dto: CreateCommentDto, req: { user?: { id?: string } }) {
 
         try {
@@ -114,7 +170,7 @@ export class CommentsService {
                 message: "Comment Not Found"
             })
 
-            return{
+            return {
                 success: true,
                 message: "Comment deleted successfully."
             }

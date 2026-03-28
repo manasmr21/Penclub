@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Param, Post, Put, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from "@nestjs/common";
 import { CommentsService } from "./comments.service";
 import { AuthGuard } from "@nestjs/passport";
 import { CreateCommentDto } from "./dto/create-comment.dto";
@@ -10,6 +10,16 @@ export class CommentsController {
     constructor(
         private commentService: CommentsService
     ) { }
+
+    @Get("get-user/:userId")
+    async getForUser(@Param("userId") userId: string){
+        return await this.commentService.getPerUser(userId);
+    }
+
+    @Get("get-blog/:blogId")
+    async getComment(@Param("blogId") blogId: string){
+        return await this.commentService.getPerBlog(blogId);
+    }
 
 
     @Post("create")

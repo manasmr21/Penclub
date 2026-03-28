@@ -39,7 +39,7 @@ export class Comment {
     @JoinColumn({ name: "parentId" })
     parent?: Comment | null;
 
-    @OneToMany(() => Comment, (comment) => comment.parent)
+    @OneToMany(() => Comment, (replies) => replies.parent)
     replies: Comment[];
 
     @Column({ type: "uuid" })
