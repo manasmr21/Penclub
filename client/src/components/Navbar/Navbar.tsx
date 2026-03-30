@@ -4,11 +4,12 @@ import { logo } from "@/public/images";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import "./Navbar.css";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { ImCross } from "react-icons/im";
 import { useAuthStore } from "@/src/store/auth-store";
+import { logoutUser } from "@/src/lib/auth-api";
 
 const navLinks = [
   { href: "#magazine", label: "Magazine" },
@@ -20,10 +21,12 @@ const navLinks = [
 
 const Navbar = () => {
   const pathname = usePathname();
+  const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const user = useAuthStore((state) => state.user);
   const hydrated = useAuthStore((state) => state.hydrated);
+  const clearAuth = useAuthStore((state) => state.clearAuth);
   const isHomePage = pathname === "/";
   const showSolidNavbar = !isHomePage || scrolled;
 
@@ -46,26 +49,63 @@ const Navbar = () => {
 
   const closeMenu = () => setMenuOpen(false);
 
+  const handleLogout = async () => {
+    if (user) {
+      await logoutUser(user.role);
+    }
+
+    clearAuth();
+    closeMenu();
+    router.push("/");
+    router.refresh();
+  };
+
   const profileChip = (
-    <Link
-      href="/profile"
-      className="flex items-center gap-3 rounded-full border border-primary/15 bg-white/80 px-3 py-2 text-primary transition hover:border-primary"
-      onClick={closeMenu}
-    >
-      <span className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-slate-100">
-        {user?.profilePicture ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={user.profilePicture}
-            alt={user.name}
-            className="h-full w-full object-cover"
-          />
-        ) : null}
-      </span>
-      <span className="max-w-[120px] truncate text-sm font-semibold">
-        {user?.name}
-      </span>
-    </Link>
+    <div className="group relative">
+      <Link
+        href="/profile"
+        className="flex items-center gap-3 rounded-full border border-primary/15 bg-white/80 px-3 py-2 text-primary transition hover:border-primary"
+        onClick={closeMenu}
+      >
+        <span className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-slate-100">
+          {user?.profilePicture ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={user.profilePicture}
+              alt={user.name}
+              className="h-full w-full object-cover"
+            />
+          ) : null}
+        </span>
+        <span className="max-w-[120px] truncate text-sm font-semibold">
+          {user?.name}
+        </span>
+      </Link>
+
+      <div className="invisible absolute right-0 top-[calc(100%+0.45rem)] z-[1001] w-44 rounded-xl border border-primary/15 bg-white p-1 opacity-0 shadow-lg transition-all duration-150 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+        <Link
+          href="/profile"
+          className="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+          onClick={closeMenu}
+        >
+          My profile
+        </Link>
+        <Link
+          href="/profile/edit"
+          className="mt-0.5 block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+          onClick={closeMenu}
+        >
+          Edit profile
+        </Link>
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="mt-0.5 block w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-red-600 hover:bg-red-50"
+        >
+          Logout
+        </button>
+      </div>
+    </div>
   );
 
   return (

@@ -5,12 +5,15 @@ import "./auth.css";
 type AuthShellProps = {
   children: ReactNode;
   mode?: "sign-in" | "sign-up";
-  maxWidthClassName?: string
+  cardClassName?: string;
+  contentClassName?: string;
 };
 
 export default function AuthShell({
   children,
   mode = "sign-in",
+  cardClassName,
+  contentClassName,
 }: AuthShellProps) {
   return (
     <main className="auth-shell">
@@ -37,7 +40,7 @@ export default function AuthShell({
           />
         </div>
 
-        <div className="auth-shell-card">
+        <div className={["auth-shell-card", cardClassName].filter(Boolean).join(" ")}>
           <div
             className={`auth-shell-backdrop ${
               mode === "sign-up"
@@ -46,7 +49,7 @@ export default function AuthShell({
             }`}
           />
 
-          <section className="auth-shell-content">
+          <section className={["auth-shell-content", contentClassName].filter(Boolean).join(" ")}>
             {children}
           </section>
         </div>

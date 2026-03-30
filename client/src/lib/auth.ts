@@ -10,7 +10,7 @@ export type AuthUser = {
   username?: string;
   profilePicture?: string;
   phoneNumber?: string;
-  interests?: string;
+  interests?: string[];
   bio?: string;
 };
 

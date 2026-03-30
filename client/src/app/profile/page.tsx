@@ -1,267 +1,331 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { ChangeEvent, useMemo, useState } from "react";
-import { AxiosError } from "axios";
-import AuthField from "@/src/components/auth/AuthField";
+import { useState } from "react";
+import Link from "next/link";
+import { ArrowUpRight, BookOpen, FileText, Plus, UserRound, Users, Pencil } from "lucide-react";
 import AuthShell from "@/src/components/auth/AuthShell";
-import { authInputClassName } from "@/src/components/auth/auth-styles";
-import { resendUserOtp, updateUserProfile, logoutUser } from "@/src/lib/auth-api";
+import { Button } from "@/src/components/ui/button";
+import { Card, CardContent } from "@/src/components/ui/card";
+import { ProfileHero } from "@/src/components/profile/ProfileHero";
+import {
+  ProfileSectionCard,
+  ProfileStatCard,
+  ProfileSummaryCard,
+} from "@/src/components/profile/ProfileCardPrimitives";
 import { useAuthStore } from "@/src/store/auth-store";
 
-type ProfileErrors = {
-  phoneNumber?: string;
-  interests?: string;
-  profilePicture?: string;
-  bio?: string;
-  form?: string;
-};
+function formatLabel(value: string) {
+  return value
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
 
-export default function ProfilePage() {
-  const router = useRouter();
-  const user = useAuthStore((state) => state.user);
-  const updateUser = useAuthStore((state) => state.updateUser);
-  const clearAuth = useAuthStore((state) => state.clearAuth);
+function getDisplayName(name?: string, username?: string, penName?: string) {
+  return penName || name || username || "Reader";
+}
 
-  const [phoneNumber, setPhoneNumber] = useState(user?.phoneNumber ?? "");
-  const [interests, setInterests] = useState(user?.interests ?? "");
-  const [bio, setBio] = useState(user?.bio ?? "");
-  const [profilePicture, setProfilePicture] = useState(user?.profilePicture ?? "");
-  const [errors, setErrors] = useState<ProfileErrors>({});
-  const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [verifying, setVerifying] = useState(false);
-
-  const canVerifyEmail = useMemo(
-    () => Boolean(user?.email && !user?.isEmailVerified),
-    [user],
+function GuestView() {
+  return (
+    <AuthShell
+      cardClassName="auth-shell-card-profile max-w-[42rem]"
+      contentClassName="auth-shell-content-profile"
+    >
+      <div className="profile-panel rounded-[2rem] bg-[linear-gradient(160deg,#ffffff,#f8f1d4)] p-8 text-center sm:p-12">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-amber-50 ring-1 ring-amber-200">
+          <UserRound className="h-8 w-8 text-amber-700" />
+        </div>
+        <h1 className="mt-6 text-3xl font-semibold tracking-tight text-slate-900">Your profile</h1>
+        <p className="mx-auto mt-3 max-w-md text-sm leading-7 text-muted-foreground sm:text-base">
+          Sign in to view your reader or author profile, details, and activity.
+        </p>
+        <Button asChild className="mt-7 rounded-full px-5 py-3 text-sm font-semibold">
+          <Link href="/sign-in">
+            Sign in
+            <ArrowUpRight size={16} />
+          </Link>
+        </Button>
+      </div>
+    </AuthShell>
   );
+}
 
-  const handleProfilePictureChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    setErrors((current) => ({ ...current, profilePicture: undefined, form: undefined }));
-    setMessage("");
+function ProfileLoadingView() {
+  return (
+    <AuthShell
+      cardClassName="auth-shell-card-profile max-w-[42rem]"
+      contentClassName="auth-shell-content-profile"
+    >
+      <div className="profile-panel rounded-[2rem] p-6 sm:p-8">
+        <div className="animate-pulse space-y-5">
+          <div className="flex items-center gap-4">
+            <div className="h-16 w-16 rounded-2xl bg-muted" />
+            <div className="flex-1 space-y-2">
+              <div className="h-4 w-28 rounded-full bg-muted" />
+              <div className="h-8 w-48 rounded-full bg-muted" />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="h-20 rounded-2xl bg-muted" />
+            <div className="h-20 rounded-2xl bg-muted" />
+          </div>
+          <div className="h-28 rounded-3xl bg-muted" />
+        </div>
+      </div>
+    </AuthShell>
+  );
+}
 
-    if (!file) {
-      setProfilePicture("");
-      return;
-    }
-
-    const validTypes = ["image/jpeg", "image/jpg", "image/png"];
-    if (!validTypes.includes(file.type)) {
-      setErrors((current) => ({
-        ...current,
-        profilePicture: "Only JPG, JPEG, and PNG files are allowed.",
-      }));
-      return;
-    }
-
-    if (file.size > 500 * 1024) {
-      setErrors((current) => ({
-        ...current,
-        profilePicture: "Image size must be below 500 KB.",
-      }));
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = () => setProfilePicture(String(reader.result ?? ""));
-    reader.readAsDataURL(file);
-  };
-
-  const handleSave = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    if (!user) return;
-
-    const nextErrors: ProfileErrors = {};
-    if (phoneNumber.trim() && !/^[0-9+\-\s()]{7,20}$/.test(phoneNumber.trim())) {
-      nextErrors.phoneNumber = "Enter a valid phone number.";
-    }
-
-    if (Object.keys(nextErrors).length > 0) {
-      setErrors(nextErrors);
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setErrors({});
-      await updateUserProfile(user, {
-        phoneNumber: phoneNumber.trim() || undefined,
-        interests: interests
-          .split(",")
-          .map((item) => item.trim())
-          .filter(Boolean),
-        bio: bio.trim() || undefined,
-        profilePicture: profilePicture || undefined,
-      });
-
-      updateUser({
-        phoneNumber: phoneNumber.trim() || undefined,
-        interests: interests.trim() || undefined,
-        bio: bio.trim() || undefined,
-        profilePicture: profilePicture || undefined,
-      });
-      setMessage("Profile updated successfully.");
-    } catch (error) {
-      const message =
-        error instanceof AxiosError
-          ? error.response?.data?.message
-          : "Could not update profile.";
-      setErrors({ form: message ?? "Could not update profile." });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleLogout = async () => {
-    if (user) {
-      await logoutUser(user.role);
-    }
-    clearAuth();
-    router.push("/");
-    router.refresh();
-  };
-
-  const handleVerifyEmail = async () => {
-    if (!user?.email) return;
-
-    try {
-      setVerifying(true);
-      setErrors({});
-      const data = await resendUserOtp(user.role, user.email);
-      useAuthStore.getState().setPendingOtpUser({
-        ...user,
-        expiresAt: Date.now() + (data?.otpExpiresInMinutes ?? 10) * 60 * 1000,
-      });
-      router.push(`/verify-otp?email=${encodeURIComponent(user.email)}&role=${user.role}`);
-    } catch (error) {
-      const message =
-        error instanceof AxiosError
-          ? error.response?.data?.message
-          : "Could not send verification email.";
-      setErrors({ form: message ?? "Could not send verification email." });
-    } finally {
-      setVerifying(false);
-    }
-  };
+function ReaderProfile({
+  displayName,
+  initials,
+  interests,
+  verified,
+  bio,
+  email,
+  phoneNumber,
+}: {
+  displayName: string;
+  initials: string;
+  interests: string[];
+  verified: boolean;
+  bio?: string;
+  email?: string;
+  phoneNumber?: string;
+}) {
+  const primaryInterest = interests[0];
 
   return (
-    <AuthShell maxWidthClassName="max-w-2xl">
-      <div className="text-center">
-        <h1 className="text-2xl font-semibold text-primary md:text-4xl">
-          Your profile
-        </h1>
-        <p className="mt-3 text-sm text-slate-600">
-          Update your phone number, interests, short bio, and profile picture.
-        </p>
-      </div>
+    <div className="profile-surface">
+      <ProfileHero
+        label="Reader profile"
+        displayName={displayName}
+        bio={
+          bio ||
+          "A clean reader profile showing your reading identity, favorite genre, and essential details."
+        }
+        initials={initials}
+        action={
+          <Button asChild variant="outline" className="rounded-xl border-white/60 bg-card text-primary hover:bg-accent">
+            <Link href="/profile/edit">
+              <Pencil size={15} />
+              Edit profile
+            </Link>
+          </Button>
+        }
+      />
 
-      <form onSubmit={handleSave} className="mt-8 space-y-4">
-        <div className="flex flex-col items-center gap-3">
-          <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-slate-100">
-            {profilePicture ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={profilePicture}
-                alt="Profile"
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <span className="text-sm text-slate-400">Blank</span>
-            )}
+      <div className="grid gap-5 p-5 sm:p-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(18rem,0.8fr)] lg:gap-6 lg:p-7 xl:p-8">
+        <div className="space-y-5">
+          <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+            <ProfileStatCard label="Following" value={0} />
+            <ProfileStatCard label="Interest" value={primaryInterest ? formatLabel(primaryInterest) : "Add some"} />
+            <ProfileStatCard label="Role" value="Reader" />
+            <ProfileStatCard label="Status" value={verified ? "Active" : "Pending"} />
           </div>
-          <input
-            type="file"
-            accept=".jpg,.jpeg,.png,image/jpeg,image/png"
-            onChange={handleProfilePictureChange}
-            className="w-full max-w-sm rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm"
-          />
-          {errors.profilePicture ? (
-            <p className="text-sm text-red-600">{errors.profilePicture}</p>
-          ) : (
-            <p className="text-xs text-slate-500">
-              JPG, JPEG, PNG only. Max size 500 KB.
+
+          <ProfileSectionCard title="About">
+            <p className="text-sm leading-7 text-slate-700">
+              {bio ||
+                "Add a short bio to introduce your reading style, favorite genres, and what keeps you turning pages."}
             </p>
-          )}
+          </ProfileSectionCard>
         </div>
 
-        <AuthField id="phoneNumber" label="Phone number" error={errors.phoneNumber}>
-          <input
-            id="phoneNumber"
-            type="tel"
-            value={phoneNumber}
-            onChange={(event) => {
-              setPhoneNumber(event.target.value);
-              setErrors((current) => ({ ...current, phoneNumber: undefined, form: undefined }));
-              setMessage("");
-            }}
-            className={authInputClassName}
-            placeholder="Add your phone number"
-          />
-        </AuthField>
+        <div className="space-y-5">
+          <ProfileSectionCard title="Interest">
+            {primaryInterest ? (
+              <span className="rounded-full bg-primary px-3 py-1 text-xs font-medium text-primary-foreground">
+                {formatLabel(primaryInterest)}
+              </span>
+            ) : (
+              <Link href="/profile/edit" className="text-sm font-medium text-slate-900 underline underline-offset-2">
+                Add some
+              </Link>
+            )}
+          </ProfileSectionCard>
 
-        <AuthField id="interests" label="Interests" error={errors.interests}>
-          <input
-            id="interests"
-            type="text"
-            value={interests}
-            onChange={(event) => {
-              setInterests(event.target.value);
-              setErrors((current) => ({ ...current, form: undefined }));
-              setMessage("");
-            }}
-            className={authInputClassName}
-            placeholder="Poetry, Fiction, Mystery"
-          />
-        </AuthField>
-
-        <AuthField id="bio" label="Short bio" error={errors.bio}>
-          <textarea
-            id="bio"
-            value={bio}
-            onChange={(event) => {
-              setBio(event.target.value);
-              setErrors((current) => ({ ...current, form: undefined }));
-              setMessage("");
-            }}
-            className={`${authInputClassName} min-h-28`}
-            placeholder="Write a short bio"
-          />
-        </AuthField>
-
-        {errors.form ? <p className="text-sm text-red-600">{errors.form}</p> : null}
-        {message ? <p className="text-sm text-green-700">{message}</p> : null}
-
-        {canVerifyEmail ? (
-          <button
-            type="button"
-            onClick={handleVerifyEmail}
-            disabled={verifying}
-            className="w-full rounded-xl border border-primary/20 bg-white px-4 py-2.5 text-sm font-semibold text-primary transition hover:bg-primary/5"
-          >
-            {verifying ? "Sending..." : "Verify email"}
-          </button>
-        ) : null}
-
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
-          >
-            {loading ? "Saving..." : "Save profile"}
-          </button>
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="w-full rounded-xl border border-primary/20 bg-white px-4 py-2.5 text-sm font-semibold text-primary transition hover:bg-primary/5"
-          >
-            Logout
-          </button>
+          <ProfileSummaryCard title="Summary">
+            <dl className="space-y-3">
+              {[
+                { label: "Display name", value: displayName },
+                { label: "Email", value: email ?? "-" },
+                { label: "Phone", value: phoneNumber ?? "-" },
+                { label: "Account", value: verified ? "Verified" : "Needs action" },
+              ].map(({ label, value }) => (
+                <div
+                  key={label}
+                  className="flex items-center justify-between gap-4 border-b border-white/10 pb-3 last:border-0 last:pb-0"
+                >
+                  <dt className="text-xs text-primary-foreground/70">{label}</dt>
+                  <dd className="truncate text-right text-sm font-medium">{value}</dd>
+                </div>
+              ))}
+            </dl>
+          </ProfileSummaryCard>
         </div>
-      </form>
+      </div>
+    </div>
+  );
+}
+
+function AuthorProfile({
+  displayName,
+  initials,
+  bio,
+  email,
+  phoneNumber,
+}: {
+  displayName: string;
+  initials: string;
+  bio?: string;
+  email?: string;
+  phoneNumber?: string;
+}) {
+  const [activeTab, setActiveTab] = useState<"books" | "posts">("books");
+  const booksCount = 0;
+  const postsCount = 0;
+  const followersCount = 0;
+  const followingCount = 0;
+  const panelTitle = activeTab === "books" ? "Books published" : "Posts published";
+  const panelDescription =
+    activeTab === "books"
+      ? "No books published yet. Use Add book to start building your author shelf."
+      : "No posts published yet. Use Add post to share your latest writing.";
+
+  return (
+    <div className="profile-surface">
+      <ProfileHero
+        label="Author profile"
+        displayName={displayName}
+        bio={bio}
+        email={email}
+        phoneNumber={phoneNumber}
+        initials={initials}
+        compact
+        stats={[
+          { label: "Followers", value: followersCount },
+          { label: "Following", value: followingCount },
+          { label: "Books", value: booksCount },
+          { label: "Blogs", value: postsCount },
+        ]}
+        action={
+          <Button asChild variant="outline" className="rounded-xl border-white/60 bg-card text-primary hover:bg-accent">
+            <Link href="/profile/edit">
+              <Pencil size={15} />
+              Edit profile
+            </Link>
+          </Button>
+        }
+      />
+
+      <div className="space-y-3 p-4 sm:p-5 lg:p-6 xl:p-7">
+        <Card className="profile-panel gap-0 rounded-[1.35rem] py-0">
+          <CardContent className="p-3.5">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            
+              <div className="text-sm text-muted-foreground">
+                Manage your published books and blogs from one place.
+              </div>
+              <div className="flex flex-wrap gap-3">
+               <Button type="button" className="rounded-xl shadow-lg">
+                  <Plus size={15} />
+                  Add book
+                </Button>
+                <Button type="button" variant="outline" className="rounded-xl">
+                  <Plus size={15} />
+                  Add post
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="flex flex-wrap gap-3">
+          <Button
+            type="button"
+            onClick={() => setActiveTab("books")}
+            variant={activeTab === "books" ? "default" : "outline"}
+            className={`rounded-xl ${activeTab === "books" ? "shadow-lg" : ""}`}
+          >
+            <BookOpen size={15} />
+            Books
+          </Button>
+          <Button
+            type="button"
+            onClick={() => setActiveTab("posts")}
+            variant={activeTab === "posts" ? "default" : "outline"}
+            className={`rounded-xl ${activeTab === "posts" ? "shadow-lg" : ""}`}
+          >
+            <FileText size={15} />
+            Posts
+          </Button>
+        </div>
+
+        <Card className="profile-panel gap-0 py-0 shadow-[0_14px_36px_rgba(15,23,42,0.06)]">
+          <CardContent className="p-4 sm:p-5">
+            <div className="rounded-[1.25rem] bg-muted/30 p-5 ring-1 ring-border/60">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h2 className="text-lg font-semibold text-card-foreground">{panelTitle}</h2>
+                  <p className="mt-1.5 text-sm leading-7 text-muted-foreground">{panelDescription}</p>
+                </div>
+                <div className="hidden rounded-full bg-accent px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground sm:block">
+                  {activeTab}
+                </div>
+              </div>
+
+              <div className="mt-5 rounded-[1.1rem] border border-dashed border-border bg-card px-5 py-12 text-center">
+                <Users className="mx-auto h-10 w-10 text-muted-foreground/60" />
+                <p className="mt-3 text-sm font-medium text-card-foreground">Nothing published here yet</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Publish your first {activeTab === "books" ? "book" : "post"} to populate this section.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+export default function ProfilePage() {
+  const user = useAuthStore((state) => state.user);
+  const hydrated = useAuthStore((state) => state.hydrated);
+
+  if (!hydrated) return <ProfileLoadingView />;
+  if (hydrated && !user) return <GuestView />;
+
+  const displayName = getDisplayName(user?.name, user?.username, user?.penName);
+  const initials = displayName.charAt(0).toUpperCase();
+  const interests = user?.interests ?? [];
+  const verified = user?.isEmailVerified ?? false;
+
+  return (
+    <AuthShell
+      cardClassName="auth-shell-card-profile"
+      contentClassName="auth-shell-content-profile"
+    >
+      {user?.role === "author" ? (
+        <AuthorProfile
+          displayName={displayName}
+          initials={initials}
+          bio={user?.bio}
+          email={user?.email}
+          phoneNumber={user?.phoneNumber}
+        />
+      ) : (
+        <ReaderProfile
+          displayName={displayName}
+          initials={initials}
+          interests={interests}
+          verified={verified}
+          bio={user?.bio}
+          email={user?.email}
+          phoneNumber={user?.phoneNumber}
+        />
+      )}
     </AuthShell>
   );
 }
