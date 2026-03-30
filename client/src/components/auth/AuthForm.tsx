@@ -28,7 +28,7 @@ type FormValues = {
   confirmPassword: string;
 };
 
-type FormErrors = Partial<Record<keyof FormValues | "form", string>>;
+type FormErrors = Partial<Record<keyof FormValues | "profilePicture" | "form", string>>;
 
 const initialValues: FormValues = {
   name: "",
@@ -43,6 +43,7 @@ function getValidationErrors(
   mode: AuthMode,
   role: UserRole,
   values: FormValues,
+  profilePictureFile: File | null,
 ): FormErrors {
   const errors: FormErrors = {};
 
@@ -73,6 +74,14 @@ function getValidationErrors(
     errors.password = "Password must be at least 6 characters.";
   }
 
+  if (mode === "sign-up" && profilePictureFile) {
+    if (!profilePictureFile.type.startsWith("image/")) {
+      errors.profilePicture = "Please upload an image file.";
+    } else if (profilePictureFile.size > 5 * 1024 * 1024) {
+      errors.profilePicture = "Image must be 5MB or smaller.";
+    }
+  }
+
   if (mode === "sign-up") {
     if (!values.confirmPassword) {
       errors.confirmPassword = "Please confirm your password.";
@@ -91,6 +100,7 @@ export default function AuthForm({ mode }: { mode: AuthMode }) {
 
   const [role, setRole] = useState<UserRole>("reader");
   const [values, setValues] = useState<FormValues>(initialValues);
+  const [profilePictureFile, setProfilePictureFile] = useState<File | null>(null);
   const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
 
@@ -115,7 +125,7 @@ export default function AuthForm({ mode }: { mode: AuthMode }) {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const validationErrors = getValidationErrors(mode, role, values);
+    const validationErrors = getValidationErrors(mode, role, values, profilePictureFile);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
@@ -132,15 +142,18 @@ export default function AuthForm({ mode }: { mode: AuthMode }) {
           username: role === "reader" ? values.username.trim() : undefined,
           email: values.identifier.trim(),
           password: values.password,
+          profilePictureFile: profilePictureFile ?? undefined,
         });
 
+        const createdUser = data?.data ?? data?.reader ?? {};
         const pendingUser: AuthUser = {
-          id: data?.data?.id,
+          id: createdUser?.id,
           name: values.name.trim(),
           email: values.identifier.trim(),
           role,
-          penName: role === "author" ? data?.data?.penName ?? values.penName.trim() : undefined,
-          username: role === "reader" ? data?.data?.username ?? values.username.trim() : undefined,
+          penName: role === "author" ? createdUser?.penName ?? values.penName.trim() : undefined,
+          username: role === "reader" ? createdUser?.username ?? values.username.trim() : undefined,
+          profilePicture: createdUser?.profilePicture,
           isEmailVerified: false,
         };
 
@@ -241,6 +254,27 @@ export default function AuthForm({ mode }: { mode: AuthMode }) {
                       onChange={(event) => handleChange("username", event.target.value)}
                       className={authInputClassName}
                       placeholder="Choose a username"
+                    />
+                  </AuthField>
+                ) : null}
+
+                {isSignUp ? (
+                  <AuthField
+                    id="profilePicture"
+                    label="Profile picture (optional)"
+                    error={errors.profilePicture}
+                  >
+                    <input
+                      id="profilePicture"
+                      type="file"
+                      accept="image/*"
+                      suppressHydrationWarning
+                      onChange={(event) => {
+                        const nextFile = event.target.files?.[0] ?? null;
+                        setProfilePictureFile(nextFile);
+                        setErrors((current) => ({ ...current, profilePicture: "", form: "" }));
+                      }}
+                      className={authInputClassName}
                     />
                   </AuthField>
                 ) : null}

@@ -105,7 +105,6 @@ function ReaderProfile({
           "A clean reader profile showing your reading identity, favorite genre, and essential details."
         }
         initials={initials}
-        verified={verified}
         action={
           <Button asChild variant="outline" className="rounded-xl border-white/60 bg-card text-primary hover:bg-accent">
             <Link href="/profile/edit">
@@ -173,14 +172,12 @@ function ReaderProfile({
 function AuthorProfile({
   displayName,
   initials,
-  verified,
   bio,
   email,
   phoneNumber,
 }: {
   displayName: string;
   initials: string;
-  verified: boolean;
   bio?: string;
   email?: string;
   phoneNumber?: string;
@@ -201,14 +198,10 @@ function AuthorProfile({
       <ProfileHero
         label="Author profile"
         displayName={displayName}
-        bio={
-          bio ||
-          "A premium author dashboard with audience metrics, publishing actions, and a clean workspace for books and posts."
-        }
+        bio={bio}
         email={email}
         phoneNumber={phoneNumber}
         initials={initials}
-        verified={verified}
         compact
         stats={[
           { label: "Followers", value: followersCount },
@@ -318,7 +311,6 @@ export default function ProfilePage() {
         <AuthorProfile
           displayName={displayName}
           initials={initials}
-          verified={verified}
           bio={user?.bio}
           email={user?.email}
           phoneNumber={user?.phoneNumber}

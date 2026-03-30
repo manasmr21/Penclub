@@ -20,6 +20,7 @@ function VerifyOtpContent() {
 
   const email = searchParams.get("email") ?? pendingOtpUser?.email ?? "";
   const role = (searchParams.get("role") as UserRole | null) ?? pendingOtpUser?.role ?? "author";
+  const canResendOtp = role === "author";
 
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
@@ -61,9 +62,11 @@ function VerifyOtpContent() {
       setUser({
         ...pendingOtpUser,
         id: data?.data?.id ?? pendingOtpUser.id,
+        name: data?.data?.name ?? pendingOtpUser.name,
         email: data?.data?.email ?? pendingOtpUser.email,
         penName: data?.data?.penName ?? pendingOtpUser.penName,
         username: data?.data?.username ?? pendingOtpUser.username,
+        profilePicture: data?.data?.profilePicture ?? pendingOtpUser.profilePicture,
         isEmailVerified: true,
       });
       setPendingOtpUser(null);
@@ -82,6 +85,10 @@ function VerifyOtpContent() {
 
   const handleResend = async () => {
     if (!email) return;
+    if (!canResendOtp) {
+      setError("Resend OTP is not available for readers in the current server API.");
+      return;
+    }
 
     try {
       setResending(true);
@@ -162,10 +169,10 @@ function VerifyOtpContent() {
               <button
                 type="button"
                 onClick={handleResend}
-                disabled={resending}
+                disabled={resending || !canResendOtp}
                 className="w-full rounded-xl border border-primary/20 bg-white px-4 py-2.5 text-sm font-semibold text-primary transition hover:bg-primary/5"
               >
-                {resending ? "Sending..." : "Resend OTP"}
+                {resending ? "Sending..." : canResendOtp ? "Resend OTP" : "Resend unavailable"}
               </button>
             </form>
 

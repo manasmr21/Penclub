@@ -171,6 +171,10 @@ export default function ProfileEditor() {
 
   const handleVerifyEmail = async () => {
     if (!user?.email) return;
+    if (user.role !== "author") {
+      setErrors({ form: "Email resend is currently available for authors only." });
+      return;
+    }
 
     try {
       setVerifying(true);

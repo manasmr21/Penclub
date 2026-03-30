@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { AlertCircle, BadgeCheck, Mail, Pencil, Phone } from "lucide-react";
+import { Mail, Pencil, Phone } from "lucide-react";
 
 type ProfileHeroProps = {
   label: string;
@@ -8,7 +8,6 @@ type ProfileHeroProps = {
   email?: string;
   phoneNumber?: string;
   initials: string;
-  verified: boolean;
   compact?: boolean;
   stats?: Array<{ label: string; value: string | number }>;
   action?: React.ReactNode;
@@ -21,7 +20,6 @@ export function ProfileHero({
   email,
   phoneNumber,
   initials,
-  verified,
   compact = false,
   stats,
   action,
@@ -66,28 +64,20 @@ export function ProfileHero({
               </div>
             ) : null}
             {stats?.length ? (
-              <div className={`${compact ? "mt-2.5" : "mt-4"} grid grid-cols-2 gap-2 sm:grid-cols-4`}>
+              <div className={`${compact ? "mt-2.5" : "mt-4"} flex flex-wrap items-center gap-x-5 gap-y-1.5 text-sm text-blue-50/90`}>
                 {stats.map((stat) => (
-                  <div key={stat.label} className="rounded-xl bg-white/10 px-2.5 py-1.5 ring-1 ring-white/10">
-                    <p className="text-[10px] uppercase tracking-[0.18em] text-blue-100/70">{stat.label}</p>
-                    <p className="mt-0.5 text-sm font-semibold text-white">{stat.value}</p>
-                  </div>
+                  <p key={stat.label} className="inline-flex items-center gap-1.5">
+                    <span className="font-semibold text-white">{stat.value}</span>
+                    <span className="text-blue-100/80">{stat.label}</span>
+                  </p>
                 ))}
               </div>
             ) : null}
-            <p className={`${compact ? "mt-2.5" : "mt-3"} max-w-3xl text-sm leading-6 text-blue-50/85`}>
-              {bio}
-            </p>
-            <span
-              className={`mt-3 inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium ${
-                verified
-                  ? "bg-emerald-400/15 text-emerald-300 ring-1 ring-emerald-400/25"
-                  : "bg-amber-400/15 text-amber-300 ring-1 ring-amber-400/25"
-              }`}
-            >
-              {verified ? <BadgeCheck size={12} /> : <AlertCircle size={12} />}
-              {verified ? "Verified" : "Pending verification"}
-            </span>
+            {bio ? (
+              <p className={`${compact ? "mt-2.5" : "mt-3"} max-w-3xl text-sm leading-6 text-blue-50/85`}>
+                {bio}
+              </p>
+            ) : null}
           </div>
         </div>
 

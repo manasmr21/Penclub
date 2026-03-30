@@ -8,6 +8,8 @@ type AuthPayload = {
   email?: string;
   password: string;
   identifier?: string;
+  profilePicture?: string;
+  profilePictureFile?: File;
 };
 
 type SharedProfilePayload = {
@@ -27,7 +29,28 @@ function rolePath(role: UserRole) {
 }
 
 export async function registerUser(role: UserRole, payload: AuthPayload) {
-  const { data } = await api.post(`/${rolePath(role)}/create`, payload);
+  const path = role === "author" ? "create" : "register";
+  const hasProfileFile = payload.profilePictureFile instanceof File;
+
+  if (hasProfileFile) {
+    const formData = new FormData();
+
+    if (payload.name) formData.append("name", payload.name);
+    if (payload.penName) formData.append("penName", payload.penName);
+    if (payload.username) formData.append("username", payload.username);
+    if (payload.email) formData.append("email", payload.email);
+    formData.append("password", payload.password);
+    formData.append("profilePicture", payload.profilePictureFile);
+
+    const { data } = await api.post(`/${rolePath(role)}/${path}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return data;
+  }
+
+  const { data } = await api.post(`/${rolePath(role)}/${path}`, payload);
   return data;
 }
 
@@ -40,11 +63,16 @@ export async function loginUser(role: UserRole, payload: AuthPayload) {
 }
 
 export async function verifyUserOtp(role: UserRole, email: string, otp: string) {
-  const { data } = await api.post(`/${rolePath(role)}/verify-otp`, { email, otp });
+  const path = role === "author" ? "verify-otp" : "verify-email";
+  const { data } = await api.post(`/${rolePath(role)}/${path}`, { email, otp });
   return data;
 }
 
 export async function resendUserOtp(role: UserRole, email: string) {
+  if (role !== "author") {
+    throw new Error("Resend OTP is not available for readers in the current server API.");
+  }
+
   const { data } = await api.post(`/${rolePath(role)}/resend-otp`, { email });
   return data;
 }
