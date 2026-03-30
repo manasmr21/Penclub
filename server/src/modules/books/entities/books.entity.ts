@@ -9,8 +9,8 @@ import {
     OneToMany
 } from "typeorm";
 import { AuthorEntity } from "../../author/entities/author.entity";
-import { User } from "src/modules/users/entities/user.entity";
-import { Review } from "src/modules/reviews/entities/review.entity";
+import { User } from "../../users/entities/user.entity";
+import { Review } from "../../reviews/entities/review.entity";
 
 @Entity("books")
 export class Book {

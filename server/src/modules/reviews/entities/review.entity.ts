@@ -10,7 +10,7 @@ import {
     Unique
 } from "typeorm";
 import { User } from "../../users/entities/user.entity";
-import { Book } from "src/modules/books/entities/books.entity";
+import { Book } from "../../books/entities/books.entity";
 
 @Entity("reviews")
 @Unique(["userId", "bookId"])

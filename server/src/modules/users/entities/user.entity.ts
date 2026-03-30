@@ -12,7 +12,7 @@ import {
   JoinTable,
   Index
 } from "typeorm";
-import { Review } from "src/modules/reviews/entities/review.entity";
+import { Review } from "../../reviews/entities/review.entity";
 
 @Entity("users")
 export class User {
