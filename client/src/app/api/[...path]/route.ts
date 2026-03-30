@@ -9,7 +9,7 @@ async function forwardRequest(
   const { path } = await params;
   const method = request.method;
   const body =
-    method === "GET" || method === "HEAD" ? undefined : await request.text();
+    method === "GET" || method === "HEAD" ? undefined : await request.arrayBuffer();
   const pathname = path.join("/");
 
   let backendResponse: Response;

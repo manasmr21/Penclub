@@ -30,7 +30,8 @@ function rolePath(role: UserRole) {
 
 export async function registerUser(role: UserRole, payload: AuthPayload) {
   const path = role === "author" ? "create" : "register";
-  const hasProfileFile = payload.profilePictureFile instanceof File;
+  const profilePictureFile = payload.profilePictureFile;
+  const hasProfileFile = profilePictureFile instanceof File;
 
   if (hasProfileFile) {
     const formData = new FormData();
@@ -40,7 +41,7 @@ export async function registerUser(role: UserRole, payload: AuthPayload) {
     if (payload.username) formData.append("username", payload.username);
     if (payload.email) formData.append("email", payload.email);
     formData.append("password", payload.password);
-    formData.append("profilePicture", payload.profilePictureFile);
+    formData.append("profilePicture", profilePictureFile);
 
     const { data } = await api.post(`/${rolePath(role)}/${path}`, formData, {
       headers: {
