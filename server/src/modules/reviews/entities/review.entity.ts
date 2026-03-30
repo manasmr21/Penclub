@@ -40,6 +40,9 @@ export class Review {
     @JoinColumn({ name: "userId" })
     user: User;
 
+    @Column({default: false})
+    edited: boolean;
+
     @CreateDateColumn()
     createdAt: Date;
 

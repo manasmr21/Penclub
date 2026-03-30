@@ -38,12 +38,14 @@ export class Book {
     @Column("text", { array: true, default: [] })
     purchaseLinks: string[];
 
+    @Column()
+    authorId: string;
+
     @ManyToOne(() => User, {
         onDelete: "CASCADE",
         onUpdate: "RESTRICT"
     })
-    @JoinColumn({name: "books_by_authors"})
-    author: AuthorEntity;
+    author: User;
 
     @OneToMany(()=> Review, (reviews)=> reviews.book)
     reviews: Review[]

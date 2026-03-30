@@ -82,7 +82,7 @@ export class BooksService {
 
             const bookPayload = this.booksRepository.create({
                 ...dto,
-                author: { id: dto.authorId } as AuthorEntity,
+                authorId: dto.authorId,
                 coverImage,
                 coverImageId
             });
