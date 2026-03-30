@@ -89,6 +89,15 @@ export class User {
   @OneToMany(()=>Review, (review)=> review.user)
   review: Review[]
 
+  @Column({ type: "text", nullable: true })
+  resetToken?: string | null;
+
+  @Column({type: "timestamptz", nullable: true})
+  resetTokenExpiresAt?: Date | null;
+
+  @Column({ default: false })
+  isLoggedIn: boolean;
+
   @CreateDateColumn()
   createdAt: Date;
 

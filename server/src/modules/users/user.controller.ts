@@ -1,10 +1,12 @@
-import { Body, Controller, Delete, Param, Post, Put, Response, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Delete, Param, Post, Put, Query, Request, Response, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { UserService } from "./user.service";
 import { UserDto } from "./dto/user.dto";
 import { UpdateUserDto } from "./dto/updateUser.dto";
 import { LoginDto } from "./dto/login.dto";
 import { AuthGuard } from "@nestjs/passport";
+import { ForgotPasswordDto } from "./dto/forgot-password.dto";
+import { ResetPasswordDto } from "./dto/reset-password.dto";
 
 @Controller("users")
 export class UserController {
@@ -28,8 +30,8 @@ export class UserController {
 
     @Post("logout")
     @UseGuards(AuthGuard("jwt"))
-    async logoutUser(@Response({ passthrough: true }) res: any) {
-        return await this.userService.logout(res);
+    async logoutUser(@Response({ passthrough: true }) res: any, @Request() req: any) {
+        return await this.userService.logout(res, req);
     }
 
     @Put("update/:userId")
@@ -62,5 +64,17 @@ export class UserController {
         return await this.userService.delete(id, password);
     }
 
+    @Post("forgot-password")
+    async forgotPassword(@Body() dto: ForgotPasswordDto) {
+        return await this.userService.forgotPassword(dto.email);
+    }
 
+    @Post("reset-password")
+    async resetPassword(
+        @Query("userId") userId: string,
+        @Query("token") token: string,
+        @Body() dto: ResetPasswordDto
+    ) {
+        return await this.userService.resetPassword(userId, token, dto.newPassword);
+    }
 }
