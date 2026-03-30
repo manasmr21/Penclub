@@ -5,10 +5,12 @@ import {
     ManyToOne,
     CreateDateColumn,
     UpdateDateColumn,
-    JoinColumn
+    JoinColumn,
+    OneToMany
 } from "typeorm";
 import { AuthorEntity } from "../../author/entities/author.entity";
 import { User } from "src/modules/users/entities/user.entity";
+import { Review } from "src/modules/reviews/entities/review.entity";
 
 @Entity("books")
 export class Book {
@@ -42,6 +44,9 @@ export class Book {
     })
     @JoinColumn({name: "books_by_authors"})
     author: AuthorEntity;
+
+    @OneToMany(()=> Review, (reviews)=> reviews.book)
+    reviews: Review[]
 
     @CreateDateColumn()
     createdAt: Date;

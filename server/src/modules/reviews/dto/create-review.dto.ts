@@ -7,6 +7,11 @@ export class CreateReviewDto {
   @ApiProperty({ example: "Great book!" })
   content?: string;
 
+  @ApiProperty({
+    example: "user-uuid"
+  })
+  userId: string
+
   @ApiProperty({ example: "uuid-blog" })
-  blogId: string;
+  bookId: string;
 }
