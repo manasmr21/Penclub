@@ -4,12 +4,13 @@ import { Repository } from "typeorm";
 import { AuthorDto } from "./dto/register.dto";
 import { VerifyOtpDto } from "./dto/verify-otp.dto";
 import { AuthorEntity } from "./entities/author.entity";
+import { Reader } from "../reader/entities/reader.entity";
 import bcrypt from "bcryptjs"
 import { JwtService } from "@nestjs/jwt";
-import { MailService } from "src/utils/sendMails";
+import { MailService } from "../../utils/sendMails";
 import type { Response } from "express";
 import { randomInt } from "crypto";
-import { CloudinaryService } from "src/utils/cloudinary/cloudinary.service";
+import { CloudinaryService } from "../../utils/cloudinary/cloudinary.service";
 
 @Injectable()
 export class AuthorService {
@@ -17,8 +18,10 @@ export class AuthorService {
     constructor(
         @InjectRepository(AuthorEntity)
         private authorRepository: Repository<AuthorEntity>,
+        @InjectRepository(Reader)
+        private readerRepository: Repository<Reader>,
         private jwtService: JwtService,
-        private mailService : MailService,
+        private mailService: MailService,
         private cloudinaryService: CloudinaryService
     ) { }
 
@@ -26,7 +29,7 @@ export class AuthorService {
         return randomInt(100000, 1000000).toString();
     }
 
-    async getAllAuthors(){
+    async getAllAuthors() {
         try {
             const authors = await this.authorRepository.find()
 
@@ -40,22 +43,22 @@ export class AuthorService {
         }
     }
 
-    async getAuthor(id: any){
+    async getAuthor(id: any) {
         try {
             const author = await this.authorRepository.query(
                 `SELECT * FROM authors WHERE ID = $1`, [id]
             )
 
-            if(author.length === 0) throw new NotFoundException({
+            if (author.length === 0) throw new NotFoundException({
                 success: false,
                 message: "Author Not found"
             })
 
-            return{
+            return {
                 success: true,
                 message: "Author Fetched Successfully",
                 author: {
-                    ...author[0], 
+                    ...author[0],
                     password: undefined
                 }
             }
@@ -65,11 +68,22 @@ export class AuthorService {
 
     }
 
-    async register(authorRegisterDto: AuthorDto, file?: Express.Multer.File) {
+    async register(authorRegisterDto: AuthorDto, file?: any) {
         try {
             const { name, penName, email, password } = authorRegisterDto;
 
             if (!name || !penName || !email || !password) throw new BadRequestException("All fields are required");
+
+            const existingReader = await this.readerRepository.findOne({
+                where: { email }
+            });
+
+            if (existingReader) {
+                throw new ConflictException({
+                    success: false,
+                    message: "Email already registered as a reader"
+                });
+            }
 
             let profilePicture = authorRegisterDto.profilePicture;
             if (file) {
@@ -84,28 +98,18 @@ export class AuthorService {
             const otpHash = await bcrypt.hash(otp, 10);
             const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
-            const result = await this.authorRepository.query(
-                `INSERT INTO authors ("name", "penName", "email", "password", "otpHash", "otpExpiresAt", "isEmailVerified", "profilePicture")
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-                ON CONFLICT ("email") DO NOTHING
-                RETURNING "id", "email", "penName", "profilePicture"`,
-                [name, penName, email, hashedPassword, otpHash, otpExpiresAt, false, profilePicture]
-            )
+            const newAuthor = this.authorRepository.create({
+                name,
+                email,
+                penName,
+                password: hashedPassword,
+                otpHash,
+                otpExpiresAt,
+                isEmailVerified: false,
+                profilePicture: profilePicture ?? undefined
+            });
 
-            const penNameExist = await this.authorRepository.find({
-                where:{
-                    penName
-                }
-            })
-
-            if(penNameExist) throw new ConflictException({
-                success: false,
-                message: "This pen name already exists"
-            })
-
-            const rows = Array.isArray(result[0]) ? result[0] : result;
-
-            if (rows.length === 0) throw new ConflictException("Email already exists");
+            const createdAuthor = await this.authorRepository.save(newAuthor);
 
             await this.mailService.sendMailService(
                 email,
@@ -116,16 +120,36 @@ export class AuthorService {
             return {
                 success: true,
                 message: "OTP sent to your email. Please verify to complete registration.",
-                data: rows[0],
+                data: {
+                    id: createdAuthor.id,
+                    email: createdAuthor.email,
+                    penName: createdAuthor.penName,
+                    profilePicture: createdAuthor.profilePicture ?? null
+                },
                 otpExpiresInMinutes: 10
             }
 
         } catch (error) {
+
+            if (error.code === '23505') {
+                const detail = error.detail;
+
+                if (detail.includes('email')) {
+                    throw new ConflictException("Email already exists");
+                }
+
+                if (detail.includes('penName')) {
+                    throw new ConflictException("Pen name already exists");
+                }
+
+                throw new ConflictException("Duplicate entry");
+            }
+
             this.handleServiceError(error);
         }
     }
 
-    async updateProfile(id: any,authorUpdate: Partial<AuthorDto>, file?: Express.Multer.File){
+    async updateProfile(id: any, authorUpdate: Partial<AuthorDto>, file?: any) {
         try {
             if (file) {
                 const folder = "authors";
@@ -136,7 +160,7 @@ export class AuthorService {
 
             const author = await this.authorRepository.update(id, authorUpdate);
 
-            if(author.affected === 0){
+            if (author.affected === 0) {
                 throw new NotFoundException({
                     success: false,
                     message: "Author not found"
@@ -154,20 +178,20 @@ export class AuthorService {
 
     }
 
-    async resendEmail(email: string){
+    async resendEmail(email: string) {
         try {
             const result = await this.authorRepository.findOne({
-                where:{
+                where: {
                     email: email
                 }
             })
 
-            if(!result) throw new NotFoundException({
+            if (!result) throw new NotFoundException({
                 success: false,
                 message: "This email is not registered"
             });
 
-            if(result.isEmailVerified) throw new ConflictException({
+            if (result.isEmailVerified) throw new ConflictException({
                 success: false,
                 message: "This email is already verified."
             })
@@ -177,7 +201,7 @@ export class AuthorService {
             const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
             await this.authorRepository.update(result.id, {
-                otpHash : otpHashMns,
+                otpHash: otpHashMns,
                 otpExpiresAt
             });
 
@@ -198,11 +222,11 @@ export class AuthorService {
 
     }
 
-    async deleteAuthor(id: any){
+    async deleteAuthor(id: any) {
         try {
             const result = await this.authorRepository.delete(id);
 
-            if(result.affected === 0){
+            if (result.affected === 0) {
                 throw new NotFoundException({
                     success: false,
                     message: "Author not found"
@@ -296,7 +320,7 @@ export class AuthorService {
                 FROM authors
                 WHERE "email" = $1`,
                 [email]
-            );  
+            );
 
             if (result.length === 0) {
                 throw new NotFoundException("Author not found");
@@ -353,7 +377,7 @@ export class AuthorService {
     }
 
 
-    
+
     //Error handler - to maker sure that errors does not make my server crash
     private handleServiceError(error: unknown): never {
         if (error instanceof HttpException) {
@@ -367,6 +391,6 @@ export class AuthorService {
         });
     }
 
-    
+
 
 }

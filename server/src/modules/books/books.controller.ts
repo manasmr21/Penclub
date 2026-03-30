@@ -24,7 +24,7 @@ export class BooksController {
     @UseInterceptors(FileInterceptor("coverImage"))
     async create(
         @Body() dto: CreateBookDto,
-        @UploadedFile() file?: Express.Multer.File
+        @UploadedFile() file?: any
     ) {
         return await this.booksService.createBook(dto, file);
     }
@@ -34,7 +34,7 @@ export class BooksController {
     async update(
         @Param("bookId") id: string,
         @Body() dto: UpdateBookDto,
-        @UploadedFile() file?: Express.Multer.File
+        @UploadedFile() file?: any
     ) {
         return await this.booksService.updateBook(id, dto, file);
     }

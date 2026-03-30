@@ -5,11 +5,12 @@ import { Reader } from "./entities/reader.entity";
 import { ReaderDto } from "./dto/reader.dto";
 import bcrypt from "bcryptjs";
 import { JwtService } from "@nestjs/jwt";
-import { MailService } from "src/utils/sendMails";
+import { MailService } from "../../utils/sendMails";
 import { randomInt } from "crypto";
 import { VerifyOtpDto } from "../author/dto/verify-otp.dto";
 import type { Response } from "express";
-import { CloudinaryService } from "src/utils/cloudinary/cloudinary.service";
+import { CloudinaryService } from "../../utils/cloudinary/cloudinary.service";
+import { AuthorEntity } from "../author/entities/author.entity";
 
 
 @Injectable()
@@ -17,6 +18,8 @@ export class ReaderService {
     constructor(
         @InjectRepository(Reader)
         private readerRepository: Repository<Reader>,
+        @InjectRepository(AuthorEntity)
+        private authorRepository: Repository<AuthorEntity>,
         private jwtService: JwtService,
         private mailService: MailService,
         private cloudinaryService: CloudinaryService
@@ -38,7 +41,7 @@ export class ReaderService {
         return reader;
     }
 
-    async readerRegister(dto: ReaderDto, res: Response, file?: Express.Multer.File) {
+    async readerRegister(dto: ReaderDto, res: Response, file?: any) {
         try {
             const { name, email, username, password } = dto
 
@@ -47,27 +50,15 @@ export class ReaderService {
                 message: "All fields are required"
             });
 
-            const existingUser = await this.readerRepository.findOne({
-                where: [
-                    { email },
-                    { username }
-                ],
+            const existingAuthor = await this.authorRepository.findOne({
+                where: { email }
             });
 
-            if (existingUser) {
-                let message = "User already exists";
-
-                if (existingUser.email === email) {
-                    message = "Email already in use";
-                } else if (existingUser.username === username) {
-                    message = "Username already taken";
-                }
-
-                throw new BadRequestException({
+            if (existingAuthor) {
+                throw new ConflictException({
                     success: false,
-                    message,
+                    message: "Email already registered as an author"
                 });
-
             }
 
             const otp = this.generateOtp();
@@ -76,12 +67,11 @@ export class ReaderService {
 
             const hashedPassword = await bcrypt.hash(password, 10);
 
-            let profilePicture = dto.profilePicture;
             if (file) {
                 const folder = "readers";
                 const organization = "penclub";
                 const cloudinaryResponse = await this.cloudinaryService.uploadImage(file, organization, folder);
-                profilePicture = cloudinaryResponse.secure_url;
+                var profilePicture = cloudinaryResponse.secure_url;
             }
 
             const user = this.readerRepository.create({
@@ -93,6 +83,16 @@ export class ReaderService {
             })
 
             const reader = await this.readerRepository.save(user);
+
+            const payload = {
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                username: user.username,
+                role: user.role
+            }
+
+            this.jwtService.signAsync(payload);
 
             await this.mailService.sendMailService(email,
                 "Verify your account",
@@ -107,6 +107,22 @@ export class ReaderService {
                 }
             }
         } catch (error) {
+
+              if (error.code === '23505') {
+                const detail = error.detail;
+
+                if (detail.includes('email')) {
+                    throw new ConflictException("Email already exists");
+                }
+
+                if (detail.includes('username')) {
+                    throw new ConflictException("Username already exists");
+                }
+
+                throw new ConflictException("Duplicate entry");
+            }
+
+            
             this.handleServiceError(error);
         }
 
@@ -159,7 +175,7 @@ export class ReaderService {
         }
     }
 
-    async updateProfile(id: any, readerUpdate: Partial<ReaderDto>, file?: Express.Multer.File) {
+    async updateProfile(id: any, readerUpdate: Partial<ReaderDto>, file?: any) {
         try {
             if(readerUpdate?.email || readerUpdate?.password) throw new BadRequestException({
                 success: false,

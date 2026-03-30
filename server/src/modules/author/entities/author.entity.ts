@@ -1,4 +1,4 @@
-import { Blog } from "src/modules/blog/entities/blogs.entity";
+import { Blog } from "../../blog/entities/blogs.entity";
 import {
     Entity,
     PrimaryGeneratedColumn,
@@ -17,13 +17,13 @@ export class AuthorEntity {
     @Column({ length: 50 })
     name: string
 
-    @Column({ unique: true, length: 50 })
-    @Index()
-    penName: string;
-
     @Column({ unique: true, length: 100 })
     @Index()
     email: string;
+
+    @Column({ unique: true, length: 50 })
+    @Index()
+    penName: string;
 
     @Column()
     password: string;
@@ -35,7 +35,7 @@ export class AuthorEntity {
     })
     role: string
 
-    @OneToMany(()=> Blog, (blog)=> blog.author)
+    @OneToMany(()=> Blog, (blog)=> blog.user)
     blogs: Blog[]
 
     @Column({ nullable: true })

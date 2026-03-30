@@ -4,9 +4,11 @@ import {
     Column,
     ManyToOne,
     CreateDateColumn,
-    UpdateDateColumn
+    UpdateDateColumn,
+    JoinColumn
 } from "typeorm";
-import { AuthorEntity } from "src/modules/author/entities/author.entity";
+import { AuthorEntity } from "../../author/entities/author.entity";
+import { User } from "src/modules/users/entities/user.entity";
 
 @Entity("books")
 export class Book {
@@ -34,10 +36,11 @@ export class Book {
     @Column("text", { array: true, default: [] })
     purchaseLinks: string[];
 
-    @ManyToOne(() => AuthorEntity, {
+    @ManyToOne(() => User, {
         onDelete: "CASCADE",
         onUpdate: "RESTRICT"
     })
+    @JoinColumn({name: "books_by_authors"})
     author: AuthorEntity;
 
     @CreateDateColumn()

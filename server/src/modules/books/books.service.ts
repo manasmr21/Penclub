@@ -4,7 +4,7 @@ import { Repository } from "typeorm";
 import { Book } from "./entities/books.entity";
 import { CreateBookDto } from "./dto/create-book.dto";
 import { AuthorEntity } from "../author/entities/author.entity";
-import { CloudinaryService } from "src/utils/cloudinary/cloudinary.service";
+import { CloudinaryService } from "../../utils/cloudinary/cloudinary.service";
 import { UpdateBookDto } from "./dto/update-book.dto";
 
 @Injectable()
@@ -56,7 +56,7 @@ export class BooksService {
         }
     }
 
-    async createBook(dto: CreateBookDto, file?: Express.Multer.File) {
+    async createBook(dto: CreateBookDto, file?: any) {
         try {
             const { title, description, genre } = dto;
 
@@ -99,7 +99,7 @@ export class BooksService {
         }
     }
 
-    async updateBook(id: string, dto: UpdateBookDto, file?: Express.Multer.File) {
+    async updateBook(id: string, dto: UpdateBookDto, file?: any) {
         try {
             if (!dto) throw new BadRequestException({
                 success: false,

@@ -16,23 +16,23 @@ export class BlogsController {
         return await this.blogsService.getAllBlogs();
     }
 
-    @Get("fetch/:authorId")
-    async fetchAuthorsBlogs(@Param("authorId") id: string){
-        return await this.blogsService.getAuthorsBlogs(id);
+    @Get("fetch/:userId")
+    async fetchUsersBlogs(@Param("userId") id: string){
+        return await this.blogsService.getUsersBlogs(id);
     }
 
     @Post("create")
     @UseInterceptors(FileInterceptor("coverImage"))
     async createBlog(
         @Body() dto: CreateBlogDto,
-        @UploadedFile() file: Express.Multer.File
+        @UploadedFile() file: any
     ) {
         return await this.blogsService.createBlog(dto, file);
     }
 
     @Put("update/:blogId")
     @UseInterceptors(FileInterceptor("coverImage"))
-    async updateBlog(@Param("blogId") id: string , @Body() dto:UpdateBlogDto, @UploadedFile() file?: Express.Multer.File){
+    async updateBlog(@Param("blogId") id: string , @Body() dto:UpdateBlogDto, @UploadedFile() file?: any){
         return await this.blogsService.updateBlog(id, dto, file);
     }
 

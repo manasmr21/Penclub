@@ -3,9 +3,10 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Blog } from "./entities/blogs.entity";
 import { CreateBlogDto } from "./dto/create-blog.dto";
-import { CloudinaryService } from "src/utils/cloudinary/cloudinary.service";
+import { CloudinaryService } from "../../utils/cloudinary/cloudinary.service";
 import { AuthorEntity } from "../author/entities/author.entity";
 import { UpdateBlogDto } from "./dto/update-blog.dto";
+import { User } from "../users/entities/user.entity";
 
 
 @Injectable()
@@ -38,15 +39,14 @@ export class BlogsService {
 
     }
 
-    async getAuthorsBlogs(id: string) {
+    async getUsersBlogs(id: string) {
 
         try {
             const blogs = await this.blogsRepository.find({
                 where: {
-                    author: {
-                        id: id
-                    }
-                }
+                    userId: id
+                },
+                relations: ["user"]
             })
 
             if (blogs.length === 0) throw new NotFoundException({
@@ -66,7 +66,7 @@ export class BlogsService {
 
     }
 
-    async createBlog(dto: CreateBlogDto, file?: Express.Multer.File) {
+    async createBlog(dto: CreateBlogDto, file?: any) {
         try {
             const { title, content, status } = dto;
 
@@ -88,7 +88,7 @@ export class BlogsService {
 
             const blogMns = this.blogsRepository.create({
                 ...dto,
-                author: { id: dto.authorId } as AuthorEntity,
+                userId: dto.userId,
                 status: status || "posted",
                 coverImage,
                 coverImageId
@@ -107,7 +107,7 @@ export class BlogsService {
     }
 
 
-    async updateBlog(id: string, dto: UpdateBlogDto, file?: Express.Multer.File) {
+    async updateBlog(id: string, dto: UpdateBlogDto, file?: any) {
 
         try {
             if (!dto) throw new BadRequestException({
