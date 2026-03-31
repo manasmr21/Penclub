@@ -77,4 +77,11 @@ export class UserController {
     ) {
         return await this.userService.resetPassword(userId, token, dto.newPassword);
     }
+
+    @Post("follow/:targetUserId")
+    @UseGuards(AuthGuard("jwt"))
+    async followUser(@Request() req: any, @Param("targetUserId") targetUserId: string) {
+        return await this.userService.followUnfollow(targetUserId, req);
+    }
+
 }

@@ -234,19 +234,19 @@ export class UserService {
                 success: true,
                 message: "User logged in successfully",
                 user: {
-                   id: user.id,
-                   name: user.name,
-                   email: user.email,
-                   username: user.username,
-                   followersCount: user.role === "author" ? user.followersCount : undefined,
-                   followingCount: user.followingCount,
-                   role: user.role,
-                   bio: user.bio ?? undefined,
-                   interests: user.interests ?? undefined,
-                   socialLinks: user.socialLinks ?? undefined,
-                   profilePicture: user.profilePicture ?? undefined,
-                   isEmailVerified: user.isEmailVerified,
-                   profilePictureId: user.profilePictureId ?? undefined
+                    id: user.id,
+                    name: user.name,
+                    email: user.email,
+                    username: user.username,
+                    followersCount: user.role === "author" ? user.followersCount : undefined,
+                    followingCount: user.followingCount,
+                    role: user.role,
+                    bio: user.bio ?? undefined,
+                    interests: user.interests ?? undefined,
+                    socialLinks: user.socialLinks ?? undefined,
+                    profilePicture: user.profilePicture ?? undefined,
+                    isEmailVerified: user.isEmailVerified,
+                    profilePictureId: user.profilePictureId ?? undefined
                 }
             }
 
@@ -271,7 +271,7 @@ export class UserService {
                 }
             })
 
-            if(!user) throw new NotFoundException({
+            if (!user) throw new NotFoundException({
                 success: false,
                 message: "User not found"
             })
@@ -546,6 +546,106 @@ export class UserService {
             throw this.handleServiceError(error);
         }
 
+    }
+
+    async followUnfollow(targetUserId: string, req: { user?: { id?: string } }) {
+        const currentUserId = req.user?.id;
+
+        if (!currentUserId) {
+            throw new UnauthorizedException("Unauthorized user");
+        }
+
+        if (currentUserId === targetUserId) {
+            throw new BadRequestException("You cannot follow/unfollow yourself");
+        }
+
+        try {
+            const [currentUser, targetUser] = await Promise.all([
+                this.userRepository
+                    .createQueryBuilder("user")
+                    .select(["user.id", "user.role"])
+                    .where("user.id = :id", { id: currentUserId })
+                    .getOne(),
+
+                this.userRepository
+                    .createQueryBuilder("user")
+                    .select(["user.id", "user.role"])
+                    .where("user.id = :id", { id: targetUserId })
+                    .getOne()
+            ]);
+
+            if (!currentUser || !targetUser) {
+                throw new NotFoundException("User not found");
+            }
+
+            if (currentUser.role !== "reader" || targetUser.role !== "author") {
+                throw new BadRequestException("Only readers can follow authors");
+            }
+
+            const isFollowing = await this.userRepository
+                .createQueryBuilder()
+                .relation("User", "following")
+                .of(currentUserId)
+                .loadMany()
+                .then((users) => users.some(u => u.id === targetUserId));
+
+            if (isFollowing) {
+                await this.userRepository
+                    .createQueryBuilder()
+                    .relation("User", "following")
+                    .of(currentUserId)
+                    .remove(targetUserId);
+
+                await Promise.all([
+                    this.userRepository
+                        .createQueryBuilder()
+                        .update()
+                        .set({ followingCount: () => "followingCount - 1" })
+                        .where("id = :id", { id: currentUserId })
+                        .execute(),
+
+                    this.userRepository
+                        .createQueryBuilder()
+                        .update()
+                        .set({ followersCount: () => "followersCount - 1" })
+                        .where("id = :id", { id: targetUserId })
+                        .execute()
+                ]);
+
+            } else {
+                await this.userRepository
+                    .createQueryBuilder()
+                    .relation("User", "following")
+                    .of(currentUserId)
+                    .add(targetUserId);
+
+                await Promise.all([
+                    this.userRepository
+                        .createQueryBuilder()
+                        .update()
+                        .set({ followingCount: () => "followingCount + 1" })
+                        .where("id = :id", { id: currentUserId })
+                        .execute(),
+
+                    this.userRepository
+                        .createQueryBuilder()
+                        .update()
+                        .set({ followersCount: () => "followersCount + 1" })
+                        .where("id = :id", { id: targetUserId })
+                        .execute()
+                ]);
+            }
+
+            return {
+                success: true,
+                message: isFollowing
+                    ? "Unfollowed successfully"
+                    : "Followed successfully"
+            };
+
+        } catch (error) {
+            throw this.handleServiceError(error);
+        }
     }
 
     //Error handler - to maker sure that errors does not make my server crash

@@ -49,11 +49,18 @@ export class User {
   @OneToMany(() => Book, (book) => book.author)
   books: Book[]
 
+  @Column({nullable: true})
+  followersId: string[];
+
+  @Column({nullable: true})
+  followingId: string[];
+
   @ManyToMany(() => User)
-  @JoinTable({ name: "users_following" })
+  @JoinTable({name: "user_following"})
   following: User[];
 
   @ManyToMany(() => User, (user) => user.following)
+  @JoinTable({name: "user_followers"})
   followers: User[];
 
   @Column({ default: 0 })
