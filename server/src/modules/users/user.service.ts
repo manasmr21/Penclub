@@ -18,6 +18,7 @@ import { CloudinaryService } from "../../utils/cloudinary/cloudinary.service";
 import { UpdateUserDto } from "./dto/updateUser.dto";
 import { LoginDto } from "./dto/login.dto";
 import { JwtService } from "@nestjs/jwt";
+import { randomBytes } from "crypto";
 
 @Injectable()
 export class UserService {
@@ -31,6 +32,25 @@ export class UserService {
 
     private generateOtp(): string {
         return randomInt(100000, 1000000).toString();
+    }
+
+    private async sendMail(email: string, subject: string, message: string) {
+        try {
+
+            await this.mailService.sendMailService(
+                email,
+                subject,
+                message
+            );
+
+            return {
+                success: true,
+                message: "OTP sent successfully"
+            }
+
+        } catch (error) {
+            return error
+        }
     }
 
     async register(dto: UserDto, file?: any) {
@@ -76,21 +96,20 @@ export class UserService {
 
             const createdUser = await this.userRepository.save(newUser);
 
-            await this.mailService.sendMailService(
-                email,
-                "Verify your account",
-                `Your OTP is ${otp}. It expires in 10 minutes.`
-            );
+            await this.sendMail(email, "Verify your account", `Your OTP is ${otp}. It expires in 10 minutes.`);
 
             return {
                 success: true,
                 message: "OTP sent to your email.",
-                data: {
+                user: {
                     id: createdUser.id,
                     email: createdUser.email,
                     username: createdUser.username,
                     role: createdUser.role,
-                    profilePicture: createdUser.profilePicture ?? undefined
+                    profilePicture: createdUser.profilePicture ?? undefined,
+                    socialLinks: createdUser.socialLinks ?? undefined,
+                    interests: createdUser.interests ?? undefined,
+                    bio: createdUser.bio ?? undefined
                 },
                 otpExpiresInMinutes: 10
             };
@@ -147,7 +166,7 @@ export class UserService {
 
             const updatedUser = this.userRepository.merge(user, dto);
 
-            const newUser = await this.userRepository.save(updatedUser)
+            await this.userRepository.save(updatedUser)
 
             return {
                 success: true,
@@ -191,11 +210,15 @@ export class UserService {
                 message: "Invalid credentials"
             })
 
+            user.isLoggedIn = true;
+            await this.userRepository.save(user);
+
             const payload = {
                 id: user.id,
                 name: user.name,
                 email: user.email,
-                role: user.role
+                role: user.role,
+                isLoggedIn: user.isLoggedIn
             }
 
             const token = this.jwtService.sign(payload);
@@ -210,10 +233,20 @@ export class UserService {
             return {
                 success: true,
                 message: "User logged in successfully",
-                token,
                 user: {
-                    ...user,
-                    password: undefined,
+                    id: user.id,
+                    name: user.name,
+                    email: user.email,
+                    username: user.username,
+                    followersCount: user.role === "author" ? user.followersCount : undefined,
+                    followingCount: user.followingCount,
+                    role: user.role,
+                    bio: user.bio ?? undefined,
+                    interests: user.interests ?? undefined,
+                    socialLinks: user.socialLinks ?? undefined,
+                    profilePicture: user.profilePicture ?? undefined,
+                    isEmailVerified: user.isEmailVerified,
+                    profilePictureId: user.profilePictureId ?? undefined
                 }
             }
 
@@ -222,8 +255,30 @@ export class UserService {
         }
     }
 
-    async logout(res: any) {
+    async logout(res: any, req: any) {
         try {
+
+            const userId = req.user?.id;
+
+            if (!userId) throw new UnauthorizedException({
+                success: false,
+                message: "Unauthorized user"
+            })
+
+            const user = await this.userRepository.findOne({
+                where: {
+                    id: userId
+                }
+            })
+
+            if (!user) throw new NotFoundException({
+                success: false,
+                message: "User not found"
+            })
+
+            user.isLoggedIn = false;
+            await this.userRepository.save(user);
+
             res.clearCookie("user", {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
@@ -340,12 +395,12 @@ export class UserService {
             const otp = this.generateOtp()
 
             const user = await this.userRepository.findOne({
-                where:{
+                where: {
                     email
                 }
             })
 
-            if(!user) throw new NotFoundException({
+            if (!user) throw new NotFoundException({
                 success: false,
                 message: "User not found"
             })
@@ -363,8 +418,8 @@ export class UserService {
 
 
 
-            return{
-                success:true,
+            return {
+                success: true,
                 message: "Otp sent successfully"
             }
 
@@ -373,6 +428,224 @@ export class UserService {
             throw this.handleServiceError(error);
         }
 
+    }
+
+    async forgotPassword(email: string) {
+        try {
+            const normalizedEmail = String(email ?? "").trim().toLowerCase();
+
+            if (!normalizedEmail) throw new BadRequestException({
+                success: false,
+                message: "Email is required"
+            })
+
+            const user = await this.userRepository.findOne({
+                where: {
+                    email: normalizedEmail
+                }
+            })
+
+            if (!user) throw new NotFoundException({
+                success: false,
+                message: "User not found"
+            })
+
+            const rawToken = randomBytes(32).toString("hex");
+            const hashedToken = await bcrypt.hash(rawToken, 12);
+            const tokenExpiresAt = new Date(Date.now() + 60 * 60 * 1000);
+
+            user.resetToken = hashedToken;
+            user.resetTokenExpiresAt = tokenExpiresAt;
+
+            const resetLink = `${process.env.FRONTEND_URL}/reset-password?userId=${user.id}&token=${encodeURIComponent(rawToken)}`;
+            await this.userRepository.save(user);
+
+            await this.mailService.sendMailService(
+                normalizedEmail,
+                "Password Reset Request",
+                `You requested a password reset. Click the link to reset your password: ${resetLink}. This link expires in 1 hour.`
+            );
+
+
+            return {
+                success: true,
+                message: "Password reset token generated. Please check your email."
+            }
+
+        } catch (error) {
+            throw this.handleServiceError(error);
+        }
+    }
+
+    async resetPassword(userId: string, token: string, newPassword: string) {
+        try {
+            const normalizedUserId = String(userId ?? "").trim();
+            const normalizedToken = String(token ?? "").trim();
+            const normalizedPassword = String(newPassword ?? "");
+
+            if (!normalizedUserId || !normalizedToken || !normalizedPassword) {
+                throw new BadRequestException({
+                    success: false,
+                    message: "User id, token and new password are required"
+                })
+            }
+
+            if (normalizedPassword.length < 6) {
+                throw new BadRequestException({
+                    success: false,
+                    message: "Password must be at least 6 characters"
+                })
+            }
+
+            const user = await this.userRepository.findOne({
+                where: {
+                    id: normalizedUserId
+                }
+            })
+
+            if (!user) throw new NotFoundException({
+                success: false,
+                message: "User not found"
+            })
+
+            if (!user.resetToken || !user.resetTokenExpiresAt) throw new UnauthorizedException({
+                success: false,
+                message: "Invalid or expired reset token"
+            })
+
+            if (user.resetTokenExpiresAt < new Date()) {
+                user.resetToken = null;
+                user.resetTokenExpiresAt = null;
+                await this.userRepository.save(user);
+                throw new UnauthorizedException({
+                    success: false,
+                    message: "Reset token expired"
+                })
+            }
+
+            const isValidToken = await bcrypt.compare(normalizedToken, user.resetToken);
+
+            if (!isValidToken) throw new UnauthorizedException({
+                success: false,
+                message: "Invalid reset token"
+            })
+
+            const newHashedPassword = await bcrypt.hash(normalizedPassword, 12);
+
+            user.password = newHashedPassword;
+            user.resetToken = null;
+            user.resetTokenExpiresAt = null;
+
+            await this.userRepository.save(user);
+
+            return {
+                success: true,
+                message: "Password reset successfully"
+            }
+        } catch (error) {
+            throw this.handleServiceError(error);
+        }
+
+    }
+
+    async followUnfollow(targetUserId: string, req: { user?: { id?: string } }) {
+        const currentUserId = req.user?.id;
+
+        if (!currentUserId) {
+            throw new UnauthorizedException("Unauthorized user");
+        }
+
+        if (currentUserId === targetUserId) {
+            throw new BadRequestException("You cannot follow/unfollow yourself");
+        }
+
+        try {
+            const [currentUser, targetUser] = await Promise.all([
+                this.userRepository
+                    .createQueryBuilder("user")
+                    .select(["user.id", "user.role"])
+                    .where("user.id = :id", { id: currentUserId })
+                    .getOne(),
+
+                this.userRepository
+                    .createQueryBuilder("user")
+                    .select(["user.id", "user.role"])
+                    .where("user.id = :id", { id: targetUserId })
+                    .getOne()
+            ]);
+
+            if (!currentUser || !targetUser) {
+                throw new NotFoundException("User not found");
+            }
+
+            if (currentUser.role !== "reader" || targetUser.role !== "author") {
+                throw new BadRequestException("Only readers can follow authors");
+            }
+
+            const isFollowing = await this.userRepository
+                .createQueryBuilder()
+                .relation("User", "following")
+                .of(currentUserId)
+                .loadMany()
+                .then((users) => users.some(u => u.id === targetUserId));
+
+            if (isFollowing) {
+                await this.userRepository
+                    .createQueryBuilder()
+                    .relation("User", "following")
+                    .of(currentUserId)
+                    .remove(targetUserId);
+
+                await Promise.all([
+                    this.userRepository
+                        .createQueryBuilder()
+                        .update()
+                        .set({ followingCount: () => "followingCount - 1" })
+                        .where("id = :id", { id: currentUserId })
+                        .execute(),
+
+                    this.userRepository
+                        .createQueryBuilder()
+                        .update()
+                        .set({ followersCount: () => "followersCount - 1" })
+                        .where("id = :id", { id: targetUserId })
+                        .execute()
+                ]);
+
+            } else {
+                await this.userRepository
+                    .createQueryBuilder()
+                    .relation("User", "following")
+                    .of(currentUserId)
+                    .add(targetUserId);
+
+                await Promise.all([
+                    this.userRepository
+                        .createQueryBuilder()
+                        .update()
+                        .set({ followingCount: () => "followingCount + 1" })
+                        .where("id = :id", { id: currentUserId })
+                        .execute(),
+
+                    this.userRepository
+                        .createQueryBuilder()
+                        .update()
+                        .set({ followersCount: () => "followersCount + 1" })
+                        .where("id = :id", { id: targetUserId })
+                        .execute()
+                ]);
+            }
+
+            return {
+                success: true,
+                message: isFollowing
+                    ? "Unfollowed successfully"
+                    : "Followed successfully"
+            };
+
+        } catch (error) {
+            throw this.handleServiceError(error);
+        }
     }
 
     //Error handler - to maker sure that errors does not make my server crash

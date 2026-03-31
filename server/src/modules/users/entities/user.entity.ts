@@ -12,7 +12,7 @@ import {
   JoinTable,
   Index
 } from "typeorm";
-import { Review } from "src/modules/reviews/entities/review.entity";
+import { Review } from "../../reviews/entities/review.entity";
 
 @Entity("users")
 export class User {
@@ -49,11 +49,18 @@ export class User {
   @OneToMany(() => Book, (book) => book.author)
   books: Book[]
 
+  @Column({nullable: true})
+  followersId: string[];
+
+  @Column({nullable: true})
+  followingId: string[];
+
   @ManyToMany(() => User)
-  @JoinTable({ name: "users_following" })
+  @JoinTable({name: "user_following"})
   following: User[];
 
   @ManyToMany(() => User, (user) => user.following)
+  @JoinTable({name: "user_followers"})
   followers: User[];
 
   @Column({ default: 0 })
@@ -88,6 +95,15 @@ export class User {
 
   @OneToMany(()=>Review, (review)=> review.user)
   review: Review[]
+
+  @Column({ type: "text", nullable: true })
+  resetToken?: string | null;
+
+  @Column({type: "timestamptz", nullable: true})
+  resetTokenExpiresAt?: Date | null;
+
+  @Column({ default: false })
+  isLoggedIn: boolean;
 
   @CreateDateColumn()
   createdAt: Date;

@@ -5,10 +5,12 @@ import {
     ManyToOne,
     CreateDateColumn,
     UpdateDateColumn,
-    JoinColumn
+    JoinColumn,
+    OneToMany
 } from "typeorm";
 import { AuthorEntity } from "../../author/entities/author.entity";
-import { User } from "src/modules/users/entities/user.entity";
+import { User } from "../../users/entities/user.entity";
+import { Review } from "../../reviews/entities/review.entity";
 
 @Entity("books")
 export class Book {
@@ -36,12 +38,17 @@ export class Book {
     @Column("text", { array: true, default: [] })
     purchaseLinks: string[];
 
+    @Column()
+    authorId: string;
+
     @ManyToOne(() => User, {
         onDelete: "CASCADE",
         onUpdate: "RESTRICT"
     })
-    @JoinColumn({name: "books_by_authors"})
-    author: AuthorEntity;
+    author: User;
+
+    @OneToMany(()=> Review, (reviews)=> reviews.book)
+    reviews: Review[]
 
     @CreateDateColumn()
     createdAt: Date;

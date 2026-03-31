@@ -9,37 +9,39 @@ import {
     JoinColumn,
     Unique
 } from "typeorm";
-import { Blog } from "../../blog/entities/blogs.entity";
 import { User } from "../../users/entities/user.entity";
+import { Book } from "../../books/entities/books.entity";
 
 @Entity("reviews")
-@Unique(["userId", "blogId"])
+@Unique(["userId", "bookId"])
 export class Review {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
     @Column("int", { width: 1 })
-    rating: number; // 1-5
+    rating: number;
 
     @Column("text", { nullable: true })
     content?: string;
 
+    @Index()
     @Column({ type: "uuid" })
-    blogId: string
-
+    bookId: string
 
     @Index()
     @Column({ type: "uuid" })
     userId: string
 
-    @Index()
-    @ManyToOne(() => Blog, { onDelete: "CASCADE" })
-    @JoinColumn({ name: "blogId" })
-    blog: Blog;
+    @ManyToOne(() => Book, { onDelete: "CASCADE" })
+    @JoinColumn({ name: "review_of_book" })
+    book: Book;
 
     @ManyToOne(() => User, (user) => user.review, { onDelete: "CASCADE" })
     @JoinColumn({ name: "userId" })
     user: User;
+
+    @Column({default: false})
+    edited: boolean;
 
     @CreateDateColumn()
     createdAt: Date;

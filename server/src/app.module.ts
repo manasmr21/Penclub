@@ -11,6 +11,7 @@ import { BlogModule } from './modules/blog/blog.module';
 import { BooksModule } from './modules/books/books.module';
 import { UserModule } from './modules/users/user.module';
 import { CommentsModule } from './modules/comments/comments.module';
+import { ReviewModule } from './modules/reviews/review.module';
 
 @Module({
   imports: [
@@ -24,7 +25,8 @@ import { CommentsModule } from './modules/comments/comments.module';
     BlogModule,
     BooksModule,
     UserModule,
-    CommentsModule
+    CommentsModule,
+    ReviewModule
   ],
   controllers: [AppController],
   providers: [AppService],

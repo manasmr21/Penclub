@@ -8,5 +8,5 @@ export class CreateReviewDto {
   content?: string;
 
   @ApiProperty({ example: "uuid-blog" })
-  blogId: string;
+  bookId: string;
 }

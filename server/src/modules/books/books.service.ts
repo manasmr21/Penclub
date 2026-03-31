@@ -56,6 +56,30 @@ export class BooksService {
         }
     }
 
+    async getBooksByAuthor(authorId: string) {
+        try {
+
+            const books = await this.booksRepository.createQueryBuilder("book")
+                .where("book.authorId = :authorId", { authorId })
+                .select(["book.id", "book.title", "book.description", "book.genre", "book.coverImage", ])
+                .getMany();
+
+            if (books.length === 0) throw new NotFoundException({
+                success: false,
+                message: "No books found for this author"
+            })
+
+            return {
+                success: true,
+                message: "Books fetched successfully",
+                books
+            }
+
+        } catch (error) {
+            throw this.handleServiceError(error);
+        }
+    }
+
     async createBook(dto: CreateBookDto, file?: any) {
         try {
             const { title, description, genre } = dto;
@@ -82,7 +106,7 @@ export class BooksService {
 
             const bookPayload = this.booksRepository.create({
                 ...dto,
-                author: { id: dto.authorId } as AuthorEntity,
+                authorId: dto.authorId,
                 coverImage,
                 coverImageId
             });
