@@ -3,7 +3,6 @@ import { type AuthUser, type UserRole } from "./auth";
 
 type AuthPayload = {
   name?: string;
-  penName?: string;
   username?: string;
   email?: string;
   password: string;
@@ -37,11 +36,10 @@ export async function registerUser(role: UserRole, payload: AuthPayload) {
     const formData = new FormData();
 
     if (payload.name) formData.append("name", payload.name);
-    if (payload.penName) formData.append("penName", payload.penName);
     if (payload.username) formData.append("username", payload.username);
     if (payload.email) formData.append("email", payload.email);
     formData.append("password", payload.password);
-    formData.append("profilePicture", payload.profilePictureFile);
+    if (payload.profilePicture) formData.append("profilePicture", payload.profilePicture);
 
     const { data } = await api.post(`/${rolePath(role)}/${path}`, formData, {
       headers: {
@@ -102,7 +100,7 @@ export async function updateUserProfile(
       }
       if (readerPayload.profile) formData.append("profile", readerPayload.profile);
       if (readerPayload.profilePicture) formData.append("profilePicture", readerPayload.profilePicture);
-      formData.append("profilePicture", payload.profilePictureFile);
+      if (payload.profilePictureFile) formData.append("profilePicture", payload.profilePictureFile);
 
       const { data } = await api.put(`/${rolePath(user.role)}/update/${user.id}`, formData, {
         headers: {
@@ -123,7 +121,7 @@ export async function updateUserProfile(
     }
     if (payload.bio) formData.append("bio", payload.bio);
     if (payload.profilePicture) formData.append("profilePicture", payload.profilePicture);
-    formData.append("profilePicture", payload.profilePictureFile);
+    if (payload.profilePictureFile) formData.append("profilePicture", payload.profilePictureFile);
 
     const { data } = await api.put(`/${rolePath(user.role)}/update/${user.id}`, formData, {
       headers: {

@@ -6,7 +6,12 @@ import cookieParser from "cookie-parser"
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-   app.use(cookieParser(process.env.cookie_secrete))
+  app.enableCors({
+    origin: process.env.FRONTEND_URL ?? "http://localhost:3000",
+    credentials: true,
+  });
+
+  app.use(cookieParser(process.env.cookie_secrete))
 
   const config = new DocumentBuilder()
     .setTitle('Penclub API')

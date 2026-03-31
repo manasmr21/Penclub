@@ -47,20 +47,23 @@ export class User {
   bio?: string;
 
   @OneToMany(() => Book, (book) => book.author)
-  books: Book[]
+  books: Book[];
 
-  @Column({nullable: true})
-  followersId: string[];
-
-  @Column({nullable: true})
-  followingId: string[];
-
-  @ManyToMany(() => User)
-  @JoinTable({name: "user_following"})
+  @ManyToMany(() => User, (user) => user.followers)
+  @JoinTable({
+    name: "user_following",
+    joinColumn: {
+      name: "follower_id",
+      referencedColumnName: "id"
+    },
+    inverseJoinColumn: {
+      name: "following_id",
+      referencedColumnName: "id"
+    }
+  })
   following: User[];
 
   @ManyToMany(() => User, (user) => user.following)
-  @JoinTable({name: "user_followers"})
   followers: User[];
 
   @Column({ default: 0 })
@@ -93,8 +96,8 @@ export class User {
   @OneToMany(() => Comment, (comment) => comment.user)
   comments: Comment[];
 
-  @OneToMany(()=>Review, (review)=> review.user)
-  review: Review[]
+  @OneToMany(() => Review, (review) => review.user)
+  review: Review[];
 
   @Column({ type: "text", nullable: true })
   resetToken?: string | null;
