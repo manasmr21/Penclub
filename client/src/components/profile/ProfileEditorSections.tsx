@@ -1,4 +1,5 @@
 import AuthField from "@/src/components/auth/AuthField";
+import { Upload } from "lucide-react";
 import {
   authHelperTextClassName,
   authInputClassName,
@@ -43,37 +44,36 @@ export function ProfilePictureSection({
         </div>
       </div>
 
-      <AuthField id="profilePicture" label="Profile picture URL" error={error}>
+      <AuthField id="profilePicture" label="Profile picture" error={error}>
         <div className="space-y-3">
-          <input
-            id="profilePicture"
-            type="url"
-            value={profilePicture}
-            onChange={(event) => onProfilePictureChange(event.target.value)}
-            className={authInputClassName}
-            placeholder="https://example.com/profile.jpg"
-          />
-          <p className={authHelperTextClassName}>
-            The current backend accepts a profile image URL in `profilePicture`, not a file upload.
-          </p>
-          <div className={`${authPanelClassName} border-dashed border-slate-300 bg-slate-50 p-3`}>
+          <div className="relative">
+            <input
+              id="profilePicture"
+              type="url"
+              value={profilePicture}
+              onChange={(event) => onProfilePictureChange(event.target.value)}
+              className={`${authInputClassName} pr-12`}
+              placeholder="https://example.com/profile.jpg"
+            />
             <label
               htmlFor="profilePictureUpload"
-              className="inline-flex cursor-pointer rounded-lg border border-primary/20 bg-white px-4 py-2 text-sm font-medium text-primary transition hover:bg-primary/5"
+              className="absolute right-3 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-lg border border-primary/20 bg-white text-primary transition hover:bg-primary/5"
+              aria-label="Upload image"
+              title="Upload image"
             >
-              Upload image
+              <Upload size={16} />
             </label>
-            <input
-              id="profilePictureUpload"
-              type="file"
-              accept="image/*"
-              onChange={onUpload}
-              className="hidden"
-            />
-            <p className={`mt-2 ${authHelperTextClassName}`}>
-              Choose a JPG, PNG, or WEBP image up to 5 MB. We will compress it before upload.
-            </p>
           </div>
+          <p className={authHelperTextClassName}>
+            Paste an image URL or upload a file. We will compress uploads before saving.
+          </p>
+          <input
+            id="profilePictureUpload"
+            type="file"
+            accept="image/*"
+            onChange={onUpload}
+            className="hidden"
+          />
         </div>
       </AuthField>
     </>
@@ -144,6 +144,8 @@ type ProfileEditorActionsProps = {
   onVerify: () => void;
   onBack: () => void;
   onLogout: () => void;
+  showLogout?: boolean;
+  backLabel?: string;
 };
 
 export function ProfileEditorActions({
@@ -153,6 +155,8 @@ export function ProfileEditorActions({
   onVerify,
   onBack,
   onLogout,
+  showLogout = true,
+  backLabel = "Back to profile",
 }: ProfileEditorActionsProps) {
   return (
     <>
@@ -178,16 +182,18 @@ export function ProfileEditorActions({
           variant="outline"
           className="w-full rounded-xl border-slate-300 text-slate-700 hover:bg-slate-50"
         >
-          Back to profile
+          {backLabel}
         </Button>
-        <Button
-          type="button"
-          onClick={onLogout}
-          variant="outline"
-          className="w-full rounded-xl border-primary/20 text-primary hover:bg-primary/5"
-        >
-          Logout
-        </Button>
+        {showLogout ? (
+          <Button
+            type="button"
+            onClick={onLogout}
+            variant="outline"
+            className="w-full rounded-xl border-primary/20 text-primary hover:bg-primary/5"
+          >
+            Logout
+          </Button>
+        ) : null}
       </div>
     </>
   );

@@ -1,12 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { AxiosError } from "axios";
 import { ArrowUpRight, BookOpen, FileText, Plus, UserRound, Users, Pencil } from "lucide-react";
 import AuthShell from "@/src/components/auth/AuthShell";
 import { Button } from "@/src/components/ui/button";
 import { Card, CardContent } from "@/src/components/ui/card";
 import { ProfileHero } from "@/src/components/profile/ProfileHero";
+import ProfileEditor from "@/src/components/profile/ProfileEditor";
+import { createBook } from "@/src/lib/books-api";
 import {
   ProfileSectionCard,
   ProfileStatCard,
@@ -79,6 +83,7 @@ function ProfileLoadingView() {
 function ReaderProfile({
   displayName,
   initials,
+  profilePicture,
   interests,
   verified,
   bio,
@@ -87,6 +92,7 @@ function ReaderProfile({
 }: {
   displayName: string;
   initials: string;
+  profilePicture?: string;
   interests: string[];
   verified: boolean;
   bio?: string;
@@ -100,14 +106,16 @@ function ReaderProfile({
       <ProfileHero
         label="Reader profile"
         displayName={displayName}
+        profilePicture={profilePicture}
         bio={
           bio ||
           "A clean reader profile showing your reading identity, favorite genre, and essential details."
         }
         initials={initials}
+        editHref="/profile?edit=1"
         action={
           <Button asChild variant="outline" className="rounded-xl border-white/60 bg-card text-primary hover:bg-accent">
-            <Link href="/profile/edit">
+            <Link href="/profile?edit=1">
               <Pencil size={15} />
               Edit profile
             </Link>
@@ -139,7 +147,7 @@ function ReaderProfile({
                 {formatLabel(primaryInterest)}
               </span>
             ) : (
-              <Link href="/profile/edit" className="text-sm font-medium text-slate-900 underline underline-offset-2">
+              <Link href="/profile?edit=1" className="text-sm font-medium text-slate-900 underline underline-offset-2">
                 Add some
               </Link>
             )}
@@ -172,36 +180,117 @@ function ReaderProfile({
 function AuthorProfile({
   displayName,
   initials,
+  profilePicture,
   bio,
   email,
   phoneNumber,
+  authorId,
 }: {
   displayName: string;
   initials: string;
+  profilePicture?: string;
   bio?: string;
   email?: string;
   phoneNumber?: string;
+  authorId?: string;
 }) {
   const [activeTab, setActiveTab] = useState<"books" | "posts">("books");
-  const booksCount = 0;
+  const [booksCount, setBooksCount] = useState(0);
   const postsCount = 0;
   const followersCount = 0;
   const followingCount = 0;
+  const [showAddBookModal, setShowAddBookModal] = useState(false);
+  const [bookTitle, setBookTitle] = useState("");
+  const [bookDescription, setBookDescription] = useState("");
+  const [bookGenre, setBookGenre] = useState("");
+  const [bookReleaseDate, setBookReleaseDate] = useState("");
+  const [bookPurchaseLinks, setBookPurchaseLinks] = useState("");
+  const [bookCoverFile, setBookCoverFile] = useState<File | null>(null);
+  const [bookFormError, setBookFormError] = useState("");
+  const [bookSubmitting, setBookSubmitting] = useState(false);
   const panelTitle = activeTab === "books" ? "Books published" : "Posts published";
   const panelDescription =
     activeTab === "books"
       ? "No books published yet. Use Add book to start building your author shelf."
       : "No posts published yet. Use Add post to share your latest writing.";
 
+  const resetBookForm = () => {
+    setBookTitle("");
+    setBookDescription("");
+    setBookGenre("");
+    setBookReleaseDate("");
+    setBookPurchaseLinks("");
+    setBookCoverFile(null);
+    setBookFormError("");
+  };
+
+  const closeAddBookModal = () => {
+    setShowAddBookModal(false);
+    resetBookForm();
+  };
+
+  const handleCreateBook = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!authorId) {
+      setBookFormError("Could not identify author account.");
+      return;
+    }
+
+    if (!bookTitle.trim() || !bookDescription.trim() || !bookGenre.trim()) {
+      setBookFormError("Title, description, and genre are required.");
+      return;
+    }
+
+    if (bookCoverFile && !bookCoverFile.type.startsWith("image/")) {
+      setBookFormError("Cover image must be an image file.");
+      return;
+    }
+
+    try {
+      setBookSubmitting(true);
+      setBookFormError("");
+
+      const purchaseLinks = bookPurchaseLinks
+        .split("\n")
+        .map((link) => link.trim())
+        .filter(Boolean);
+
+      await createBook({
+        title: bookTitle.trim(),
+        description: bookDescription.trim(),
+        genre: bookGenre.trim(),
+        releaseDate: bookReleaseDate || undefined,
+        purchaseLinks: purchaseLinks.length ? purchaseLinks : undefined,
+        authorId,
+        coverImageFile: bookCoverFile ?? undefined,
+      });
+
+      setBooksCount((current) => current + 1);
+      closeAddBookModal();
+    } catch (error) {
+      const message =
+        error instanceof AxiosError
+          ? error.response?.data?.message
+          : "Could not add book.";
+
+      setBookFormError(message ?? "Could not add book.");
+    } finally {
+      setBookSubmitting(false);
+    }
+  };
+
   return (
     <div className="profile-surface">
       <ProfileHero
         label="Author profile"
         displayName={displayName}
+        profilePicture={profilePicture}
         bio={bio}
         email={email}
         phoneNumber={phoneNumber}
         initials={initials}
+        editHref="/profile?edit=1"
         compact
         stats={[
           { label: "Followers", value: followersCount },
@@ -211,7 +300,7 @@ function AuthorProfile({
         ]}
         action={
           <Button asChild variant="outline" className="rounded-xl border-white/60 bg-card text-primary hover:bg-accent">
-            <Link href="/profile/edit">
+            <Link href="/profile?edit=1">
               <Pencil size={15} />
               Edit profile
             </Link>
@@ -228,7 +317,7 @@ function AuthorProfile({
                 Manage your published books and blogs from one place.
               </div>
               <div className="flex flex-wrap gap-3">
-               <Button type="button" className="rounded-xl shadow-lg">
+               <Button type="button" className="rounded-xl shadow-lg" onClick={() => setShowAddBookModal(true)}>
                   <Plus size={15} />
                   Add book
                 </Button>
@@ -286,13 +375,111 @@ function AuthorProfile({
           </CardContent>
         </Card>
       </div>
+
+      {showAddBookModal ? (
+        <div
+          className="fixed inset-0 z-[1100] flex items-start justify-center bg-slate-950/50 p-4 pt-20 sm:p-6 sm:pt-24"
+          onClick={closeAddBookModal}
+        >
+          <div
+            className="max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white p-5 shadow-2xl sm:p-7"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="text-center">
+              <h2 className="text-xl font-semibold text-primary sm:text-2xl">Add book</h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Publish a new book to your author profile.
+              </p>
+            </div>
+
+            <form onSubmit={handleCreateBook} className="mt-6 space-y-3">
+              <input
+                type="text"
+                value={bookTitle}
+                onChange={(event) => setBookTitle(event.target.value)}
+                placeholder="Book title"
+                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-primary"
+              />
+              <input
+                type="text"
+                value={bookGenre}
+                onChange={(event) => setBookGenre(event.target.value)}
+                placeholder="Genre"
+                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-primary"
+              />
+              <input
+                type="date"
+                value={bookReleaseDate}
+                onChange={(event) => setBookReleaseDate(event.target.value)}
+                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-primary"
+              />
+              <textarea
+                value={bookDescription}
+                onChange={(event) => setBookDescription(event.target.value)}
+                placeholder="Book description"
+                className="min-h-28 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-primary"
+              />
+              <textarea
+                value={bookPurchaseLinks}
+                onChange={(event) => setBookPurchaseLinks(event.target.value)}
+                placeholder="Purchase links (one per line)"
+                className="min-h-24 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-primary"
+              />
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(event) => setBookCoverFile(event.target.files?.[0] ?? null)}
+                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-primary"
+              />
+
+              {bookFormError ? <p className="text-sm text-red-600">{bookFormError}</p> : null}
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <Button type="submit" disabled={bookSubmitting} className="w-full rounded-xl">
+                  {bookSubmitting ? "Adding..." : "Add book"}
+                </Button>
+                <Button type="button" variant="outline" className="w-full rounded-xl" onClick={closeAddBookModal}>
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
 
 export default function ProfilePage() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const user = useAuthStore((state) => state.user);
   const hydrated = useAuthStore((state) => state.hydrated);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  const closeEditModal = () => {
+    setIsEditModalOpen(false);
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("edit");
+    const nextQuery = params.toString();
+    router.replace(nextQuery ? `${pathname}?${nextQuery}` : pathname, { scroll: false });
+  };
+
+  useEffect(() => {
+    if (searchParams.get("edit") === "1") {
+      setIsEditModalOpen(true);
+      return;
+    }
+    setIsEditModalOpen(false);
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (!isEditModalOpen) return;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isEditModalOpen]);
 
   if (!hydrated) return <ProfileLoadingView />;
   if (hydrated && !user) return <GuestView />;
@@ -303,29 +490,48 @@ export default function ProfilePage() {
   const verified = user?.isEmailVerified ?? false;
 
   return (
-    <AuthShell
-      cardClassName="auth-shell-card-profile"
-      contentClassName="auth-shell-content-profile"
-    >
-      {user?.role === "author" ? (
-        <AuthorProfile
-          displayName={displayName}
-          initials={initials}
-          bio={user?.bio}
-          email={user?.email}
-          phoneNumber={user?.phoneNumber}
-        />
-      ) : (
-        <ReaderProfile
-          displayName={displayName}
-          initials={initials}
-          interests={interests}
-          verified={verified}
-          bio={user?.bio}
-          email={user?.email}
-          phoneNumber={user?.phoneNumber}
-        />
-      )}
-    </AuthShell>
+    <>
+      <AuthShell
+        cardClassName="auth-shell-card-profile"
+        contentClassName="auth-shell-content-profile"
+      >
+        {user?.role === "author" ? (
+          <AuthorProfile
+            displayName={displayName}
+            initials={initials}
+            profilePicture={user?.profilePicture}
+            bio={user?.bio}
+            email={user?.email}
+            phoneNumber={user?.phoneNumber}
+            authorId={user?.id}
+          />
+        ) : (
+          <ReaderProfile
+            displayName={displayName}
+            initials={initials}
+            profilePicture={user?.profilePicture}
+            interests={interests}
+            verified={verified}
+            bio={user?.bio}
+            email={user?.email}
+            phoneNumber={user?.phoneNumber}
+          />
+        )}
+      </AuthShell>
+
+      {isEditModalOpen ? (
+        <div
+          className="fixed inset-0 z-[1100] flex items-start justify-center bg-slate-950/50 p-4 pt-20 sm:p-6 sm:pt-24"
+          onClick={closeEditModal}
+        >
+          <div
+            className="max-h-[85vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white p-5 shadow-2xl sm:p-7"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <ProfileEditor inModal onClose={closeEditModal} />
+          </div>
+        </div>
+      ) : null}
+    </>
   );
 }

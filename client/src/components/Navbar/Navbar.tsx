@@ -60,6 +60,8 @@ const Navbar = () => {
     router.refresh();
   };
 
+  const hasProfilePicture = typeof user?.profilePicture === "string" && user.profilePicture.trim().length > 0;
+
   const profileChip = (
     <div className="group relative">
       <Link
@@ -68,14 +70,18 @@ const Navbar = () => {
         onClick={closeMenu}
       >
         <span className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-slate-100">
-          {user?.profilePicture ? (
+          {hasProfilePicture ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={user.profilePicture}
-              alt={user.name}
+              alt={user?.name ?? user?.penName ?? user?.username ?? "Profile"}
               className="h-full w-full object-cover"
             />
-          ) : null}
+          ) : (
+            <span className="text-xs font-semibold text-slate-600">
+              {(user?.name ?? user?.penName ?? user?.username ?? "U").charAt(0).toUpperCase()}
+            </span>
+          )}
         </span>
         <span className="max-w-[120px] truncate text-sm font-semibold">
           {user?.name}
@@ -91,7 +97,7 @@ const Navbar = () => {
           My profile
         </Link>
         <Link
-          href="/profile/edit"
+          href="/profile?edit=1"
           className="mt-0.5 block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
           onClick={closeMenu}
         >
