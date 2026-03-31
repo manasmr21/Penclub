@@ -9,7 +9,6 @@ import {
   publicationSvg,
 } from "@/public/images/index";
 import Image from "next/image";
-import "./Hero.css";
 
 const stripData = [
   {

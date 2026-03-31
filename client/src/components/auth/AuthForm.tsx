@@ -173,7 +173,7 @@ export default function AuthForm({ mode }: { mode: AuthMode }) {
       });
 
       setUser({
-        id: data?.data?.id,
+        id: data?.data?.id ?? data?.id,
         name:
           data?.data?.name ??
           (role === "author" ? data?.data?.penName : data?.data?.username) ??
@@ -182,6 +182,7 @@ export default function AuthForm({ mode }: { mode: AuthMode }) {
         role,
         penName: data?.data?.penName,
         username: data?.data?.username,
+        profilePicture: data?.data?.profilePicture,
         isEmailVerified: true,
       });
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AxiosError } from "axios";
 import AuthField from "@/src/components/auth/AuthField";
@@ -17,7 +17,6 @@ import {
   InterestsSection,
 } from "@/src/components/profile/ProfileEditorSections";
 import {
-  compressProfileImage,
   isValidProfilePicture,
   validateProfilePictureValue,
   validateUploadedProfileImage,
@@ -35,41 +34,53 @@ const INTEREST_OPTIONS = [
 ];
 
 type ProfileErrors = {
-  phoneNumber?: string;
   interests?: string;
   profilePicture?: string;
   bio?: string;
   form?: string;
 };
 
-export default function ProfileEditor() {
+type ProfileEditorProps = {
+  inModal?: boolean;
+  onClose?: () => void;
+};
+
+export default function ProfileEditor({ inModal = false, onClose }: ProfileEditorProps) {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const updateUser = useAuthStore((state) => state.updateUser);
   const clearAuth = useAuthStore((state) => state.clearAuth);
 
-  const [phoneNumber, setPhoneNumber] = useState(user?.phoneNumber ?? "");
   const [interests, setInterests] = useState<string[]>(user?.interests ?? []);
   const [bio, setBio] = useState(user?.bio ?? "");
   const [profilePicture, setProfilePicture] = useState(user?.profilePicture ?? "");
+  const [profilePictureFile, setProfilePictureFile] = useState<File | null>(null);
+  const [localProfilePreview, setLocalProfilePreview] = useState("");
   const [errors, setErrors] = useState<ProfileErrors>({});
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [imagePreviewFailed, setImagePreviewFailed] = useState(false);
 
-  const isReader = user?.role === "reader";
   const normalizedProfilePicture = profilePicture.trim();
+  const previewSrc = localProfilePreview || normalizedProfilePicture;
   const showProfilePreview = Boolean(
-    normalizedProfilePicture &&
-      isValidProfilePicture(normalizedProfilePicture) &&
-      !imagePreviewFailed,
+    previewSrc &&
+      (localProfilePreview || (isValidProfilePicture(normalizedProfilePicture) && !imagePreviewFailed)),
   );
 
   const canVerifyEmail = useMemo(
     () => Boolean(user?.email && !user?.isEmailVerified),
     [user],
   );
+
+  useEffect(() => {
+    return () => {
+      if (localProfilePreview) {
+        URL.revokeObjectURL(localProfilePreview);
+      }
+    };
+  }, [localProfilePreview]);
 
   const toggleInterest = (interest: string) => {
     setInterests((current) =>
@@ -85,14 +96,17 @@ export default function ProfileEditor() {
     event.preventDefault();
 
     if (!user) return;
+    if (!user.id || user.id === "undefined") {
+      setErrors({ form: "Session expired. Please sign in again and retry." });
+      return;
+    }
 
     const nextErrors: ProfileErrors = {};
-    if (isReader && phoneNumber.trim() && !/^[0-9+\-\s()]{7,20}$/.test(phoneNumber.trim())) {
-      nextErrors.phoneNumber = "Enter a valid phone number.";
-    }
-    const profilePictureError = validateProfilePictureValue(normalizedProfilePicture);
-    if (profilePictureError) {
-      nextErrors.profilePicture = profilePictureError;
+    if (!profilePictureFile) {
+      const profilePictureError = validateProfilePictureValue(normalizedProfilePicture);
+      if (profilePictureError) {
+        nextErrors.profilePicture = profilePictureError;
+      }
     }
 
     if (Object.keys(nextErrors).length > 0) {
@@ -107,18 +121,23 @@ export default function ProfileEditor() {
         interests: interests.length ? interests : undefined,
         bio: bio.trim() || undefined,
         profilePicture: normalizedProfilePicture || undefined,
-        ...(isReader ? { phoneNumber: phoneNumber.trim() || undefined } : {}),
+        profilePictureFile: profilePictureFile ?? undefined,
       };
 
-      await updateUserProfile(user, payload);
+      const response = await updateUserProfile(user, payload);
+      const savedProfilePicture =
+        response?.author?.profilePicture ??
+        response?.reader?.profilePicture ??
+        (profilePictureFile ? localProfilePreview || undefined : normalizedProfilePicture || undefined);
 
       updateUser({
-        ...(isReader ? { phoneNumber: phoneNumber.trim() || undefined } : {}),
         interests: interests.length ? interests : undefined,
         bio: bio.trim() || undefined,
-        profilePicture: normalizedProfilePicture || undefined,
+        ...(savedProfilePicture ? { profilePicture: savedProfilePicture } : {}),
       });
-      setProfilePicture(normalizedProfilePicture);
+      setProfilePicture(savedProfilePicture ?? "");
+      setProfilePictureFile(null);
+      setLocalProfilePreview("");
       setImagePreviewFailed(false);
       setMessage("Profile updated successfully.");
     } catch (error) {
@@ -144,20 +163,16 @@ export default function ProfileEditor() {
       return;
     }
 
-    try {
-      const dataUrl = await compressProfileImage(file);
-      setProfilePicture(dataUrl);
-      setImagePreviewFailed(false);
-      setErrors((current) => ({ ...current, profilePicture: undefined, form: undefined }));
-      setMessage("");
-    } catch {
-      setErrors((current) => ({
-        ...current,
-        profilePicture: "Could not process the selected image.",
-      }));
-    } finally {
-      event.target.value = "";
+    if (localProfilePreview) {
+      URL.revokeObjectURL(localProfilePreview);
     }
+
+    setProfilePictureFile(file);
+    setLocalProfilePreview(URL.createObjectURL(file));
+    setImagePreviewFailed(false);
+    setErrors((current) => ({ ...current, profilePicture: undefined, form: undefined }));
+    setMessage("");
+    event.target.value = "";
   };
 
   const handleLogout = async () => {
@@ -197,16 +212,14 @@ export default function ProfileEditor() {
     }
   };
 
-  return (
-    <AuthShell>
+  const content = (
+    <>
       <div className="text-center">
         <h1 className="text-2xl font-semibold text-primary md:text-4xl">
           Edit profile
         </h1>
         <p className="mt-3 text-sm text-slate-600">
-          {isReader
-            ? "Update your phone number, interests, short bio, and profile picture."
-            : "Update your interests, short bio, and profile picture."}
+          Update your interests, short bio, and profile picture.
         </p>
       </div>
 
@@ -215,9 +228,14 @@ export default function ProfileEditor() {
           error={errors.profilePicture}
           profilePicture={profilePicture}
           showProfilePreview={showProfilePreview}
-          previewSrc={normalizedProfilePicture}
+          previewSrc={previewSrc}
           onProfilePictureChange={(value) => {
             setProfilePicture(value);
+            setProfilePictureFile(null);
+            if (localProfilePreview) {
+              URL.revokeObjectURL(localProfilePreview);
+              setLocalProfilePreview("");
+            }
             setImagePreviewFailed(false);
             setErrors((current) => ({ ...current, profilePicture: undefined, form: undefined }));
             setMessage("");
@@ -225,23 +243,6 @@ export default function ProfileEditor() {
           onUpload={handleProfilePictureUpload}
           onPreviewError={() => setImagePreviewFailed(true)}
         />
-
-        {isReader ? (
-          <AuthField id="phoneNumber" label="Phone number" error={errors.phoneNumber}>
-            <input
-              id="phoneNumber"
-              type="tel"
-              value={phoneNumber}
-              onChange={(event) => {
-                setPhoneNumber(event.target.value);
-                setErrors((current) => ({ ...current, phoneNumber: undefined, form: undefined }));
-                setMessage("");
-              }}
-              className={authInputClassName}
-              placeholder="Add your phone number"
-            />
-          </AuthField>
-        ) : null}
 
         <InterestsSection
           options={INTEREST_OPTIONS}
@@ -272,10 +273,24 @@ export default function ProfileEditor() {
           canVerifyEmail={canVerifyEmail}
           verifying={verifying}
           onVerify={handleVerifyEmail}
-          onBack={() => router.push("/profile")}
+          onBack={() => {
+            if (inModal && onClose) {
+              onClose();
+              return;
+            }
+            router.push("/profile");
+          }}
           onLogout={handleLogout}
+          showLogout={!inModal}
+          backLabel={inModal ? "Close" : "Back to profile"}
         />
       </form>
-    </AuthShell>
+    </>
   );
+
+  if (inModal) {
+    return <div className="space-y-2">{content}</div>;
+  }
+
+  return <AuthShell>{content}</AuthShell>;
 }

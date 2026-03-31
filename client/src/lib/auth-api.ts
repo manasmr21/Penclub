@@ -15,6 +15,7 @@ type AuthPayload = {
 type SharedProfilePayload = {
   interests?: string[];
   profilePicture?: string;
+  profilePictureFile?: File;
   bio?: string;
 };
 
@@ -81,6 +82,57 @@ export async function updateUserProfile(
   user: AuthUser,
   payload: ReaderProfilePayload | AuthorProfilePayload,
 ) {
+  if (!user.id || user.id === "undefined") {
+    throw new Error("Profile session is invalid. Please sign in again.");
+  }
+
+  const hasProfileFile = payload.profilePictureFile instanceof File;
+
+  if (user.role === "reader") {
+    const readerPayload = {
+      interest: payload.interests,
+      profile: payload.bio,
+      profilePicture: payload.profilePicture,
+    };
+
+    if (hasProfileFile) {
+      const formData = new FormData();
+      if (readerPayload.interest?.length) {
+        readerPayload.interest.forEach((item) => formData.append("interest", item));
+      }
+      if (readerPayload.profile) formData.append("profile", readerPayload.profile);
+      if (readerPayload.profilePicture) formData.append("profilePicture", readerPayload.profilePicture);
+      formData.append("profilePicture", payload.profilePictureFile);
+
+      const { data } = await api.put(`/${rolePath(user.role)}/update/${user.id}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      return data;
+    }
+
+    const { data } = await api.put(`/${rolePath(user.role)}/update/${user.id}`, readerPayload);
+    return data;
+  }
+
+  if (hasProfileFile) {
+    const formData = new FormData();
+    if (payload.interests?.length) {
+      payload.interests.forEach((item) => formData.append("interests", item));
+    }
+    if (payload.bio) formData.append("bio", payload.bio);
+    if (payload.profilePicture) formData.append("profilePicture", payload.profilePicture);
+    formData.append("profilePicture", payload.profilePictureFile);
+
+    const { data } = await api.put(`/${rolePath(user.role)}/update/${user.id}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return data;
+  }
+
   const { data } = await api.put(`/${rolePath(user.role)}/update/${user.id}`, payload);
   return data;
 }

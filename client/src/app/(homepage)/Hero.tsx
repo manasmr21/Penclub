@@ -4,7 +4,6 @@ import Image from "next/image";
 import { cloud, cloud2 } from "@/public/images";
 import HeroCarousel from "@/src/components/Carousels/HeroCarousel";
 import Strip from "./Strip";
-import "./Hero.css";
 
 const Hero = () => {
   return (

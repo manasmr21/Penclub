@@ -61,7 +61,7 @@ function VerifyOtpContent() {
 
       setUser({
         ...pendingOtpUser,
-        id: data?.data?.id ?? pendingOtpUser.id,
+        id: data?.data?.id ?? data?.id ?? pendingOtpUser.id,
         name: data?.data?.name ?? pendingOtpUser.name,
         email: data?.data?.email ?? pendingOtpUser.email,
         penName: data?.data?.penName ?? pendingOtpUser.penName,

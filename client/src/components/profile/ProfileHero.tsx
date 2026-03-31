@@ -4,6 +4,7 @@ import { Mail, Pencil, Phone } from "lucide-react";
 type ProfileHeroProps = {
   label: string;
   displayName: string;
+  profilePicture?: string;
   bio?: string;
   email?: string;
   phoneNumber?: string;
@@ -11,11 +12,13 @@ type ProfileHeroProps = {
   compact?: boolean;
   stats?: Array<{ label: string; value: string | number }>;
   action?: React.ReactNode;
+  editHref?: string;
 };
 
 export function ProfileHero({
   label,
   displayName,
+  profilePicture,
   bio,
   email,
   phoneNumber,
@@ -23,17 +26,25 @@ export function ProfileHero({
   compact = false,
   stats,
   action,
+  editHref = "/profile/edit",
 }: ProfileHeroProps) {
+  const hasProfilePicture = typeof profilePicture === "string" && profilePicture.trim().length > 0;
+
   return (
     <div className={`profile-hero ${compact ? "px-5 py-5 sm:px-6 lg:px-8 lg:py-6" : "px-5 py-6 sm:px-7 lg:px-10 lg:py-8"}`}>
       <div className={`flex flex-col ${compact ? "gap-4" : "gap-5"} xl:flex-row xl:items-end xl:justify-between`}>
         <div className="flex items-end gap-5">
           <div className="relative shrink-0">
             <div className={`flex items-center justify-center overflow-hidden rounded-[1.2rem] bg-white/15 font-semibold text-white ring-2 ring-white/20 shadow-xl ${compact ? "h-[4.5rem] w-[4.5rem] text-xl sm:h-20 sm:w-20 sm:text-2xl lg:h-24 lg:w-24 lg:text-[1.7rem]" : "h-20 w-20 text-2xl sm:h-24 sm:w-24 sm:text-3xl lg:h-28 lg:w-28 lg:text-[2rem]"}`}>
-              {initials}
+              {hasProfilePicture ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={profilePicture} alt={displayName} className="h-full w-full object-cover" />
+              ) : (
+                initials
+              )}
             </div>
             <Link
-              href="/profile/edit"
+              href={editHref}
               className={`absolute -bottom-2 -right-2 flex items-center justify-center rounded-xl bg-card text-primary shadow-xl transition hover:bg-accent ${compact ? "h-8 w-8" : "h-9 w-9"}`}
             >
               <Pencil size={compact ? 14 : 15} />

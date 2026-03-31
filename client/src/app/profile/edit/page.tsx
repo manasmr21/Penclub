@@ -1,5 +1,5 @@
-import ProfileEditor from "@/src/components/profile/ProfileEditor";
+import { redirect } from "next/navigation";
 
 export default function EditProfilePage() {
-  return <ProfileEditor />;
+  redirect("/profile?edit=1");
 }
