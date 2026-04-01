@@ -127,8 +127,8 @@ export class UserService {
                     throw new ConflictException("Email already exists");
                 }
 
-                if (detail.includes('penName')) {
-                    throw new ConflictException("Pen name already exists");
+                if (detail.includes('username')) {
+                    throw new ConflictException("Username already exists");
                 }
 
                 throw new ConflictException("Duplicate entry");

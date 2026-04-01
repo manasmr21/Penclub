@@ -3,18 +3,15 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-import type { AuthUser, PendingOtpUser } from "../auth";
 
 type AppStore = {
-  user: AuthUser | null;
-  pendingOtpUser: PendingOtpUser | null;
+  user: Object | null;
   hydrated: boolean;
   isLoading: boolean;
   error: string | null;
   setHydrated: (value: boolean) => void;
-  setUser: (user: AuthUser | null) => void;
-  updateUser: (payload: Partial<AuthUser>) => void;
-  setPendingOtpUser: (user: PendingOtpUser | null) => void;
+  setUser: (user: any | null) => void;
+  updateUser: (payload: Partial<any>) => void;
   setLoading: (value: boolean) => void;
   setError: (message: string | null) => void;
   clearAuth: () => void;
@@ -39,18 +36,16 @@ export const useAppStore = create<AppStore>()(
         set((state) => ({
           user: state.user ? { ...state.user, ...payload } : state.user,
         })),
-      setPendingOtpUser: (pendingOtpUser) => set({ pendingOtpUser }),
       setLoading: (value) => set({ isLoading: value }),
       setError: (message) => set({ error: message }),
-      clearAuth: () => set({ user: null, pendingOtpUser: null }),
+      clearAuth: () => set({ user: null }),
       resetStore: () => set(initialState),
     }),
     {
       name: "penclub-app-store",
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
-        user: state.user,
-        pendingOtpUser: state.pendingOtpUser,
+        user: state.user
       }),
       onRehydrateStorage: () => (state) => {
         state?.setHydrated(true);
