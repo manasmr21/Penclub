@@ -44,7 +44,7 @@ export async function register(payload: RegisterPayload, setLoading: (value: boo
     if (payload.profilePictureFile) formData.append("profilePicture", payload.profilePictureFile);
 
     const response = await registerUser(formData);
-    alert(response.message);
+    if (response.success) alert(response.message);
     return response;
 
   } catch (error) {
@@ -61,7 +61,7 @@ export async function verifyOtp(email: string, otp: string, setLoading: (value: 
   setLoading(true);
   try {
     const response = await verifyUserOtp(email, otp);
-    alert(response.message);
+    if (response.success) alert(response.message);
     return response;
   } catch (error) {
     const message = getErrorMessage(error);
@@ -74,9 +74,12 @@ export async function verifyOtp(email: string, otp: string, setLoading: (value: 
 }
 
 export async function login(payload: LoginPayload, setLoading: (value: boolean) => void) {
+  setLoading(true);
   try {
-    setLoading(true);
-    return await loginUser(payload);
+    const response = await loginUser(payload);
+
+    if(response.success) alert(response.message);
+    return response
   } catch (error) {
     const message = getErrorMessage(error);
     alert(message);

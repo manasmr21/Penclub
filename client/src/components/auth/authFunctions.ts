@@ -3,18 +3,67 @@ import { login, register, type RegisterPayload } from "../../lib/auth";
 
 export type AuthFormState = RegisterPayload & {
   identifier: string;
-  profilePictureFile: File | null;
+  profilePictureFile?: File;
+};
+
+type RouterLike = {
+  push: (href: string) => void;
+  refresh: () => void;
 };
 
 export const handleImageChange = (
   e: ChangeEvent<HTMLInputElement>,
-  setFormData: Dispatch<SetStateAction<any>>,
+  setFormData: Dispatch<SetStateAction<AuthFormState>>,
   setPreviewUrl: Dispatch<SetStateAction<string | null>>
 ) => {
   const file = e.target.files?.[0];
   if (file) {
-    setFormData((prev: any) => ({ ...prev, profilePictureFile: file }));
+    setFormData((prev) => ({ ...prev, profilePictureFile: file }));
     setPreviewUrl(URL.createObjectURL(file));
+  }
+};
+
+const handleSignupSubmit = async (
+  formData: AuthFormState,
+  setLoading: (value: boolean) => void,
+  router: RouterLike
+) => {
+  const response = await register(
+    {
+      ...formData,
+      profilePictureFile: formData.profilePictureFile,
+    },
+    setLoading,
+  );
+
+  if (response?.user?.email) {
+    const expiresAtQuery = response?.otpExpiresAt
+      ? `&expiresAt=${encodeURIComponent(response.otpExpiresAt)}`
+      : "";
+
+    router.push(`/verify-otp?email=${encodeURIComponent(response.user.email)}${expiresAtQuery}`);
+    router.refresh();
+  }
+};
+
+const handleLoginSubmit = async (
+  formData: AuthFormState,
+  setLoading: (value: boolean) => void,
+  setUser: (user: Record<string, unknown> | null) => void,
+  router: RouterLike
+) => {
+  const response = await login(
+    {
+      identifier: formData.identifier.trim(),
+      password: formData.password,
+    },
+    setLoading,
+  );
+
+  if (response?.user) {
+    setUser(response.user);
+    router.push("/");
+    router.refresh();
   }
 };
 
@@ -23,8 +72,8 @@ export const handleSubmit = async (
   authType: 'login' | 'signup',
   formData: AuthFormState,
   setLoading: (value: boolean) => void,
-  setUser: (user: any) => void,
-  router: any
+  setUser: (user: Record<string, unknown> | null) => void,
+  router: RouterLike
 ) => {
   e.preventDefault();
 
@@ -35,29 +84,11 @@ export const handleSubmit = async (
     }
 
     if (authType === 'signup') {
-      await register(
-        {
-          ...formData,
-          profilePictureFile: formData.profilePictureFile ?? undefined,
-        },
-        setLoading,
-      );
+      await handleSignupSubmit(formData, setLoading, router);
       return;
     }
 
-    const response = await login(
-      {
-        identifier: formData.identifier.trim(),
-        password: formData.password,
-      },
-      setLoading,
-    );
-
-    if (response?.user) {
-      setUser(response.user);
-      router.push("/");
-      router.refresh();
-    }
+    await handleLoginSubmit(formData, setLoading, setUser, router);
   } catch {
     // The auth helpers already surface the backend message to the user.
   }

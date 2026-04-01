@@ -4,10 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AxiosError } from "axios";
 import AuthField from "@/src/components/auth/AuthField";
+import AuthShell from "@/src/components/auth/AuthShell";
 import {
   authInputClassName,
 } from "@/src/components/auth/auth-styles";
-import { Button } from "@/src/components/ui/button";
 import { logoutUser, resendUserOtp, updateUserProfile } from "@/src/lib/auth-api";
 import { useAuthStore } from "@/src/store/auth-store";
 import {
@@ -194,12 +194,10 @@ export default function ProfileEditor({ inModal = false, onClose }: ProfileEdito
       setVerifying(true);
       setErrors({});
       const data = await resendUserOtp(user.role, user.email);
-      useAuthStore.getState().setPendingOtpUser({
-        ...user,
-        expiresAt: Date.now() + (data?.otpExpiresInMinutes ?? 10) * 60 * 1000,
-        devOtp: data?.devOtp,
-      });
-      router.push(`/verify-otp?email=${encodeURIComponent(user.email)}&role=${user.role}`);
+      const expiresAtQuery = data?.otpExpiresAt
+        ? `&expiresAt=${encodeURIComponent(data.otpExpiresAt)}`
+        : "";
+      router.push(`/verify-otp?email=${encodeURIComponent(user.email)}${expiresAtQuery}`);
     } catch (error) {
       const nextMessage =
         error instanceof AxiosError
