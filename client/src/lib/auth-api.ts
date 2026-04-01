@@ -6,16 +6,14 @@ export async function registerUser(payload: FormData) {
   return data;
 }
 
-export async function loginUser(payload: LoginPayload) {
-  const { data } = await api.post("/users/login", payload);
+export async function verifyUserOtp(email: string, otp: string) {
+  const { data } = await api.post("/users/verify", { email, otp })
   return data;
 }
 
-
-export async function verifyUserOtp(role: string, email: string, otp: string) {
-  void role;
-  void email;
-  void otp;
+export async function loginUser(payload: LoginPayload) {
+  const { data } = await api.post("/users/login", payload);
+  return data;
 }
 
 export async function resendUserOtp(role: string, email: string) {

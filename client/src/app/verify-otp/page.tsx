@@ -7,7 +7,7 @@ import { resendUserOtp, verifyUserOtp } from "@/src/lib/auth-api";
 
 export default function VerifyEmailPage() {
   const router = useRouter();
-  const { pendingOtpUser, setPendingOtpUser, setError, setUser } = useAuthStore();
+  const { setError, setUser } = useAuthStore();
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [timeLeft, setTimeLeft] = useState(600); // 10 minutes (600 seconds)
   const [isLoading, setIsLoading] = useState(false);
@@ -51,64 +51,12 @@ export default function VerifyEmailPage() {
     }
   };
 
-  const handleResendOtp = async () => {
-    if (!pendingOtpUser) {
-      alert("No pending session found. Please sign up again.");
-      router.push("/sign-up");
-      return;
-    }
+  
 
-    try {
-      setIsLoading(true);
-      await resendUserOtp(pendingOtpUser.role, pendingOtpUser.email);
-      setTimeLeft(600); // Reset timer
-      alert("OTP resent successfully!");
-    } catch (err: any) {
-      alert(err.message || "Failed to resend OTP");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleVerifyOtp = async () => {
-    const otpString = otp.join("");
-    if (otpString.length < 6) {
-      alert("Please enter the full 6-digit OTP.");
-      return;
-    }
-
-    if (!pendingOtpUser) {
-      router.push("/sign-up");
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      const response = await verifyUserOtp(pendingOtpUser.role, pendingOtpUser.email, otpString);
-      
-      if (response && response.user) {
-        setUser(response.user);
-        setPendingOtpUser(null);
-        router.push("/profile");
-      } else {
-        alert("Verification successful. Please sign in.");
-        router.push("/sign-in");
-      }
-    } catch (err: any) {
-      alert(err.message || "Incorrect OTP. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleBackToSignUp = () => {
-    setPendingOtpUser(null);
-    router.push("/sign-up");
-  };
 
   return (
     <div className="min-h-screen flex flex-col font-body text-on-surface">
-      
+
       {/* Header */}
       <header className="bg-[#fdf9eb] flex justify-between items-center w-full px-6 py-4 max-w-7xl mx-auto">
         <div className="flex items-center gap-2">
@@ -118,7 +66,7 @@ export default function VerifyEmailPage() {
           <h1 className="font-serif text-xl uppercase">PEN CLUB</h1>
         </div>
 
-        <button 
+        <button
           onClick={() => router.push("/sign-in")}
           className="text-xs font-medium uppercase tracking-wider text-[#002663]"
         >
@@ -135,7 +83,7 @@ export default function VerifyEmailPage() {
           <div className="text-center mb-10">
             <h2 className="text-3xl mb-3 font-serif">Verify your email</h2>
             <p className="text-sm text-gray-500">
-              Enter the OTP sent to {pendingOtpUser?.email || "your email address"}
+              Enter the OTP sent to someone
             </p>
           </div>
 
@@ -169,7 +117,7 @@ export default function VerifyEmailPage() {
               </div>
 
               <div className="h-1 bg-gray-200 rounded-full overflow-hidden">
-                <div 
+                <div
                   className={`h-full transition-all duration-1000 ${timeLeft < 60 ? "bg-red-500" : "bg-blue-900"}`}
                   style={{ width: `${(timeLeft / 600) * 100}%` }}
                 ></div>
@@ -179,16 +127,15 @@ export default function VerifyEmailPage() {
 
           {/* Buttons */}
           <div className="space-y-4">
-            <button 
-              onClick={handleVerifyOtp}
+            <button
+
               disabled={isLoading || otp.join("").length < 6}
               className="w-full ink-gradient text-white py-4 rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
             >
               {isLoading ? "Verifying..." : "Verify OTP"}
             </button>
 
-            <button 
-              onClick={handleResendOtp}
+            <button
               disabled={isLoading || timeLeft > 0}
               className="w-full text-gray-500 py-3 rounded-xl text-sm hover:bg-gray-50 transition-colors disabled:opacity-50"
             >
@@ -198,8 +145,7 @@ export default function VerifyEmailPage() {
 
           {/* Footer Link */}
           <div className="mt-10 text-center">
-            <button 
-              onClick={handleBackToSignUp}
+            <button
               className="text-[10px] uppercase text-gray-500 hover:text-blue-900 transition-colors tracking-widest font-bold"
             >
               Need to restart? Back to sign up
@@ -209,4 +155,4 @@ export default function VerifyEmailPage() {
       </main>
     </div>
   );
-}
+}

@@ -1,5 +1,5 @@
 import { AxiosError } from "axios";
-import { loginUser, registerUser } from "./auth-api";
+import { loginUser, registerUser, verifyUserOtp } from "./auth-api";
 
 
 export type RegisterPayload = {
@@ -47,6 +47,22 @@ export async function register(payload: RegisterPayload, setLoading: (value: boo
     alert(response.message);
     return response;
 
+  } catch (error) {
+    const message = getErrorMessage(error);
+    alert(message);
+    console.log(error);
+    throw error;
+  } finally {
+    setLoading(false);
+  }
+}
+
+export async function verifyOtp(email: string, otp: string, setLoading: (value: boolean) => void) {
+  setLoading(true);
+  try {
+    const response = await verifyUserOtp(email, otp);
+    alert(response.message);
+    return response;
   } catch (error) {
     const message = getErrorMessage(error);
     alert(message);
