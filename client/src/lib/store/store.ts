@@ -3,24 +3,41 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
+export type UserRole = "reader" | "author";
+
+export type AuthUser = {
+  id: string;
+  email: string;
+  role: UserRole;
+  name?: string;
+  username?: string;
+  bio?: string;
+  interests?: string[];
+  socialLinks?: string[];
+  profilePicture?: string;
+  profilePictureId?: string;
+  followersCount?: number;
+  followingCount?: number;
+  isEmailVerified?: boolean;
+  isLoggedIn?: boolean;
+};
 
 type AppStore = {
-  user: Object | null;
+  user: AuthUser | null;
   hydrated: boolean;
   isLoading: boolean;
   error: string | null;
   setHydrated: (value: boolean) => void;
-  setUser: (user: any | null) => void;
-  updateUser: (payload: Partial<any>) => void;
+  setUser: (user: AuthUser | null) => void;
+  updateUser: (payload: Partial<AuthUser>) => void;
   setLoading: (value: boolean) => void;
   setError: (message: string | null) => void;
   clearAuth: () => void;
   resetStore: () => void;
 };
 
-const initialState = {
+const initialState: Pick<AppStore, "user" | "hydrated" | "isLoading" | "error"> = {
   user: null,
-  pendingOtpUser: null,
   hydrated: false,
   isLoading: false,
   error: null,

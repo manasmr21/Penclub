@@ -1,5 +1,6 @@
 import { ChangeEvent, FormEvent, Dispatch, SetStateAction } from 'react';
 import { login, register, type RegisterPayload } from "../../lib/auth";
+import { type AuthUser } from "@/src/lib/store/store";
 
 export type AuthFormState = RegisterPayload & {
   identifier: string;
@@ -49,7 +50,7 @@ const handleSignupSubmit = async (
 const handleLoginSubmit = async (
   formData: AuthFormState,
   setLoading: (value: boolean) => void,
-  setUser: (user: Record<string, unknown> | null) => void,
+  setUser: (user: AuthUser | null) => void,
   router: RouterLike
 ) => {
   const response = await login(
@@ -72,7 +73,7 @@ export const handleSubmit = async (
   authType: 'login' | 'signup',
   formData: AuthFormState,
   setLoading: (value: boolean) => void,
-  setUser: (user: Record<string, unknown> | null) => void,
+  setUser: (user: AuthUser | null) => void,
   router: RouterLike
 ) => {
   e.preventDefault();

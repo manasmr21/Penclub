@@ -74,12 +74,12 @@ const Navbar = () => {
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={user.profilePicture}
-              alt={user?.name ?? user?.penName ?? user?.username ?? "Profile"}
+              alt={user?.name ?? user?.username ?? "Profile"}
               className="h-full w-full object-cover"
             />
           ) : (
             <span className="text-xs font-semibold text-slate-600">
-              {(user?.name ?? user?.penName ?? user?.username ?? "U").charAt(0).toUpperCase()}
+              {(user?.name ?? user?.username ?? "U").charAt(0).toUpperCase()}
             </span>
           )}
         </span>

@@ -5,15 +5,10 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { api } from "@/src/lib/api";
 import { useAuthStore } from "@/src/store/auth-store";
+import { type AuthUser } from "@/src/lib/store/store";
 
 const OTP_LENGTH = 6;
 const DEFAULT_OTP_WINDOW_SECONDS = 10 * 60;
-
-type StoredUser = {
-  email?: string;
-  isEmailVerified?: boolean;
-  [key: string]: unknown;
-};
 
 function getErrorMessage(error: unknown, fallback: string) {
   if (error instanceof AxiosError) {
@@ -30,7 +25,7 @@ function getErrorMessage(error: unknown, fallback: string) {
 export default function VerifyEmailPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const user = useAuthStore((state) => state.user as StoredUser | null);
+  const user = useAuthStore((state) => state.user as AuthUser | null);
   const isLoading = useAuthStore((state) => state.isLoading);
   const setLoading = useAuthStore((state) => state.setLoading);
   const setError = useAuthStore((state) => state.setError);
