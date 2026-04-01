@@ -55,7 +55,7 @@ export class UserService {
 
     async register(dto: UserDto, file?: any) {
         try {
-            const { name, email, username, password, role } = dto;
+            const { name, email, username, password, confirmPassword, role } = dto;
 
             if (!name || !email || !password || !role || !username) {
                 throw new BadRequestException({
@@ -63,6 +63,11 @@ export class UserService {
                     message: "All fields are required"
                 });
             }
+
+            if (password !== confirmPassword) throw new BadRequestException({
+                success: false,
+                message: "Password and confirm password do not match"
+            })
 
 
             if (file) {

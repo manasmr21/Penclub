@@ -25,9 +25,9 @@ const Testimonials = () => {
   return (
     <div
       id="events"
-      className="section-testimonials bg-white py-20 overflow-hidden main-container"
+      className="section-testimonials bg-white py-20 overflow-hidden "
     >
-      <div className=" max-w-[1400px] m-auto relative">
+      <div className=" max-w-[1400px] m-auto relative main-container">
         <div className="background bg-transparent flex justify-between transform-[translateX(-45%)] md:transform-[translateX(-35%)] lg:transform-none">
           <div className=" transform-[translateY(-110px)]">
             <div className=" testimonial-card blank w-[130px] h-[150px] bg-gray-50 rounded-2xl overflow-hidden mt-2"></div>

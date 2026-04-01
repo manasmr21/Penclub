@@ -1,69 +1,36 @@
 import { api } from "./api";
-import { type AuthUser, type UserRole } from "./auth";
+import { type RegisterPayload, type UserRole } from "./auth";
 
-type AuthPayload = {
-  name?: string;
-  username?: string;
-  email?: string;
-  password: string;
-  identifier?: string;
-  profilePicture?: string;
-  profilePictureFile?: File;
-};
-
-type SharedProfilePayload = {
-  interests?: string[];
-  profilePicture?: string;
-  profilePictureFile?: File;
-  bio?: string;
-};
-
-type ReaderProfilePayload = SharedProfilePayload & {
-  phoneNumber?: string;
-};
-
-type AuthorProfilePayload = SharedProfilePayload;
 
 function rolePath(role: UserRole) {
   return role === "author" ? "authors" : "readers";
 }
 
-export async function registerUser(role: UserRole, payload: AuthPayload) {
-  const path = role === "author" ? "create" : "register";
-  const hasProfileFile = payload.profilePictureFile instanceof File;
+function appendTextField(formData: FormData, key: string, value?: string) {
+  if (value) {
+    formData.append(key, value);
+  }
+}
 
-  if (hasProfileFile) {
-    const formData = new FormData();
-
-    if (payload.name) formData.append("name", payload.name);
-    if (payload.username) formData.append("username", payload.username);
-    if (payload.email) formData.append("email", payload.email);
-    formData.append("password", payload.password);
-    if (payload.profilePicture) formData.append("profilePicture", payload.profilePicture);
-
-    const { data } = await api.post(`/${rolePath(role)}/${path}`, formData, {
+export async function registerUser(payload: RegisterPayload) {
+  try {
+    const data = await api.post(`/users/create`, payload, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
     });
-    return data;
+
+    return data.data;
+
+  } catch (error) {
+    console.log(error)
   }
-
-  const { data } = await api.post(`/${rolePath(role)}/${path}`, payload);
-  return data;
 }
 
-export async function loginUser(role: UserRole, payload: AuthPayload) {
-  const { data } = await api.post(`/${rolePath(role)}/login`, {
-    identifier: payload.identifier,
-    password: payload.password,
-  });
-  return data;
-}
 
 export async function verifyUserOtp(role: UserRole, email: string, otp: string) {
   const path = role === "author" ? "verify-otp" : "verify-email";
-  const { data } = await api.post(`/${rolePath(role)}/${path}`, { email, otp });
+  const { data } = await api.post<AuthApiResponse>(`/${rolePath(role)}/${path}`, { email, otp });
   return data;
 }
 
@@ -72,12 +39,12 @@ export async function resendUserOtp(role: UserRole, email: string) {
     throw new Error("Resend OTP is not available for readers in the current server API.");
   }
 
-  const { data } = await api.post(`/${rolePath(role)}/resend-otp`, { email });
+  const { data } = await api.post<AuthApiResponse>(`/${rolePath(role)}/resend-otp`, { email });
   return data;
 }
 
 export async function updateUserProfile(
-  user: AuthUser,
+ user: AuthUser,
   payload: ReaderProfilePayload | AuthorProfilePayload,
 ) {
   if (!user.id || user.id === "undefined") {
@@ -87,7 +54,7 @@ export async function updateUserProfile(
   const hasProfileFile = payload.profilePictureFile instanceof File;
 
   if (user.role === "reader") {
-    const readerPayload = {
+     const readerPayload = {
       interest: payload.interests,
       profile: payload.bio,
       profilePicture: payload.profilePicture,
@@ -98,9 +65,11 @@ export async function updateUserProfile(
       if (readerPayload.interest?.length) {
         readerPayload.interest.forEach((item) => formData.append("interest", item));
       }
-      if (readerPayload.profile) formData.append("profile", readerPayload.profile);
-      if (readerPayload.profilePicture) formData.append("profilePicture", readerPayload.profilePicture);
-      if (payload.profilePictureFile) formData.append("profilePicture", payload.profilePictureFile);
+      appendTextField(formData, "profile", readerPayload.profile);
+      appendTextField(formData, "profilePicture", readerPayload.profilePicture);
+      if (payload.profilePictureFile) {
+        formData.append("profilePicture", payload.profilePictureFile);
+      }
 
       const { data } = await api.put(`/${rolePath(user.role)}/update/${user.id}`, formData, {
         headers: {
@@ -119,9 +88,11 @@ export async function updateUserProfile(
     if (payload.interests?.length) {
       payload.interests.forEach((item) => formData.append("interests", item));
     }
-    if (payload.bio) formData.append("bio", payload.bio);
-    if (payload.profilePicture) formData.append("profilePicture", payload.profilePicture);
-    if (payload.profilePictureFile) formData.append("profilePicture", payload.profilePictureFile);
+    appendTextField(formData, "bio", payload.bio);
+    appendTextField(formData, "profilePicture", payload.profilePicture);
+    if (payload.profilePictureFile) {
+      formData.append("profilePicture", payload.profilePictureFile);
+    }
 
     const { data } = await api.put(`/${rolePath(user.role)}/update/${user.id}`, formData, {
       headers: {

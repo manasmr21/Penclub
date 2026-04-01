@@ -8,7 +8,7 @@ export class UserDto {
 
   @ApiProperty({
     example: 'johndoe123'
- })
+  })
   username: string;
 
   @ApiProperty({
@@ -20,6 +20,9 @@ export class UserDto {
     example: 'password123'
   })
   password: string;
+
+  @ApiProperty()
+  confirmPassword: string
 
   @ApiProperty({
     example: 'reader'

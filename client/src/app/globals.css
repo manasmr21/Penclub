@@ -149,6 +149,10 @@
   }
 }
 
+body{
+  background: var(--background);
+}
+
 .main-container{
   width: 90%;
   max-width: 1920px;
