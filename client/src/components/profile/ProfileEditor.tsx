@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AxiosError } from "axios";
 import AuthField from "@/src/components/auth/AuthField";
-import AuthShell from "@/src/components/auth/AuthShell";
 import {
   authInputClassName,
 } from "@/src/components/auth/auth-styles";
