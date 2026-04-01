@@ -61,6 +61,12 @@ const Navbar = () => {
   };
 
   const hasProfilePicture = typeof user?.profilePicture === "string" && user.profilePicture.trim().length > 0;
+  const profileDisplayName = user?.name ?? user?.username ?? "User";
+  const nameParts = profileDisplayName.trim().split(/\s+/).filter(Boolean);
+  const profileInitials =
+    nameParts.length > 1
+      ? `${nameParts[0].charAt(0)}${nameParts[nameParts.length - 1].charAt(0)}`.toUpperCase()
+      : (nameParts[0]?.charAt(0).toUpperCase() || "U");
 
   const profileChip = (
     <div className="group relative">
@@ -79,7 +85,7 @@ const Navbar = () => {
             />
           ) : (
             <span className="text-xs font-semibold text-slate-600">
-              {(user?.name ?? user?.username ?? "U").charAt(0).toUpperCase()}
+              {profileInitials}
             </span>
           )}
         </span>
@@ -97,7 +103,7 @@ const Navbar = () => {
           My profile
         </Link>
         <Link
-          href="/profile?edit=1"
+          href="/profile-edit"
           className="mt-0.5 block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
           onClick={closeMenu}
         >
