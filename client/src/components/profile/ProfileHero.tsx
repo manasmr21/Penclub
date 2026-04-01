@@ -26,7 +26,7 @@ export function ProfileHero({
   compact = false,
   stats,
   action,
-  editHref = "/profile/edit",
+  editHref = "/profile-edit",
 }: ProfileHeroProps) {
   const hasProfilePicture = typeof profilePicture === "string" && profilePicture.trim().length > 0;
 
