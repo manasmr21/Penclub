@@ -18,8 +18,8 @@ export async function loginUser(payload: LoginPayload) {
 
 export async function resendUserOtp(role: string, email: string) {
   void role;
-  void email;
-  console.log("aslkdmakl")
+  const { data } = await api.post("/users/resend", { email });
+  return data;
 }
 
 export async function updateUserProfile() {

@@ -28,8 +28,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type = 'signup' }) => {
     password: '',
     confirmPassword: '',
     role: 'reader',
-    //@ts-expect-error
-    profilePictureFile: null,
+    profilePictureFile: undefined,
   });
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 

@@ -116,7 +116,8 @@ export class UserService {
                     interests: createdUser.interests ?? undefined,
                     bio: createdUser.bio ?? undefined
                 },
-                otpExpiresInMinutes: 10
+                otpExpiresInMinutes: 10,
+                otpExpiresAt: otpExpiresAt.toISOString()
             };
         } catch (error) {
 
@@ -425,7 +426,9 @@ export class UserService {
 
             return {
                 success: true,
-                message: "Otp sent successfully"
+                message: "Otp sent successfully",
+                otpExpiresInMinutes: 10,
+                otpExpiresAt: user.otpExpiresAt?.toISOString()
             }
 
 

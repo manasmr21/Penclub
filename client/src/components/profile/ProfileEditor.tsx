@@ -190,12 +190,10 @@ export default function ProfileEditor({ inModal = false, onClose }: ProfileEdito
       setVerifying(true);
       setErrors({});
       const data = await resendUserOtp(user.role, user.email);
-      useAuthStore.getState().setPendingOtpUser({
-        ...user,
-        expiresAt: Date.now() + (data?.otpExpiresInMinutes ?? 10) * 60 * 1000,
-        devOtp: data?.devOtp,
-      });
-      router.push(`/verify-otp?email=${encodeURIComponent(user.email)}&role=${user.role}`);
+      const expiresAtQuery = data?.otpExpiresAt
+        ? `&expiresAt=${encodeURIComponent(data.otpExpiresAt)}`
+        : "";
+      router.push(`/verify-otp?email=${encodeURIComponent(user.email)}${expiresAtQuery}`);
     } catch (error) {
       const nextMessage =
         error instanceof AxiosError
