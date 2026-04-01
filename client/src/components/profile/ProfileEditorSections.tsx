@@ -1,10 +1,5 @@
-import AuthField from "@/src/components/auth/AuthField";
+
 import { Upload } from "lucide-react";
-import {
-  authHelperTextClassName,
-  authInputClassName,
-  authPanelClassName,
-} from "@/src/components/auth/auth-styles";
 import { Button } from "@/src/components/ui/button";
 
 type ProfilePictureSectionProps = {

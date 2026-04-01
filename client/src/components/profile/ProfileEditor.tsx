@@ -3,11 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AxiosError } from "axios";
-import AuthField from "@/src/components/auth/AuthField";
-import AuthShell from "@/src/components/auth/AuthShell";
-import {
-  authInputClassName,
-} from "@/src/components/auth/auth-styles";
+import { Button } from "@/src/components/ui/button";
 import { logoutUser, resendUserOtp, updateUserProfile } from "@/src/lib/auth-api";
 import { useAuthStore } from "@/src/store/auth-store";
 import {
@@ -289,5 +285,5 @@ export default function ProfileEditor({ inModal = false, onClose }: ProfileEdito
     return <div className="space-y-2">{content}</div>;
   }
 
-  return <AuthShell>{content}</AuthShell>;
+return <>{content}</>;
 }
