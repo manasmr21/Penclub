@@ -2,8 +2,8 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import ProfileEditor from "@/src/components/profile/ProfileEditor";
 import { useAuthStore } from "@/src/store/auth-store";
+import ProfileEditor from "@/src/components/profile/ProfileEditor";
 
 function ProfileEditLoadingView() {
   return (

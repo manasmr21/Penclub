@@ -244,20 +244,6 @@ export default function ProfileEditor({ inModal = false, onClose }: ProfileEdito
           onToggle={toggleInterest}
         />
 
-        <AuthField id="bio" label="Short bio" error={errors.bio}>
-          <textarea
-            id="bio"
-            value={bio}
-            onChange={(event) => {
-              setBio(event.target.value);
-              setErrors((current) => ({ ...current, form: undefined }));
-              setMessage("");
-            }}
-            className={`${authInputClassName} min-h-28`}
-            placeholder="Write a short bio"
-          />
-        </AuthField>
-
         {errors.form ? <p className="text-sm text-red-600">{errors.form}</p> : null}
         {message ? <p className="text-sm text-green-700">{message}</p> : null}
 
