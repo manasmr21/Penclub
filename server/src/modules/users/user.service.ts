@@ -134,7 +134,7 @@ export class UserService {
                 otpExpiresInMinutes: 10,
                 otpExpiresAt: otpExpiresAt.toISOString()
             };
-        } catch (error) {
+        } catch (error: any) {
 
             if (error.code === '23505') {
                 const detail = error.detail;
