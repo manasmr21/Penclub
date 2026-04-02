@@ -8,7 +8,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { ImCross } from "react-icons/im";
-import { useAppStore} from "@/src/lib/store/store";
+import { useAppStore } from "@/src/lib/store/store";
 import { logoutUser } from "@/src/lib/auth-api";
 
 const navLinks = [
@@ -51,7 +51,7 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     if (user) {
-      await logoutUser(user.role);
+      await logoutUser();
     }
 
     clearAuth();

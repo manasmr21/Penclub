@@ -2,7 +2,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { BiEdit } from "react-icons/bi";
 import { useEffect, useState } from "react";
-import { useAuthStore } from "@/src/store/auth-store";
+import { useAppStore } from "@/src/lib/store/store";
 import {
   fetchAuthorArticlesCount,
   fetchAuthorBooksCount,
@@ -10,7 +10,7 @@ import {
 
 const UserDetails = () => {
   const router = useRouter();
-  const user = useAuthStore((state) => state.user);
+  const user = useAppStore((state) => state.user);
   const isAuthor = user?.role === "author";
   const isReader = user?.role === "reader";
   const hasProfilePicture =
