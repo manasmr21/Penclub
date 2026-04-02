@@ -47,6 +47,17 @@ export class Book {
     })
     author: User;
 
+    @Column({
+        default: "pending",
+        enum: ["pending", "approved"]
+    })
+    state: string
+
+    @Column({
+        default: false
+    })
+    approved: boolean
+
     @OneToMany(()=> Review, (reviews)=> reviews.book)
     reviews: Review[]
 

@@ -20,7 +20,12 @@ export class BooksService {
 
     async getAllBooks() {
         try {
-            const books = await this.booksRepository.find();
+            const books = await this.booksRepository.find({
+                where: {
+                    state: "approved",
+                    approved: true
+                }
+            });
 
             if (books.length === 0) throw new NotFoundException({
                 success: true,
@@ -35,6 +40,72 @@ export class BooksService {
 
         } catch (error) {
             this.handleServiceError(error);
+        }
+    }
+
+    async getPendingbooks(req: any) {
+        try {
+
+            const userRole = req.user?.role
+
+            if (userRole !== "admin") throw new UnauthorizedException({
+                success: false,
+                message: "You are not authorized."
+            })
+
+            const books = await this.booksRepository.find({
+                where: {
+                    approved: false
+                }
+            })
+
+            if (books.length === 0) throw new NotFoundException({
+                success: false,
+                message: "No books found"
+            })
+
+            return {
+                success: true,
+                message: "Pending books fetched successfully",
+                books
+            }
+
+        } catch (error) {
+            throw this.handleServiceError(error);
+        }
+    }
+
+    async getPendingBooksPerAuthor(req: any) {
+        try {
+            const userId = req.user?.id
+            const userRole = req.user?.role
+
+            if(userRole !== "author") throw new UnauthorizedException({
+                success: false,
+                message: "You are not authorized"
+            })
+
+            const books = await this.booksRepository.find({
+                where:{
+                    id: userId,
+                    approved: false
+                }
+            })
+
+            if(books.length === 0) throw new NotFoundException({
+                success: false,
+                message: "No books found"
+            })
+
+            return{
+                success: true,
+                message: "Books fetched successfully",
+                books
+            }
+
+
+        } catch (error) {
+
         }
     }
 
@@ -64,7 +135,8 @@ export class BooksService {
 
             const books = await this.booksRepository.createQueryBuilder("book")
                 .where("book.authorId = :authorId", { authorId })
-                .select(["book.id", "book.title", "book.description", "book.genre", "book.coverImage", ])
+                .andWhere("book.approved = true")
+                .select(["book.id", "book.title", "book.description", "book.genre", "book.coverImage",])
                 .getMany();
 
             if (books.length === 0) throw new NotFoundException({
@@ -83,7 +155,7 @@ export class BooksService {
         }
     }
 
-    async createBook(dto: CreateBookDto, req: any, file?: any ) {
+    async createBook(dto: CreateBookDto, req: any, file?: any) {
         try {
             const { title, description, genre } = dto;
             const authorId = req.user?.id
@@ -94,14 +166,14 @@ export class BooksService {
                 message: "Title, description, and genre are required fields"
             });
 
-            if (!dto.authorId) throw new BadRequestException({
+            if (!authorId) throw new BadRequestException({
                 success: false,
-                message: "Author is required"
+                message: "Not authorized"
             });
 
-            if(role !== "author") throw new UnauthorizedException({
+            if (role !== "author") throw new UnauthorizedException({
                 success: false,
-                message:"You are not authorized to publish a book"
+                message: "You are not authorized to publish a book"
             })
 
             if (file) {
@@ -116,7 +188,7 @@ export class BooksService {
 
             const bookPayload = this.booksRepository.create({
                 ...dto,
-                authorId: dto.authorId,
+                authorId,
                 coverImage,
                 coverImageId
             });
@@ -126,14 +198,13 @@ export class BooksService {
             return {
                 success: true,
                 message: "Book created successfully",
-                book: createdBook
             }
         } catch (error) {
             this.handleServiceError(error);
         }
     }
 
-    async updateBook(id: string, dto: UpdateBookDto, req:any, file?: any) {
+    async updateBook(id: string, dto: UpdateBookDto, req: any, file?: any) {
         try {
             if (!dto) throw new BadRequestException({
                 success: false,
@@ -142,7 +213,7 @@ export class BooksService {
 
             const role = req.user?.role
 
-            if(role !== "author") throw new UnauthorizedException({
+            if (role !== "author") throw new UnauthorizedException({
                 success: false,
                 message: "You are not authorized to upadte a book."
             })
@@ -179,8 +250,7 @@ export class BooksService {
 
             return {
                 success: true,
-                message: "Book updated successfully",
-                book: savedBook
+                message: "Book updated successfully"
             }
         } catch (error) {
             this.handleServiceError(error);
@@ -191,7 +261,7 @@ export class BooksService {
         try {
 
             const role = req.user?.role
-            if(role !== "author") throw new UnauthorizedException({
+            if (role !== "author") throw new UnauthorizedException({
                 success: false,
                 message: "You are not authorized to delete a book"
             })
