@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException, InternalServerErrorException, HttpException, NotFoundException } from "@nestjs/common";
+import { Injectable, BadRequestException, InternalServerErrorException, HttpException, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Blog } from "./entities/blogs.entity";
@@ -39,6 +39,37 @@ export class BlogsService {
 
     }
 
+    async getBlog(id: string){
+        try {
+
+            if(!id) throw new BadRequestException({
+                success: false,
+                message: "Blog id is required"
+            })
+
+            const blog = this.blogsRepository.findOne({
+                where:{
+                    id
+                }
+            })
+
+            if(!blog) throw new NotFoundException({
+                success: false,
+                message: "Blog with this blog id is not found"
+            })
+
+            return{
+                success: true,
+                message: "blog fetched successfully",
+                blog
+            }
+
+
+        } catch (error) {
+            throw this.handleServiceError(error);
+        }
+    }
+
     async getUsersBlogs(id: string) {
 
         try {
@@ -66,8 +97,15 @@ export class BlogsService {
 
     }
 
-    async createBlog(dto: CreateBlogDto, file?: any) {
+    async createBlog(dto: CreateBlogDto, req: any, file?: any) {
         try {
+
+            const userRole = req.user?.role
+            if(userRole !== "author") throw new UnauthorizedException({
+                success: false,
+                message: "You are not authorized to post articles."
+            })
+
             const { title, content, status } = dto;
 
             if (!title || !content) throw new BadRequestException({
@@ -107,9 +145,17 @@ export class BlogsService {
     }
 
 
-    async updateBlog(id: string, dto: UpdateBlogDto, file?: any) {
+    async updateBlog(id: string, dto: UpdateBlogDto, req : any, file?: any) {
 
         try {
+
+            const userRole = req.user?.role
+
+            if(userRole !== "author") throw new UnauthorizedException({
+                success: false,
+                message: "You are not authorized to update an article"
+            })
+
             if (!dto) throw new BadRequestException({
                 success: false,
                 message: "No edit field recieved."
@@ -160,10 +206,15 @@ export class BlogsService {
     }
 
 
-    async deleteBlog(id: string, coverImageId: string) {
+    async deleteBlog(id: string, coverImageId: string, req: any) {
         try {
 
-            console.log(coverImageId)
+            const userRole = req.user?.role
+
+            if(userRole !== "author") throw new UnauthorizedException({
+                success: false,
+                message: "You are not authorized to delete a blog"
+            })
 
             const blog = await this.blogsRepository.delete(id)
 
