@@ -1,7 +1,7 @@
 "use client";
 
 import { AxiosError } from "axios";
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { api } from "@/lib/api";
 import { useAppStore } from "@/lib/store/store";
@@ -22,7 +22,17 @@ function getErrorMessage(error: unknown, fallback: string) {
   return fallback;
 }
 
-export default function VerifyEmailPage() {
+function VerifyEmailPageFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background px-6">
+      <div className="w-full max-w-md rounded-xl bg-white p-8 text-center text-sm text-gray-500 shadow-sm">
+        Loading verification details...
+      </div>
+    </div>
+  );
+}
+
+function VerifyEmailPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const user = useAppStore((state) => state.user as AuthUser | null);
@@ -348,5 +358,13 @@ export default function VerifyEmailPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense fallback={<VerifyEmailPageFallback />}>
+      <VerifyEmailPageContent />
+    </Suspense>
   );
 }

@@ -34,15 +34,15 @@ const rougeScript = Rouge_Script({
 
 const quickSand = Quicksand({
   subsets: ["latin"],
-  variable:"--font-quicksand"
-})
+  variable: "--font-quicksand",
+});
 
 export const metadata: Metadata = {
   title: "Penclub",
   description: "",
-  icons:{
-    icon: "@/public/images/favicon.ico"
-  }
+  icons: {
+    icon: "/images/favicon.ico",
+  },
 };
 
 export default function RootLayout({
@@ -55,7 +55,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${interFont.variable} ${rougeScript.variable} ${chauPhilomene.variable} ${quickSand.variable} antialiased`}
       >
-        <Navbar/>
+        <Navbar />
         {children}
       </body>
     </html>
