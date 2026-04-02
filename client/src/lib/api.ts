@@ -1,6 +1,6 @@
 import axios from "axios";
 import { AxiosError } from "axios";
-import { loginUser, registerUser, verifyUserOtp, updateUserProfile, deleteUserProfile } from "./auth-api";
+import { loginUser, registerUser, verifyUserOtp, updateUserProfile, deleteUserProfile, forgotPassword, resetPassword } from "./auth-api";
 
 
 export const api = axios.create({
@@ -175,4 +175,44 @@ export async function deleteUser(id: string, password: string, setLoading: (valu
   } finally {
     setLoading(false);
   }
+}
+
+export async function forgotPasswordAPi(email: string, setLoading: (value: boolean) => void) {
+  setLoading(true);
+  try {
+
+    const response = await forgotPassword(email);
+
+    if(response.success) alert(response.message);
+    return response
+
+  } catch (error) {
+    const message = getErrorMessage(error);
+    alert(message);
+    console.log(message);
+    throw error;
+  } finally {
+    setLoading(false);
+  }
+
+}
+
+export async function resetUserPassword(userId: string, token:string, newPassword: string, setLoading: (value: boolean)=> void){
+  setLoading(true);
+  try {
+    
+    const response = await resetPassword(userId, token, newPassword);
+    
+    if(response.success) alert(response.message)
+      
+      return response
+      
+    } catch (error) {
+      const message = getErrorMessage(error);
+      alert(message);
+      console.log(message);
+      throw error;
+    }finally{
+      setLoading(false);
+    }
 }

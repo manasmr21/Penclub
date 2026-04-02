@@ -48,3 +48,15 @@ export async function deleteUserProfile(id: string, password: string){
 
   return data
 }
+
+export async function forgotPassword(email: string){
+  const {data} = await api.post("/users/forgot-password", email);
+
+  return data;
+}
+
+export async function resetPassword(userId: string, token: string, newPassword: string){
+  const {data} = await api.post(`/users/reset-password?userId=${userId}&token=${token}`, newPassword)
+
+  return data
+}
