@@ -15,6 +15,11 @@ export class BooksController {
         return await this.booksService.getAllBooks();
     }
 
+    @Get("author/:authorId")
+    async getByAuthor(@Param("authorId") authorId: string) {
+        return await this.booksService.getBooksByAuthor(authorId);
+    }
+
     @Get(":bookId")
     async getOne(@Param("bookId") id: string) {
         return await this.booksService.getBookById(id);
