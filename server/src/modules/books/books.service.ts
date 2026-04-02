@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, HttpException, InternalServerErrorException, NotFoundException } from "@nestjs/common";
+import { BadRequestException, Injectable, HttpException, InternalServerErrorException, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Book } from "./entities/books.entity";
@@ -6,13 +6,16 @@ import { CreateBookDto } from "./dto/create-book.dto";
 import { AuthorEntity } from "../author/entities/author.entity";
 import { CloudinaryService } from "../../utils/cloudinary/cloudinary.service";
 import { UpdateBookDto } from "./dto/update-book.dto";
+import { User } from "../users/entities/user.entity";
 
 @Injectable()
 export class BooksService {
     constructor(
         @InjectRepository(Book)
         private booksRepository: Repository<Book>,
-        private cloudinaryService: CloudinaryService
+        private cloudinaryService: CloudinaryService,
+        @InjectRepository(User)
+        private userRepository: Repository<User>
     ) { }
 
     async getAllBooks() {
@@ -80,9 +83,11 @@ export class BooksService {
         }
     }
 
-    async createBook(dto: CreateBookDto, file?: any) {
+    async createBook(dto: CreateBookDto, req: any, file?: any ) {
         try {
             const { title, description, genre } = dto;
+            const authorId = req.user?.id
+            const role = req.user?.role
 
             if (!title || !description || !genre) throw new BadRequestException({
                 success: false,
@@ -93,6 +98,11 @@ export class BooksService {
                 success: false,
                 message: "Author is required"
             });
+
+            if(role !== "author") throw new UnauthorizedException({
+                success: false,
+                message:"You are not authorized to publish a book"
+            })
 
             if (file) {
                 const folder = "books";
@@ -123,11 +133,18 @@ export class BooksService {
         }
     }
 
-    async updateBook(id: string, dto: UpdateBookDto, file?: any) {
+    async updateBook(id: string, dto: UpdateBookDto, req:any, file?: any) {
         try {
             if (!dto) throw new BadRequestException({
                 success: false,
                 message: "No edit field recieved."
+            })
+
+            const role = req.user?.role
+
+            if(role !== "author") throw new UnauthorizedException({
+                success: false,
+                message: "You are not authorized to upadte a book."
             })
 
             const book = await this.booksRepository.findOne({
@@ -170,8 +187,15 @@ export class BooksService {
         }
     }
 
-    async deleteBook(id: string) {
+    async deleteBook(id: string, req) {
         try {
+
+            const role = req.user?.role
+            if(role !== "author") throw new UnauthorizedException({
+                success: false,
+                message: "You are not authorized to delete a book"
+            })
+
             const book = await this.booksRepository.findOne({
                 where: { id }
             })

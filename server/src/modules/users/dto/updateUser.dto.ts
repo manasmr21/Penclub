@@ -14,7 +14,7 @@ export class UpdateUserDto {
   @ApiProperty({
     description: "Public id for profile picture"
   })
-  profilePictureId: string
+  profilePictureId?: string
 
   @ApiProperty({
     example: ['fiction', 'mystery']
@@ -22,7 +22,25 @@ export class UpdateUserDto {
   interest?: string[];
 
   @ApiProperty({
+    example: ['fiction', 'mystery'],
+    required: false
+  })
+  interests?: string[];
+
+  @ApiProperty({
+    example: 'https://images.example.com/profile.jpg',
+    required: false
+  })
+  profilePicture?: string;
+
+  @ApiProperty({
     example: ['https://twitter.com/johndoe', 'https://facebook.com/johndoe']
   })
   socialeLinks?: string[];
+
+  @ApiProperty({
+    example: ['https://twitter.com/johndoe', 'https://facebook.com/johndoe'],
+    required: false
+  })
+  socialLinks?: string[];
 }

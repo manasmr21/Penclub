@@ -50,10 +50,6 @@ export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
             throw new UnauthorizedException("User no longer exists");
         }
 
-        if (!user.isEmailVerified) {
-            throw new UnauthorizedException("Email not verified");
-        }
-
         return user
     }
 }

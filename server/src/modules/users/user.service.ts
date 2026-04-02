@@ -53,6 +53,21 @@ export class UserService {
         }
     }
 
+    private normalizeStringArray(value?: string | string[]) {
+        if (Array.isArray(value)) {
+            return value.map((item) => item.trim()).filter(Boolean);
+        }
+
+        if (typeof value === "string") {
+            return value
+                .split(",")
+                .map((item) => item.trim())
+                .filter(Boolean);
+        }
+
+        return undefined;
+    }
+
     async register(dto: UserDto, file?: any) {
         try {
             const { name, email, username, password, confirmPassword, role } = dto;
@@ -119,7 +134,7 @@ export class UserService {
                 otpExpiresInMinutes: 10,
                 otpExpiresAt: otpExpiresAt.toISOString()
             };
-        } catch (error) {
+        } catch (error: any) {
 
             if (error.code === '23505') {
                 const detail = error.detail;
@@ -153,13 +168,33 @@ export class UserService {
                 message: "User not found."
             })
 
-            if (file) {
-                if (!dto.profilePictureId) throw new NotFoundException({
-                    success: false,
-                    message: "Profile picture public_id not found."
-                })
+            const interests = this.normalizeStringArray(dto.interests ?? dto.interest);
+            const socialLinks = this.normalizeStringArray(dto.socialLinks ?? dto.socialeLinks);
 
-                if (user.profilePicture && user.profilePictureId) await this.cloudinaryService.deleteImage(dto.profilePictureId)
+            if (dto.name !== undefined) {
+                user.name = dto.name;
+            }
+
+            if (dto.bio !== undefined) {
+                user.bio = dto.bio;
+            }
+
+            if (interests !== undefined) {
+                user.interests = interests;
+            }
+
+            if (socialLinks !== undefined) {
+                user.socialLinks = socialLinks;
+            }
+
+            if (dto.profilePicture !== undefined && !file) {
+                user.profilePicture = dto.profilePicture;
+            }
+
+            if (file) {
+                if (user.profilePicture && user.profilePictureId) {
+                    await this.cloudinaryService.deleteImage(user.profilePictureId);
+                }
 
                 const organization = "penclub"
                 const folder = "users"
@@ -170,13 +205,26 @@ export class UserService {
                 user.profilePictureId = cloudinaryResponse.public_id
             }
 
-            const updatedUser = this.userRepository.merge(user, dto);
-
-            await this.userRepository.save(updatedUser)
+            const updatedUser = await this.userRepository.save(user)
 
             return {
                 success: true,
-                message: "User update successfully"
+                message: "User updated successfully",
+                user: {
+                    id: updatedUser.id,
+                    name: updatedUser.name,
+                    email: updatedUser.email,
+                    username: updatedUser.username,
+                    followersCount: updatedUser.role === "author" ? updatedUser.followersCount : undefined,
+                    followingCount: updatedUser.followingCount,
+                    role: updatedUser.role,
+                    bio: updatedUser.bio ?? undefined,
+                    interests: updatedUser.interests ?? undefined,
+                    socialLinks: updatedUser.socialLinks ?? undefined,
+                    profilePicture: updatedUser.profilePicture ?? undefined,
+                    profilePictureId: updatedUser.profilePictureId ?? undefined,
+                    isEmailVerified: updatedUser.isEmailVerified
+                }
             }
 
         } catch (error) {

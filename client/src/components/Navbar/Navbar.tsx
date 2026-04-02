@@ -61,7 +61,7 @@ const Navbar = () => {
   };
 
   const hasProfilePicture = typeof user?.profilePicture === "string" && user.profilePicture.trim().length > 0;
-  const profileDisplayName = user?.name ?? user?.penName ?? user?.username ?? "User";
+  const profileDisplayName = user?.name ?? user?.username ?? "User";
   const nameParts = profileDisplayName.trim().split(/\s+/).filter(Boolean);
   const profileInitials =
     nameParts.length > 1
@@ -80,7 +80,7 @@ const Navbar = () => {
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={user.profilePicture}
-              alt={user?.name ?? user?.penName ?? user?.username ?? "Profile"}
+              alt={user?.name ?? user?.username ?? "Profile"}
               className="h-full w-full object-cover"
             />
           ) : (
