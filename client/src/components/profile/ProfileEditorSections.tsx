@@ -39,38 +39,6 @@ export function ProfilePictureSection({
         </div>
       </div>
 
-      <AuthField id="profilePicture" label="Profile picture" error={error}>
-        <div className="space-y-3">
-          <div className="relative">
-            <input
-              id="profilePicture"
-              type="url"
-              value={profilePicture}
-              onChange={(event) => onProfilePictureChange(event.target.value)}
-              className={`${authInputClassName} pr-12`}
-              placeholder="https://example.com/profile.jpg"
-            />
-            <label
-              htmlFor="profilePictureUpload"
-              className="absolute right-3 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-lg border border-primary/20 bg-white text-primary transition hover:bg-primary/5"
-              aria-label="Upload image"
-              title="Upload image"
-            >
-              <Upload size={16} />
-            </label>
-          </div>
-          <p className={authHelperTextClassName}>
-            Paste an image URL or upload a file. We will compress uploads before saving.
-          </p>
-          <input
-            id="profilePictureUpload"
-            type="file"
-            accept="image/*"
-            onChange={onUpload}
-            className="hidden"
-          />
-        </div>
-      </AuthField>
     </>
   );
 }
@@ -110,24 +78,6 @@ export function InterestsSection({
         </div>
       ) : null}
 
-      <AuthField id="interests" label="Interests" error={error}>
-        <div className={`grid grid-cols-2 gap-3 p-4 sm:grid-cols-3 ${authPanelClassName}`}>
-          {options.map((interest) => (
-            <label
-              key={interest}
-              className="flex items-center gap-2 text-sm text-slate-700"
-            >
-              <input
-                type="checkbox"
-                checked={interests.includes(interest)}
-                onChange={() => onToggle(interest)}
-                className="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary"
-              />
-              <span className="capitalize">{interest}</span>
-            </label>
-          ))}
-        </div>
-      </AuthField>
     </>
   );
 }
