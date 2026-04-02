@@ -44,7 +44,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type = 'signup' }) => {
       </div>
 
       <form className="space-y-4" onSubmit={(e) => handleSubmit(e, authType, formData, setLoading, setUser, router)}>
-        <div className="flex p-1 space-x-1 bg-gray-100/50 rounded-xl mb-6">
+       { authType === "signup" && <div className="flex p-1 space-x-1 bg-gray-100/50 rounded-xl mb-6">
           <input type="hidden" name="role" value={role} />
           <button
             type="button"
@@ -75,7 +75,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type = 'signup' }) => {
           >
             Author
           </button>
-        </div>
+        </div>}
 
         {
           authType === 'signup' && (
