@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import ProfileEditor from "@/src/components/profile/Edit/ProfileEditor";
 import ProfileRedesign from "@/src/components/profile/redesign/Profile";
@@ -30,7 +30,7 @@ function ProfileLoadingView() {
 
 /* ---------------- MAIN ---------------- */
 
-export default function ProfilePage() {
+function ProfilePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -57,15 +57,23 @@ export default function ProfilePage() {
 
       {isEditModalOpen && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex justify-center items-center pt-8">
-            <ProfileEditor 
-              inModal={true} 
+            <ProfileEditor
+              inModal={true}
               onClose={() => {
                 setIsEditModalOpen(false);
                 router.push("/profile");
-              }} 
+              }}
             />
         </div>
       )}
     </div>
+  );
+}
+
+export default function ProfilePage() {
+  return (
+    <Suspense fallback={<ProfileLoadingView />}>
+      <ProfilePageContent />
+    </Suspense>
   );
 }
