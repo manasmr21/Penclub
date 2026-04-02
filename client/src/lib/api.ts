@@ -205,7 +205,7 @@ export async function resetUserPassword(userId: string, token:string, newPasswor
     
     if(response.success) alert(response.message)
       
-      return response
+    return response
       
     } catch (error) {
       const message = getErrorMessage(error);
