@@ -1,11 +1,11 @@
 "use client";
 
+import "./Navbar.css"
 import { logo } from "@/public/images";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import "./Navbar.css";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { ImCross } from "react-icons/im";
 import { useAppStore } from "@/src/lib/store/store";

@@ -36,7 +36,7 @@ export class BlogsController {
     @Put("update/:blogId")
     @UseGuards(AuthGuard("jwt"))
     @UseInterceptors(FileInterceptor("coverImage"))
-    async updateBlog(@Param("blogId") id: string , @Body() dto:UpdateBlogDto, @UploadedFile(), @Request() req: any, file?: any, ){
+    async updateBlog(@Param("blogId") id: string , @Body() dto:UpdateBlogDto,  @Request() req: any, @UploadedFile() file?: any ){
         return await this.blogsService.updateBlog(id, dto, req, file);
     }
 
