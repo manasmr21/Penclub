@@ -2,6 +2,11 @@
 import { Upload } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
 
+const inputClassName =
+  "w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20";
+const helperTextClassName = "text-xs text-slate-500";
+const panelClassName = "rounded-xl border border-slate-200 bg-slate-50";
+
 type ProfilePictureSectionProps = {
   error?: string;
   profilePicture: string;
@@ -39,7 +44,10 @@ export function ProfilePictureSection({
         </div>
       </div>
 
-      <AuthField id="profilePicture" label="Profile picture" error={error}>
+      <div className="space-y-2">
+        <label htmlFor="profilePicture" className="text-sm font-medium text-slate-800">
+          Profile picture
+        </label>
         <div className="space-y-3">
           <div className="relative">
             <input
@@ -47,7 +55,7 @@ export function ProfilePictureSection({
               type="url"
               value={profilePicture}
               onChange={(event) => onProfilePictureChange(event.target.value)}
-              className={`${authInputClassName} pr-12`}
+              className={`${inputClassName} pr-12`}
               placeholder="https://example.com/profile.jpg"
             />
             <label
@@ -59,7 +67,7 @@ export function ProfilePictureSection({
               <Upload size={16} />
             </label>
           </div>
-          <p className={authHelperTextClassName}>
+          <p className={helperTextClassName}>
             Paste an image URL or upload a file. We will compress uploads before saving.
           </p>
           <input
@@ -70,7 +78,8 @@ export function ProfilePictureSection({
             className="hidden"
           />
         </div>
-      </AuthField>
+        {error ? <p className="text-sm text-red-600">{error}</p> : null}
+      </div>
     </>
   );
 }
@@ -110,8 +119,11 @@ export function InterestsSection({
         </div>
       ) : null}
 
-      <AuthField id="interests" label="Interests" error={error}>
-        <div className={`grid grid-cols-2 gap-3 p-4 sm:grid-cols-3 ${authPanelClassName}`}>
+      <div className="space-y-2">
+        <label htmlFor="interests" className="text-sm font-medium text-slate-800">
+          Interests
+        </label>
+        <div id="interests" className={`grid grid-cols-2 gap-3 p-4 sm:grid-cols-3 ${panelClassName}`}>
           {options.map((interest) => (
             <label
               key={interest}
@@ -127,7 +139,8 @@ export function InterestsSection({
             </label>
           ))}
         </div>
-      </AuthField>
+        {error ? <p className="text-sm text-red-600">{error}</p> : null}
+      </div>
     </>
   );
 }
