@@ -8,7 +8,7 @@ import { usePathname, useRouter } from "next/navigation";
 import "./Navbar.css";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { ImCross } from "react-icons/im";
-import { useAuthStore } from "@/src/store/auth-store";
+import { useAppStore } from "@/src/lib/store/store";
 import { logoutUser } from "@/src/lib/auth-api";
 
 const navLinks = [
@@ -24,9 +24,9 @@ const Navbar = () => {
   const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const user = useAuthStore((state) => state.user);
-  const hydrated = useAuthStore((state) => state.hydrated);
-  const clearAuth = useAuthStore((state) => state.clearAuth);
+  const user = useAppStore((state) => state.user);
+  const hydrated = useAppStore((state) => state.hydrated);
+  const clearAuth = useAppStore((state) => state.clearAuth);
   const isHomePage = pathname === "/";
   const showSolidNavbar = !isHomePage || scrolled;
 
