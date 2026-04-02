@@ -1,5 +1,5 @@
 import { api } from "./api";
-import { type LoginPayload, type UpdateUserProfilePayload } from "./auth";
+import { type LoginPayload } from "./api";
 import { type AuthUser } from "./store/store";
 
 export async function registerUser(payload: FormData) {
@@ -23,43 +23,13 @@ export async function resendUserOtp(role: string, email: string) {
   return data;
 }
 
-
 export async function updateUserProfile(
   user: string,
-  payload: UpdateUserProfilePayload,
+  payload: FormData,
 ) {
-  const formData = new FormData();
+ 
 
-  if (payload.name !== undefined) {
-    formData.append("name", payload.name);
-  }
-
-  if (payload.bio !== undefined) {
-    formData.append("bio", payload.bio);
-  }
-
-  if (payload.interests?.length) {
-    payload.interests.forEach((interest) => {
-      formData.append("interests", interest);
-    });
-  }
-
-  if (payload.socileLinks?.length) {
-    payload.socileLinks.forEach((links) => {
-      formData.append("socialLinks", links);
-    });
-  }
-
-  if (payload.profilePictureFile) {
-    formData.append("profilePicture", payload.profilePictureFile);
-    if (payload.profilePictureId) {
-      formData.append("profilePictureId", payload.profilePictureId);
-    }
-  } else if (payload.profilePictureId !== undefined) {
-    formData.append("profilePicture", payload.profilePictureId);
-  }
-
-  const { data } = await api.put(`/users/update/${user}`, formData, {
+  const { data } = await api.put(`/users/update/${user}`, payload, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
@@ -68,8 +38,13 @@ export async function updateUserProfile(
   return data;
 }
 
-export async function logoutUser(role: string) {
-  void role;
+export async function logoutUser() {
   const { data } = await api.post("/users/logout");
   return data;
+}
+
+export async function deleteUserProfile(id: string, password: string){
+  const {data} = await api.post(`/users/logout/id`, password);
+
+  return data
 }
