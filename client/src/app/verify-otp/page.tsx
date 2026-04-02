@@ -3,9 +3,9 @@
 import { AxiosError } from "axios";
 import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { api } from "@/src/lib/api";
-import { useAuthStore } from "@/src/store/auth-store";
-import { type AuthUser } from "@/src/lib/store/store";
+import { api } from "@/lib/api";
+import { useAppStore } from "@/lib/store/store";
+import { type AuthUser } from "@/lib/store/store";
 
 const OTP_LENGTH = 6;
 const DEFAULT_OTP_WINDOW_SECONDS = 10 * 60;
@@ -25,11 +25,11 @@ function getErrorMessage(error: unknown, fallback: string) {
 export default function VerifyEmailPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const user = useAuthStore((state) => state.user as AuthUser | null);
-  const isLoading = useAuthStore((state) => state.isLoading);
-  const setLoading = useAuthStore((state) => state.setLoading);
-  const setError = useAuthStore((state) => state.setError);
-  const setUser = useAuthStore((state) => state.setUser);
+  const user = useAppStore((state) => state.user as AuthUser | null);
+  const isLoading = useAppStore((state) => state.isLoading);
+  const setLoading = useAppStore((state) => state.setLoading);
+  const setError = useAppStore((state) => state.setError);
+  const setUser = useAppStore((state) => state.setUser);
 
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [timeWindow, setTimeWindow] = useState(DEFAULT_OTP_WINDOW_SECONDS);
