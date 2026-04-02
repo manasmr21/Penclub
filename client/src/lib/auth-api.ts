@@ -23,40 +23,8 @@ export async function resendUserOtp(role: string, email: string) {
   return data;
 }
 
-export type UpdateUserProfilePayload = {
-  interests?: string[];
-  bio?: string;
-  profilePicture?: string;
-  profilePictureFile?: File;
-};
-
-export async function updateUserProfile(
-  user: Pick<AuthUser, "id" | "profilePictureId">,
-  payload: UpdateUserProfilePayload,
-) {
-  const formData = new FormData();
-
-  if (payload.bio !== undefined) {
-    formData.append("bio", payload.bio);
-  }
-
-  if (payload.interests?.length) {
-    payload.interests.forEach((interest) => {
-      formData.append("interests", interest);
-      formData.append("interest", interest);
-    });
-  }
-
-  if (payload.profilePictureFile) {
-    formData.append("profilePicture", payload.profilePictureFile);
-    if (user.profilePictureId) {
-      formData.append("profilePictureId", user.profilePictureId);
-    }
-  } else if (payload.profilePicture !== undefined) {
-    formData.append("profilePicture", payload.profilePicture);
-  }
-
-  const { data } = await api.put(`/users/update/${user.id}`, formData, {
+export async function updateUserProfile(userId: string, payload: FormData) {
+  const { data } = await api.put(`/users/update/${userId}`, payload, {
     headers: {
       "Content-Type": "multipart/form-data",
     },

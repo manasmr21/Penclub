@@ -86,12 +86,12 @@ const UserDetails = () => {
       <div className="flex flex-col md:flex-row items-center md:items-start gap-10 w-full md:w-auto">
         {/* Profile Image */}
         <div
-          onClick={() => router.push("/profile-edit")}
+          onClick={() => router.push("/profile?edit=1")}
           className="group cursor-pointer relative w-[160px] md:w-[200px] shrink-0 aspect-square overflow-hidden rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.08)] ring-4 ring-offset-4 ring-outline-variant/10 transition-transform duration-500 hover:scale-[1.02]"
         >
           {hasProfilePicture ? (
             <Image
-              src={user.profilePicture}
+              src={user?.profilePicture || ""}
               alt="profile picture"
               width={300}
               height={300}
@@ -159,7 +159,7 @@ const UserDetails = () => {
       {/* Actions */}
       <div className="flex w-full md:w-auto mt-6 md:mt-4 items-center justify-center md:justify-end shrink-0">
         <button
-          onClick={() => router.push("/profile-edit")}
+          onClick={() => router.push("/profile?edit=1")}
           className="px-8 py-3 bg-primary text-white font-semibold text-[11px] tracking-widest uppercase rounded-full hover:bg-primary/90 transition-all duration-300 shadow-md hover:shadow-[0_8px_20px_rgb(0,0,0,0.12)] hover:-translate-y-0.5 cursor-pointer"
         >
           Edit Profile

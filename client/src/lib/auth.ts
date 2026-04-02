@@ -1,6 +1,6 @@
 import { AxiosError } from "axios";
-import { loginUser, registerUser, verifyUserOtp } from "./auth-api";
-
+import { loginUser, registerUser, verifyUserOtp, updateUserProfile } from "./auth-api";
+import { type AuthUser } from "./store/store";
 
 export type RegisterPayload = {
   name: string;
@@ -16,6 +16,13 @@ export type LoginPayload = {
   identifier: string;
   password: string;
 }
+
+export type UpdateUserProfilePayload = {
+  interests?: string[];
+  bio?: string;
+  profilePicture?: string;
+  profilePictureFile?: File;
+};
 
 function getErrorMessage(error: unknown) {
   if (error instanceof AxiosError) {
@@ -87,5 +94,47 @@ export async function login(payload: LoginPayload, setLoading: (value: boolean) 
     throw error;
   } finally {
     setLoading(false);
+  }
+}
+
+export async function updateProfile(
+  user: Pick<AuthUser, "id" | "profilePictureId">,
+  payload: UpdateUserProfilePayload,
+  setLoading?: (value: boolean) => void
+) {
+  try {
+    if (setLoading) setLoading(true);
+    const formData = new FormData();
+
+    if (payload.bio !== undefined) {
+      formData.append("bio", payload.bio);
+    }
+
+    if (payload.interests?.length) {
+      payload.interests.forEach((interest) => {
+        formData.append("interests", interest);
+        formData.append("interest", interest);
+      });
+    }
+
+    if (payload.profilePictureFile) {
+      formData.append("profilePicture", payload.profilePictureFile);
+      if (user.profilePictureId) {
+        formData.append("profilePictureId", user.profilePictureId);
+      }
+    } else if (payload.profilePicture !== undefined) {
+      formData.append("profilePicture", payload.profilePicture);
+    }
+
+    const response = await updateUserProfile(user.id, formData);
+    if (response?.success && response?.message) alert(response.message);
+    return response;
+  } catch (error) {
+    const message = getErrorMessage(error);
+    alert(message);
+    console.log(error);
+    throw error;
+  } finally {
+    if (setLoading) setLoading(false);
   }
 }

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import ProfileEditor from "@/src/components/profile/ProfileEditor";
+import ProfileEditor from "@/src/components/profile/Edit/ProfileEditor";
 import ProfileRedesign from "@/src/components/profile/redesign/Profile";
 import { useAuthStore } from "@/src/store/auth-store";
 
@@ -56,8 +56,7 @@ export default function ProfilePage() {
       <ProfileRedesign />
 
       {isEditModalOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex justify-center items-center p-4">
-          <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8 relative">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex justify-center items-center pt-8">
             <ProfileEditor 
               inModal={true} 
               onClose={() => {
@@ -65,7 +64,6 @@ export default function ProfilePage() {
                 router.push("/profile");
               }} 
             />
-          </div>
         </div>
       )}
     </div>
