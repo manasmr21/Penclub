@@ -28,8 +28,8 @@ export class AdminController {
 
     @Post("admin/approve/:bookId")
     @UseGuards(AuthGuard("jwt"))
-    async approveBook(@Request() req: any, @Param("bookId") bookId: string, status: string) {
-        return await this.adminService.approve(req, bookId, status);
+    async approveBook(@Request() req: any, @Param("bookId") bookId: string,@Body() approve: boolean) {
+        return await this.adminService.approve(req, bookId, approve);
     }
 
     @Get("pending")
@@ -38,12 +38,12 @@ export class AdminController {
     }
 
     @Post("/soft-delete")
-    async softDeleteUser(@Request() req: any, userId: string){
+    async softDeleteUser(@Request() req: any, @Body() userId: string){
         return await this.adminService.softDeleteUser(req, userId);
     }
 
     @Post("/permanent-delete")
-    async permanentDeleteUser(@Request() req: any, userId: string){
+    async permanentDeleteUser(@Request() req: any, @Body() userId: string){
         return await this.adminService.permanentDelete(req, userId);
     }
 

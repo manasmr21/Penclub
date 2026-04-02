@@ -265,7 +265,7 @@ export class AdminService {
         }
     }
 
-    async approve(req: any, bookId: string, status: string) {
+    async approve(req: any, bookId: string, approve: boolean) {
         try {
 
             const userRole = req.user?.role
@@ -311,7 +311,7 @@ export class AdminService {
                 message: "Book has already been approved"
             })
 
-            if (status === "approve") {
+            if (approve) {
                 book.approved = true
                 book.state = "approved"
             } else {
