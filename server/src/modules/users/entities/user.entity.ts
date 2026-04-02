@@ -43,7 +43,7 @@ export class User {
   @OneToMany(() => Blog, (blog) => blog.user)
   blogs: Blog[];
 
-  @Column({ nullable: true, type: "text" })
+  @Column({ nullable: true, type: "varchar", length: 150 })
   bio?: string;
 
   @OneToMany(() => Book, (book) => book.author)

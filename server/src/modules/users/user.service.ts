@@ -703,43 +703,167 @@ export class UserService {
         }
     }
 
-    async createAdmin(dto: {email: string, password: string, confirmPassword: string}){
+    async createAdmin(dto: { email: string, password: string, confirmPassword: string }) {
         try {
 
-            const {email, password, confirmPassword} = dto;
+            const { email, password, confirmPassword } = dto;
 
-            if(password !== confirmPassword) throw new BadRequestException({
+            if (password !== confirmPassword) throw new BadRequestException({
                 success: false,
                 message: "Confirm password does not match the password"
             })
 
-            if(!email || !password) throw new BadRequestException({
+            if (!email || !password) throw new BadRequestException({
                 success: false,
                 message: "All fields are required"
             })
 
             const adminExist = await this.userRepository.findOne({
-                where:{
-                    role : "admin"
+                where: {
+                    role: "admin"
                 }
             })
 
-            if(adminExist) throw new BadRequestException({
+            if (adminExist) throw new BadRequestException({
                 success: false,
                 message: "Admin already exist cannot make another one"
             })
 
-            const hashedPassword = bcrypt.hash(password, 12);
+            const hashedPassword = await bcrypt.hash(password, 12);
 
             const admin = this.userRepository.create({
                 email,
-                password,
+                password: hashedPassword,
                 name: "Admin",
                 username: "admin",
                 role: "admin"
             })
 
+            await this.userRepository.save(admin);
 
+            return {
+                success: true,
+                message: "Admin created successfully",
+                admin: {
+                    username: admin.username,
+                    email: admin.email,
+                    role: admin.role
+                }
+            }
+
+        } catch (error) {
+            throw this.handleServiceError(error);
+        }
+    }
+
+    async loginAdmin(dto: { email: string, password: string }, res: any) {
+        try {
+
+            const { email, password } = dto;
+
+            if (!email || !password) throw new BadRequestException({
+                success: false,
+                message: "All fields are required"
+            })
+
+            const admin = await this.userRepository.findOne({
+                where: {
+                    email,
+                    role: "admin"
+                }
+            })
+
+            if (!admin) throw new UnauthorizedException({
+                success: false,
+                message: "Admin not found"
+            })
+
+            const isValidPassword = await bcrypt.compare(password, admin.password);
+
+            if (!isValidPassword) throw new UnauthorizedException({
+                success: false,
+                message: "Invalid credentials"
+            })
+
+            admin.isLoggedIn = true;
+            await this.userRepository.save(admin);
+
+            const payload = {
+                id: admin.id,
+                name: admin.name,
+                email: admin.email,
+                role: admin.role,
+                isLoggedIn: admin.isLoggedIn
+            }
+
+            const token = this.jwtService.sign(payload);
+
+            res.cookie("admin", token, {
+                httpOnly: true,
+                maxAge: 24 * 60 * 60 * 1000,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "lax"
+            });
+
+            return {
+                success: true,
+                message: "Admin logged in successfully",
+                admin: {
+                    id: admin.id,
+                    name: admin.name,
+                    email: admin.email,
+                    username: admin.username,
+                    role: admin.role,
+                    isLoggedIn: admin.isLoggedIn
+                }
+            }
+
+
+        } catch (error) {
+            throw this.handleServiceError(error);
+        }
+    }
+
+    async logoutAdmin(res: any, req: any) {
+        try {
+            const userId = req.user?.id;
+            const role = req.user?.role;
+
+            if (!userId) throw new UnauthorizedException({
+                success: false,
+                message: "Unauthorized user"
+            })
+
+            if (role !== "admin") throw new UnauthorizedException({
+                success: false,
+                message: "Only admins can access this route"
+            })
+
+            const admin = await this.userRepository.findOne({
+                where: {
+                    id: userId,
+                    role: "admin"
+                }
+            })
+
+            if (!admin) throw new NotFoundException({
+                success: false,
+                message: "Admin not found"
+            })
+
+            admin.isLoggedIn = false;
+            await this.userRepository.save(admin);
+
+            res.clearCookie("admin", {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "lax"
+            });
+
+            return {
+                success: true,
+                message: "Admin logged out successfully"
+            };
         } catch (error) {
             throw this.handleServiceError(error);
         }
