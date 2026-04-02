@@ -55,13 +55,8 @@ export class BooksController {
         return await this.booksService.deleteBook(id, req);
     }
 
-    @Get("pending")
-    async getPendingBooksAdmin(@Request() req:any){
-        return await this.booksService.getPendingbooks(req);
-    }
-
     @Get("pending-author")
-    async getPendingBooksAuthor(@Request() req: any){
+    async getPendingBooksAuthor(@Request() req: any, state: string){
         return await this.booksService.getPendingBooksPerAuthor(req);
     }
 

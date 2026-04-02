@@ -49,7 +49,7 @@ export class Book {
 
     @Column({
         default: "pending",
-        enum: ["pending", "approved"]
+        enum: ["pending", "approved", "not_approved"]
     })
     state: string
 

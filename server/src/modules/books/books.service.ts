@@ -43,38 +43,6 @@ export class BooksService {
         }
     }
 
-    async getPendingbooks(req: any) {
-        try {
-
-            const userRole = req.user?.role
-
-            if (userRole !== "admin") throw new UnauthorizedException({
-                success: false,
-                message: "You are not authorized."
-            })
-
-            const books = await this.booksRepository.find({
-                where: {
-                    approved: false
-                }
-            })
-
-            if (books.length === 0) throw new NotFoundException({
-                success: false,
-                message: "No books found"
-            })
-
-            return {
-                success: true,
-                message: "Pending books fetched successfully",
-                books
-            }
-
-        } catch (error) {
-            throw this.handleServiceError(error);
-        }
-    }
-
     async getPendingBooksPerAuthor(req: any) {
         try {
             const userId = req.user?.id

@@ -83,21 +83,4 @@ export class UserController {
     async followUser(@Request() req: any, @Param("targetUserId") targetUserId: string) {
         return await this.userService.followUnfollow(targetUserId, req);
     }
-
-    @Post("admin")
-    async makeAdmin(@Body() dto: {email : string, password: string, confirmPassword: string}){
-        return await this.userService.createAdmin(dto);
-    }
-
-    @Post("admin/login")
-    async loginAdmin(@Body() dto: {email: string, password: string}, @Response({passthrough:true}) res: any){
-        return await this.userService.loginAdmin(dto, res);
-    }
-
-    @Post("admin/logout")
-    @UseGuards(AuthGuard("jwt"))
-    async logoutAdmin(@Response({ passthrough: true }) res: any, @Request() req: any) {
-        return await this.userService.logoutAdmin(res, req);
-    }
-
 }
