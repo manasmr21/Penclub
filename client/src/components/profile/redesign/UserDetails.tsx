@@ -13,9 +13,24 @@ const UserDetails = () => {
   const user = useAppStore((state) => state.user);
   const isAuthor = user?.role === "author";
   const isReader = user?.role === "reader";
-  const hasProfilePicture =
-    typeof user?.profilePicture === "string" &&
-    user.profilePicture.trim().length > 0;
+  const getProfileUrl = (pic: any) => {
+    if (!pic) return null;
+    if (typeof pic === "string") {
+      try {
+        const parsed = JSON.parse(pic);
+        return parsed.secure_url || parsed.url || pic;
+      } catch {
+        return pic;
+      }
+    }
+    if (typeof pic === "object") {
+      return pic.secure_url || pic.url || null;
+    }
+    return null;
+  };
+
+  const picUrl = getProfileUrl(user?.profilePicture);
+  const hasProfilePicture = typeof picUrl === "string" && picUrl.trim().length > 0;
   const displayName = user?.name || user?.username || "Pen Club Member";
 
   const initials = displayName.trim().split(/\s+/).filter(Boolean).slice(0, 2);
@@ -91,7 +106,7 @@ const UserDetails = () => {
         >
           {hasProfilePicture ? (
             <Image
-              src={user?.profilePicture || ""}
+              src={picUrl || ""}
               alt="profile picture"
               width={300}
               height={300}
