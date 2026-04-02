@@ -168,8 +168,8 @@ export class UserService {
                 message: "User not found."
             })
 
-            const interests = this.normalizeStringArray(dto.interests ?? dto.interest);
-            const socialLinks = this.normalizeStringArray(dto.socialLinks ?? dto.socialeLinks);
+            const interests = this.normalizeStringArray(dto.interests);
+            const socialLinks = this.normalizeStringArray(dto.socialLinks);
 
             if (dto.name !== undefined) {
                 user.name = dto.name;
@@ -187,10 +187,6 @@ export class UserService {
                 user.socialLinks = socialLinks;
             }
 
-            if (dto.profilePicture !== undefined && !file) {
-                user.profilePicture = dto.profilePicture;
-            }
-
             if (file) {
                 if (user.profilePicture && user.profilePictureId) {
                     await this.cloudinaryService.deleteImage(user.profilePictureId);
@@ -203,6 +199,9 @@ export class UserService {
 
                 user.profilePicture = cloudinaryResponse.secure_url
                 user.profilePictureId = cloudinaryResponse.public_id
+            } else if (dto.profilePictureId) {
+                if (user.profilePictureId)
+                    await this.cloudinaryService.deleteImage(user.profilePictureId);
             }
 
             const updatedUser = await this.userRepository.save(user)

@@ -17,6 +17,16 @@ export type LoginPayload = {
   password: string;
 }
 
+export type UpdateUserProfilePayload = {
+  name:string;
+  interests?: string[];
+  bio?: string;
+  profilePictureId?: string;
+  profilePictureFile?: File;
+  socileLinks?:string[]
+};
+
+
 function getErrorMessage(error: unknown) {
   if (error instanceof AxiosError) {
     return error.response?.data?.message ?? error.message;
@@ -89,3 +99,4 @@ export async function login(payload: LoginPayload, setLoading: (value: boolean) 
     setLoading(false);
   }
 }
+

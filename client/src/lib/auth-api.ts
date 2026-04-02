@@ -1,5 +1,5 @@
 import { api } from "./api";
-import { type LoginPayload } from "./auth";
+import { type LoginPayload, type UpdateUserProfilePayload } from "./auth";
 import { type AuthUser } from "./store/store";
 
 export async function registerUser(payload: FormData) {
@@ -23,18 +23,16 @@ export async function resendUserOtp(role: string, email: string) {
   return data;
 }
 
-export type UpdateUserProfilePayload = {
-  interests?: string[];
-  bio?: string;
-  profilePicture?: string;
-  profilePictureFile?: File;
-};
 
 export async function updateUserProfile(
-  user: Pick<AuthUser, "id" | "profilePictureId">,
+  user: string,
   payload: UpdateUserProfilePayload,
 ) {
   const formData = new FormData();
+
+  if (payload.name !== undefined) {
+    formData.append("name", payload.name);
+  }
 
   if (payload.bio !== undefined) {
     formData.append("bio", payload.bio);
@@ -43,20 +41,25 @@ export async function updateUserProfile(
   if (payload.interests?.length) {
     payload.interests.forEach((interest) => {
       formData.append("interests", interest);
-      formData.append("interest", interest);
+    });
+  }
+
+  if (payload.socileLinks?.length) {
+    payload.socileLinks.forEach((links) => {
+      formData.append("socialLinks", links);
     });
   }
 
   if (payload.profilePictureFile) {
     formData.append("profilePicture", payload.profilePictureFile);
-    if (user.profilePictureId) {
-      formData.append("profilePictureId", user.profilePictureId);
+    if (payload.profilePictureId) {
+      formData.append("profilePictureId", payload.profilePictureId);
     }
-  } else if (payload.profilePicture !== undefined) {
-    formData.append("profilePicture", payload.profilePicture);
+  } else if (payload.profilePictureId !== undefined) {
+    formData.append("profilePicture", payload.profilePictureId);
   }
 
-  const { data } = await api.put(`/users/update/${user.id}`, formData, {
+  const { data } = await api.put(`/users/update/${user}`, formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },

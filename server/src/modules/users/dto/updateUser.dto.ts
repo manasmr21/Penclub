@@ -17,11 +17,6 @@ export class UpdateUserDto {
   profilePictureId?: string
 
   @ApiProperty({
-    example: ['fiction', 'mystery']
-  })
-  interest?: string[];
-
-  @ApiProperty({
     example: ['fiction', 'mystery'],
     required: false
   })
@@ -35,12 +30,6 @@ export class UpdateUserDto {
 
   @ApiProperty({
     example: ['https://twitter.com/johndoe', 'https://facebook.com/johndoe']
-  })
-  socialeLinks?: string[];
-
-  @ApiProperty({
-    example: ['https://twitter.com/johndoe', 'https://facebook.com/johndoe'],
-    required: false
   })
   socialLinks?: string[];
 }
