@@ -5,10 +5,12 @@ import UserDetails from '../profile/redesign/UserDetails'
 import BookShelft from '../profile/redesign/BookShelft'
 import ArticleShelft from '../profile/redesign/ArticleShelft'
 import { Plus } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 const tabs = ['Bookshelf', 'Articles'];
 
 const Profile = () => {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('Bookshelf');
 
   return (
@@ -38,7 +40,10 @@ const Profile = () => {
 
           {/* Action Button */}
           <div className="pb-4">
-            <button className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white font-bold text-[11px] tracking-[0.15em] uppercase rounded-full hover:bg-primary/90 transition-all duration-300 shadow-[0_4px_12px_rgba(13,56,125,0.2)] hover:shadow-[0_6px_20px_rgba(13,56,125,0.3)] hover:-translate-y-0.5 cursor-pointer group">
+            <button
+              onClick={() => router.push(activeTab === 'Bookshelf' ? '/add-book' : '/post-article')}
+              className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white font-bold text-[11px] tracking-[0.15em] uppercase rounded-full hover:bg-primary/90 transition-all duration-300 shadow-[0_4px_12px_rgba(13,56,125,0.2)] hover:shadow-[0_6px_20px_rgba(13,56,125,0.3)] hover:-translate-y-0.5 cursor-pointer group"
+            >
               <Plus size={16} className="transition-transform group-hover:rotate-90" />
               {activeTab === 'Bookshelf' ? 'Add Book' : 'Post Article'}
             </button>

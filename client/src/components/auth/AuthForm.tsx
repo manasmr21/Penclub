@@ -34,7 +34,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type = 'signup' }) => {
 
   return (
     <div className="w-full max-w-[560px] mx-auto p-6 sm:p-8 rounded-2xl bg-white/40 backdrop-blur-md">
-      <div className="text-center mb-6">
+      <div className="text-center mb-3">
         <h1 className="text-[26px] font-extrabold text-[#0a192f] tracking-tight mb-1">
           {authType === 'login' ? 'Welcome back' : 'Create your account'}
         </h1>

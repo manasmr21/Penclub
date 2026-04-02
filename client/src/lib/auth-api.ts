@@ -1,6 +1,6 @@
 import { api } from "./api";
 import { type LoginPayload } from "./api";
-import { type AuthUser } from "./store/store";
+import { useAppStore } from "./store/store";
 
 export async function registerUser(payload: FormData) {
   const { data } = await api.post("/users/create", payload);
@@ -29,11 +29,7 @@ export async function updateUserProfile(
 ) {
  
 
-  const { data } = await api.put(`/users/update/${user}`, payload, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+  const { data } = await api.put(`/users/update/${user}`, payload);
 
   return data;
 }

@@ -60,7 +60,25 @@ const Navbar = () => {
     router.refresh();
   };
 
-  const hasProfilePicture = typeof user?.profilePicture === "string" && user.profilePicture.trim().length > 0;
+  const getProfileUrl = (pic: any) => {
+    if (!pic) return null;
+    if (typeof pic === "string") {
+      try {
+        const parsed = JSON.parse(pic);
+        return parsed.secure_url || parsed.url || pic;
+      } catch {
+        return pic;
+      }
+    }
+    if (typeof pic === "object") {
+      return pic.secure_url || pic.url || null;
+    }
+    return null;
+  };
+
+  const picUrl = getProfileUrl(user?.profilePicture);
+  const hasProfilePicture = typeof picUrl === "string" && picUrl.trim().length > 0;
+  
   const profileDisplayName = user?.name ?? user?.username ?? "User";
   const nameParts = profileDisplayName.trim().split(/\s+/).filter(Boolean);
   const profileInitials =
@@ -79,7 +97,7 @@ const Navbar = () => {
           {hasProfilePicture ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={user.profilePicture}
+              src={picUrl}
               alt={user?.name ?? user?.username ?? "Profile"}
               className="h-full w-full object-cover"
             />
@@ -102,17 +120,10 @@ const Navbar = () => {
         >
           My profile
         </Link>
-        <Link
-          href="/profile-edit"
-          className="mt-0.5 block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
-          onClick={closeMenu}
-        >
-          Edit profile
-        </Link>
         <button
           type="button"
           onClick={handleLogout}
-          className="mt-0.5 block w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-red-600 hover:bg-red-50"
+          className="mt-0.5 block w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-red-600 hover:bg-red-50 "
         >
           Logout
         </button>
