@@ -703,6 +703,48 @@ export class UserService {
         }
     }
 
+    async createAdmin(dto: {email: string, password: string, confirmPassword: string}){
+        try {
+
+            const {email, password, confirmPassword} = dto;
+
+            if(password !== confirmPassword) throw new BadRequestException({
+                success: false,
+                message: "Confirm password does not match the password"
+            })
+
+            if(!email || !password) throw new BadRequestException({
+                success: false,
+                message: "All fields are required"
+            })
+
+            const adminExist = await this.userRepository.findOne({
+                where:{
+                    role : "admin"
+                }
+            })
+
+            if(adminExist) throw new BadRequestException({
+                success: false,
+                message: "Admin already exist cannot make another one"
+            })
+
+            const hashedPassword = bcrypt.hash(password, 12);
+
+            const admin = this.userRepository.create({
+                email,
+                password,
+                name: "Admin",
+                username: "admin",
+                role: "admin"
+            })
+
+
+        } catch (error) {
+            throw this.handleServiceError(error);
+        }
+    }
+
     //Error handler - to maker sure that errors does not make my server crash
     private handleServiceError(error: unknown): never {
         if (error instanceof HttpException) {

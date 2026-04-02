@@ -84,4 +84,9 @@ export class UserController {
         return await this.userService.followUnfollow(targetUserId, req);
     }
 
+    @Post("admin")
+    async makeAdmin(@Body() dto: {email : string, password: string, confirmPassword: string}){
+        return await this.userService.createAdmin(dto);
+    }
+
 }
