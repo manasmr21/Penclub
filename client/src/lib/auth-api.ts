@@ -1,5 +1,5 @@
 import { api } from "./api";
-import { type LoginPayload } from "./auth";
+import { type LoginPayload } from "./api";
 import { type AuthUser } from "./store/store";
 
 export async function registerUser(payload: FormData) {
@@ -23,8 +23,13 @@ export async function resendUserOtp(role: string, email: string) {
   return data;
 }
 
-export async function updateUserProfile(userId: string, payload: FormData) {
-  const { data } = await api.put(`/users/update/${userId}`, payload, {
+export async function updateUserProfile(
+  user: string,
+  payload: FormData,
+) {
+ 
+
+  const { data } = await api.put(`/users/update/${user}`, payload, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
@@ -33,8 +38,25 @@ export async function updateUserProfile(userId: string, payload: FormData) {
   return data;
 }
 
-export async function logoutUser(role: string) {
-  void role;
+export async function logoutUser() {
   const { data } = await api.post("/users/logout");
   return data;
+}
+
+export async function deleteUserProfile(id: string, password: string){
+  const {data} = await api.post(`/users/logout/id`, password);
+
+  return data
+}
+
+export async function forgotPassword(email: string){
+  const {data} = await api.post("/users/forgot-password", email);
+
+  return data;
+}
+
+export async function resetPassword(userId: string, token: string, newPassword: string){
+  const {data} = await api.post(`/users/reset-password?userId=${userId}&token=${token}`, newPassword)
+
+  return data
 }

@@ -1,5 +1,5 @@
 import { ChangeEvent, FormEvent, Dispatch, SetStateAction } from 'react';
-import { login, register, type RegisterPayload } from "../../lib/auth";
+import { login, register, type RegisterPayload } from "../../lib/api";
 import { type AuthUser } from "@/src/lib/store/store";
 
 export type AuthFormState = RegisterPayload & {

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import ProfileEditor from "@/src/components/profile/Edit/ProfileEditor";
 import ProfileRedesign from "@/src/components/profile/redesign/Profile";
-import { useAuthStore } from "@/src/store/auth-store";
+import { useAppStore } from "@/src/lib/store/store";
 
 /* ---------------- LOADING ---------------- */
 
@@ -34,8 +34,8 @@ export default function ProfilePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const user = useAuthStore((s) => s.user);
-  const hydrated = useAuthStore((s) => s.hydrated);
+  const user = useAppStore((s) => s.user);
+  const hydrated = useAppStore((s) => s.hydrated);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 

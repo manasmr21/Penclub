@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useAuthStore } from "@/src/store/auth-store";
+import { useAppStore } from '@/src/lib/store/store';
 import { updateProfile, UpdateUserProfilePayload } from "@/src/lib/auth";
 
 interface ProfileEditorProps {
@@ -117,8 +117,8 @@ const FormInput = ({ id, label, value, onChange, type = 'text', prefix }: FormIn
 );
 
 export default function ProfileEditor({ onClose }: ProfileEditorProps) {
-  const user = useAuthStore((s) => s.user);
-  const updateUser = useAuthStore((s) => s.updateUser);
+  const user = useAppStore((s) => s.user);
+  const updateUser = useAppStore((s) => s.updateUser);
 
   const allInterests = ['Poetry', 'Fiction', 'Non-fiction', 'Essays', 'Memoir', 'Fantasy', 'Modernist Fiction'];
 

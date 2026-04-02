@@ -5,12 +5,12 @@ import UserDetails from './UserDetails'
 import BookShelft from './BookShelft'
 import ArticleShelft from './ArticleShelft'
 import { Plus } from 'lucide-react';
-import { useAuthStore } from "@/src/store/auth-store";
+import { useAppStore } from '@/src/lib/store/store';
 import { fetchAuthorArticles, fetchAuthorBooks } from "@/src/lib/profile-stats-api";
 import type { AuthorArticle, AuthorBook } from "@/src/lib/profile-stats-api";
 
 const Profile = () => {
-  const user = useAuthStore((state) => state.user);
+  const user = useAppStore((state) => state.user);
   const isAuthor = user?.role === "author";
   const [activeTab, setActiveTab] = useState<'Bookshelf' | 'Articles'>('Bookshelf');
   const [books, setBooks] = useState<AuthorBook[]>([]);
