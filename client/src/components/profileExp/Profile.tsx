@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import UserDetails from '../profile/redesign/UserDetails'
 import BookShelft from '../profile/redesign/BookShelft'
-import Fallback from '../profile/redesign/Fallback'
+import ArticleShelft from '../profile/redesign/ArticleShelft'
 import { Plus } from 'lucide-react';
 
 const tabs = ['Bookshelf', 'Articles'];
@@ -48,8 +48,8 @@ const Profile = () => {
 
       {/* Tab Content */}
       <div className="mt-8 min-h-[70vh]">
-        {activeTab === 'Bookshelf' && <BookShelft />}
-        {activeTab === 'Articles' && <Fallback comp="Articles" />}
+        {activeTab === 'Bookshelf' && <BookShelft books={[]} />}
+        {activeTab === 'Articles' && <ArticleShelft articles={[]} />}
       </div>
     </div>
   )
