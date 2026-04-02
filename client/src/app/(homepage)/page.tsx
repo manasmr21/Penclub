@@ -14,7 +14,6 @@ const page = () => {
         <Publisher/>
         <Podcast/>
         <Testimonials/>
-        <Footer/>
     </div>
   )
 }
