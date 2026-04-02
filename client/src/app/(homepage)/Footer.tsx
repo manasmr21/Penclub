@@ -1,8 +1,14 @@
+"use client";
+
 import { FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
+import { usePathname } from "next/navigation";
 
 const Footer = () => {
+  const pathname = usePathname();
+  const isHome = pathname === "/";
+
   return (
-    <footer id="contact" className="bg-primary text-white">
+    <footer id="contact" className={isHome ? "bg-primary text-white" : "fixed bottom-0 w-full z-[998] bg-primary text-white shadow-[0_-4px_10px_rgba(0,0,0,0.1)]"}>
       <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-4">
         <div className="
           flex flex-col 

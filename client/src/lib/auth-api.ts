@@ -29,11 +29,7 @@ export async function updateUserProfile(
 ) {
  
 
-  const { data } = await api.put(`/users/update/${user}`, payload, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+  const { data } = await api.put(`/users/update/${user}`, payload);
 
   return data;
 }

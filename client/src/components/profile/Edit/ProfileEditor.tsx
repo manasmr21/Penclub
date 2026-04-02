@@ -175,11 +175,16 @@ export default function ProfileEditor({ onClose }: ProfileEditorProps) {
       );
       
       // Optimistic user state update (Profile picture might need re-fetch, but bio/interests match)
-      updateUser({
+      const optimisticUpdate: Partial<typeof user> = {
         bio,
         interests: selected,
-        // (name and username might be added here when backend fully supports them)
-      });
+      };
+
+      if (file) {
+        optimisticUpdate.profilePicture = URL.createObjectURL(file);
+      }
+
+      updateUser(optimisticUpdate);
       
       if (onClose) onClose();
       

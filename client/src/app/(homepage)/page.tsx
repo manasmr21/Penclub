@@ -4,7 +4,8 @@ import Category from './Category'
 import Publisher from './Publisher'
 import Podcast from './Podcast'
 import Testimonials from './Testimonials'
-import Footer from './Footer'
+
+
 
 const page = () => {
   return (
@@ -14,7 +15,6 @@ const page = () => {
         <Publisher/>
         <Podcast/>
         <Testimonials/>
-        <Footer/>
     </div>
   )
 }
