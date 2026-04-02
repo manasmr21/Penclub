@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AxiosError } from "axios";
-import { Button } from "@/src/components/ui/button";
 import { logoutUser, resendUserOtp, updateUserProfile } from "@/src/lib/auth-api";
 import { useAuthStore } from "@/src/store/auth-store";
 import {
@@ -39,6 +38,9 @@ type ProfileEditorProps = {
   inModal?: boolean;
   onClose?: () => void;
 };
+
+const textAreaClassName =
+  "w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 min-h-28";
 
 export default function ProfileEditor({ inModal = false, onClose }: ProfileEditorProps) {
   const router = useRouter();
@@ -243,6 +245,24 @@ export default function ProfileEditor({ inModal = false, onClose }: ProfileEdito
           error={errors.interests}
           onToggle={toggleInterest}
         />
+
+        <div className="space-y-2">
+          <label htmlFor="bio" className="text-sm font-medium text-slate-800">
+            Short bio
+          </label>
+          <textarea
+            id="bio"
+            value={bio}
+            onChange={(event) => {
+              setBio(event.target.value);
+              setErrors((current) => ({ ...current, form: undefined }));
+              setMessage("");
+            }}
+            className={textAreaClassName}
+            placeholder="Write a short bio"
+          />
+          {errors.bio ? <p className="text-sm text-red-600">{errors.bio}</p> : null}
+        </div>
 
         {errors.form ? <p className="text-sm text-red-600">{errors.form}</p> : null}
         {message ? <p className="text-sm text-green-700">{message}</p> : null}
