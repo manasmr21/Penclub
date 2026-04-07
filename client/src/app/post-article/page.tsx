@@ -105,7 +105,7 @@ export default function PostArticlePage() {
                 onChange={(e) => setTitle(e.target.value)}
                 required
               />
-            </div>
+            </div> 
 
             <div className="space-y-1.5">
               <label className="ml-1 block text-[11px] font-semibold uppercase tracking-[0.08em] text-gray-500">

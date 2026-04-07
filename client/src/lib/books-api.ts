@@ -1,4 +1,4 @@
-import { api, requestWithFallback } from "./http-client";
+import { api } from "./http-client";
 import type { AuthorBook } from "./profile-stats-api";
 import { AxiosError } from "axios";
 
@@ -38,22 +38,14 @@ export type UpdateArticlePayload = {
 };
 
 export async function fetchAllBooks(): Promise<AuthorBook[]> {
-  const data = await requestWithFallback<{ books?: AuthorBook[] }>({
-    axiosRequest: () => api.get("/books"),
-    path: "/books",
-    method: "GET",
-  });
+  const { data } = await api.get<{ books?: AuthorBook[] }>("/books");
 
   return Array.isArray(data?.books) ? data.books : [];
 }
 
 export async function fetchBookById(bookId: string): Promise<AuthorBook | null> {
   try {
-    const data = await requestWithFallback<{ book?: AuthorBook }>({
-      axiosRequest: () => api.get(`/books/${bookId}`),
-      path: `/books/${bookId}`,
-      method: "GET",
-    });
+    const { data } = await api.get<{ book?: AuthorBook }>(`/books/${bookId}`);
 
     return data?.book ?? null;
   } catch (error) {
@@ -68,11 +60,9 @@ export async function fetchAuthorNameById(authorId: string): Promise<string | nu
   if (!authorId?.trim()) return null;
 
   try {
-    const data = await requestWithFallback<{ blogs?: Array<{ user?: { name?: string; username?: string } }> }>({
-      axiosRequest: () => api.get(`/blogs/fetch/${authorId}`),
-      path: `/blogs/fetch/${authorId}`,
-      method: "GET",
-    });
+    const { data } = await api.get<{ blogs?: Array<{ user?: { name?: string; username?: string } }> }>(
+      `/blogs/fetch/${authorId}`,
+    );
 
     const firstUser = data?.blogs?.[0]?.user;
     const name = firstUser?.name?.trim();
@@ -85,11 +75,9 @@ export async function fetchAuthorNameById(authorId: string): Promise<string | nu
   }
 
   try {
-    const data = await requestWithFallback<{ author?: { name?: string; penName?: string } }>({
-      axiosRequest: () => api.get(`/authors/get-author/${authorId}`),
-      path: `/authors/get-author/${authorId}`,
-      method: "GET",
-    });
+    const { data } = await api.get<{ author?: { name?: string; penName?: string } }>(
+      `/authors/get-author/${authorId}`,
+    );
 
     const name = data?.author?.name?.trim();
     const penName = data?.author?.penName?.trim();
@@ -116,11 +104,7 @@ export type BookReview = {
 
 export async function fetchReviewsByBook(bookId: string): Promise<BookReview[]> {
   try {
-    const data = await requestWithFallback<{ reviews?: BookReview[] }>({
-      axiosRequest: () => api.get(`/reviews/get-book/${bookId}`),
-      path: `/reviews/get-book/${bookId}`,
-      method: "GET",
-    });
+    const { data } = await api.get<{ reviews?: BookReview[] }>(`/reviews/get-book/${bookId}`);
 
     return Array.isArray(data?.reviews) ? data.reviews : [];
   } catch (error) {
@@ -132,21 +116,13 @@ export async function fetchReviewsByBook(bookId: string): Promise<BookReview[]> 
 }
 
 export async function createBookReview(payload: { bookId: string; rating: number; content?: string }) {
-  return requestWithFallback({
-    axiosRequest: () => api.post("/reviews/create", payload),
-    path: "/reviews/create",
-    method: "POST",
-    body: payload,
-  });
+  const { data } = await api.post("/reviews/create", payload);
+  return data;
 }
 
 export async function updateBookReview(reviewId: string, payload: { rating?: number; content?: string }) {
-  return requestWithFallback({
-    axiosRequest: () => api.put(`/reviews/update/${reviewId}`, payload),
-    path: `/reviews/update/${reviewId}`,
-    method: "PUT",
-    body: payload,
-  });
+  const { data } = await api.put(`/reviews/update/${reviewId}`, payload);
+  return data;
 }
 
 export async function createBook(payload: CreateBookPayload) {
@@ -169,12 +145,8 @@ export async function createBook(payload: CreateBookPayload) {
     formData.append("coverImage", payload.coverImageFile);
   }
 
-  return requestWithFallback({
-    axiosRequest: () => api.post("/books/create", formData),
-    path: "/books/create",
-    method: "POST",
-    body: formData,
-  });
+  const { data } = await api.post("/books/create", formData);
+  return data;
 }
 
 export async function createArticle(payload: CreateArticlePayload) {
@@ -194,12 +166,8 @@ export async function createArticle(payload: CreateArticlePayload) {
     formData.append("coverImage", payload.coverImageFile);
   }
 
-  return requestWithFallback({
-    axiosRequest: () => api.post("/blogs/create", formData),
-    path: "/blogs/create",
-    method: "POST",
-    body: formData,
-  });
+  const { data } = await api.post("/blogs/create", formData);
+  return data;
 }
 
 export async function updateBook(bookId: string, payload: UpdateBookPayload) {
@@ -218,20 +186,13 @@ export async function updateBook(bookId: string, payload: UpdateBookPayload) {
     formData.append("coverImage", payload.coverImageFile);
   }
 
-  return requestWithFallback({
-    axiosRequest: () => api.put(`/books/update/${bookId}`, formData),
-    path: `/books/update/${bookId}`,
-    method: "PUT",
-    body: formData,
-  });
+  const { data } = await api.put(`/books/update/${bookId}`, formData);
+  return data;
 }
 
 export async function deleteBook(bookId: string) {
-  return requestWithFallback({
-    axiosRequest: () => api.delete(`/books/delete/${bookId}`),
-    path: `/books/delete/${bookId}`,
-    method: "DELETE",
-  });
+  const { data } = await api.delete(`/books/delete/${bookId}`);
+  return data;
 }
 
 export async function updateArticle(articleId: string, payload: UpdateArticlePayload) {
@@ -249,26 +210,15 @@ export async function updateArticle(articleId: string, payload: UpdateArticlePay
     formData.append("coverImage", payload.coverImageFile);
   }
 
-  return requestWithFallback({
-    axiosRequest: () => api.put(`/blogs/update/${articleId}`, formData),
-    path: `/blogs/update/${articleId}`,
-    method: "PUT",
-    body: formData,
-  });
+  const { data } = await api.put(`/blogs/update/${articleId}`, formData);
+  return data;
 }
 
 export async function deleteArticle(articleId: string, coverImageId?: string) {
-  return requestWithFallback({
-    axiosRequest: () =>
-      api.delete(`/blogs/delete/${articleId}`, {
-        data: {
-          coverImageId: coverImageId ?? "",
-        },
-      }),
-    path: `/blogs/delete/${articleId}`,
-    method: "DELETE",
-    body: {
+  const { data } = await api.delete(`/blogs/delete/${articleId}`, {
+    data: {
       coverImageId: coverImageId ?? "",
     },
   });
+  return data;
 }

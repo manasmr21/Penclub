@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/src/lib/store/store';
 import { updateProfile, UpdateUserProfilePayload } from "@/src/lib/auth";
-import { resendUserOtp } from "@/src/lib/auth-api";
+import { resendUserOtp, updateUserProfile } from "@/src/lib/auth-api";
 import { extractErrorMessage } from "@/src/lib/http-client";
 
 interface ProfileEditorProps {
@@ -132,6 +132,36 @@ export default function ProfileEditor({ onClose }: ProfileEditorProps) {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [verifyLoading, setVerifyLoading] = useState(false);
+  const [initialSyncLoading, setInitialSyncLoading] = useState(false);
+
+  useEffect(() => {
+    if (!user?.id) return;
+
+    let isMounted = true;
+
+    const syncLatestProfile = async () => {
+      try {
+        setInitialSyncLoading(true);
+        // Reuses authenticated endpoint to read latest persisted profile fields.
+        const response = await updateUserProfile(user.id, new FormData()) as any;
+        if (isMounted && response?.user) {
+          updateUser(response.user);
+        }
+      } catch {
+        // Keep local persisted store data when refresh fails.
+      } finally {
+        if (isMounted) {
+          setInitialSyncLoading(false);
+        }
+      }
+    };
+
+    void syncLatestProfile();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [user?.id, updateUser]);
 
   useEffect(() => {
     if (user) {
@@ -312,10 +342,10 @@ export default function ProfileEditor({ onClose }: ProfileEditorProps) {
           </button>
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || initialSyncLoading}
             className="h-11 flex-1 rounded-full bg-[linear-gradient(90deg,var(--primary),var(--secondary))] text-sm font-semibold text-[var(--primary-foreground)] shadow-[0_12px_30px_rgba(10,56,125,0.2)] transition disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {loading ? "Saving..." : "Save Changes"}
+            {loading ? "Saving..." : initialSyncLoading ? "Loading..." : "Save Changes"}
           </button>
         </div>
       </form>
