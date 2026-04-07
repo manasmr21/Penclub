@@ -5,10 +5,9 @@ import {
     ManyToOne,
     CreateDateColumn,
     UpdateDateColumn,
-    JoinColumn,
-    OneToMany
+    OneToMany,
+    DeleteDateColumn
 } from "typeorm";
-import { AuthorEntity } from "../../author/entities/author.entity";
 import { User } from "../../users/entities/user.entity";
 import { Review } from "../../reviews/entities/review.entity";
 
@@ -49,7 +48,7 @@ export class Book {
 
     @Column({
         default: "pending",
-        enum: ["pending", "approved"]
+        enum: ["pending", "approved", "not_approved"]
     })
     state: string
 
@@ -66,4 +65,7 @@ export class Book {
 
     @UpdateDateColumn()
     updatedAt: Date;
+
+    @DeleteDateColumn()
+    deletedAt: Date;
 }

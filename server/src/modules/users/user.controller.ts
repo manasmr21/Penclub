@@ -83,5 +83,4 @@ export class UserController {
     async followUser(@Request() req: any, @Param("targetUserId") targetUserId: string) {
         return await this.userService.followUnfollow(targetUserId, req);
     }
-
 }

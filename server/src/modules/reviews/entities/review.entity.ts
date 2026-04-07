@@ -7,7 +7,8 @@ import {
     UpdateDateColumn,
     Index,
     JoinColumn,
-    Unique
+    Unique,
+    DeleteDateColumn
 } from "typeorm";
 import { User } from "../../users/entities/user.entity";
 import { Book } from "../../books/entities/books.entity";
@@ -48,4 +49,7 @@ export class Review {
 
     @UpdateDateColumn()
     updatedAt: Date;
+
+    @DeleteDateColumn()
+    deletedAt: Date;
 }

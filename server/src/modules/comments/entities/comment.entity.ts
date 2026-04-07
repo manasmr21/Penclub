@@ -7,7 +7,8 @@ import {
     CreateDateColumn,
     UpdateDateColumn,
     Index,
-    JoinColumn
+    JoinColumn,
+    DeleteDateColumn
 } from "typeorm";
 import { Blog } from "../../blog/entities/blogs.entity";
 import { User } from "../../users/entities/user.entity";
@@ -59,4 +60,7 @@ export class Comment {
 
     @UpdateDateColumn()
     updatedAt: Date;
+
+    @DeleteDateColumn()
+    deletedAt: Date;
 }

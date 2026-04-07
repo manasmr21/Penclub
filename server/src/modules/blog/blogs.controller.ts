@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Request, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Request, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { BlogsService } from "./blogs.service";
 import { CreateBlogDto } from "./dto/create-blog.dto";
@@ -13,13 +13,27 @@ export class BlogsController {
 
 
     @Get()
-    async getAll(){
-        return await this.blogsService.getAllBlogs();
+    async getAll(@Query("page") page?: string, @Query("limit") limit?: string){
+        return await this.blogsService.getAllBlogs(page, limit);
     }
 
     @Get("fetch/:userId")
-    async fetchUsersBlogs(@Param("userId") id: string){
-        return await this.blogsService.getUsersBlogs(id);
+    async fetchUsersBlogs(
+        @Param("userId") id: string,
+        @Query("page") page?: string,
+        @Query("limit") limit?: string
+    ){
+        return await this.blogsService.getUsersBlogs(id, page, limit);
+    }
+
+    @Get("pending-author")
+    @UseGuards(AuthGuard("jwt"))
+    async getPendingBlogsAuthor(
+        @Request() req: any,
+        @Query("page") page?: string,
+        @Query("limit") limit?: string
+    ){
+        return await this.blogsService.getPendingBlogsPerAuthor(req, page, limit);
     }
 
     @Post("create")

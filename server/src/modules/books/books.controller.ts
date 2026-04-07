@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Req, Request, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Request, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { BooksService } from "./books.service";
 import { CreateBookDto } from "./dto/create-book.dto";
@@ -12,13 +12,39 @@ export class BooksController {
     ) { }
 
     @Get()
-    async getAll() {
-        return await this.booksService.getAllBooks();
+    async getAll(@Query("page") page?: string, @Query("limit") limit?: string) {
+        return await this.booksService.getAllBooks(page, limit);
     }
 
     @Get("author/:authorId")
-    async getByAuthor(@Param("authorId") authorId: string) {
-        return await this.booksService.getBooksByAuthor(authorId);
+    async getByAuthor(
+        @Param("authorId") authorId: string,
+        @Query("page") page?: string,
+        @Query("limit") limit?: string
+    ) {
+        return await this.booksService.getBooksByAuthor(authorId, page, limit);
+    }
+
+    @Get("pending-author")
+    @UseGuards(AuthGuard("jwt"))
+    async getPendingBooksAuthor(
+        @Request() req: any,
+        @Query("page") page?: string,
+        @Query("limit") limit?: string
+    ) {
+        return await this.booksService.getPendingBooksPerAuthor(req, page, limit);
+    }
+
+    @Get("recommended")
+    @UseGuards(AuthGuard("jwt"))
+    async getRecommended(
+        @Request() req: any,
+        @Query("page") page?: string,
+        @Query("limit") limit?: string
+    ) {
+        const pageNumber = page ? parseInt(page, 10) : 1;
+        const limitNumber = limit ? parseInt(limit, 10) : 10;
+        return await this.booksService.getRecomendedBooks(req, pageNumber, limitNumber);
     }
 
     @Get(":bookId")
@@ -49,20 +75,22 @@ export class BooksController {
         return await this.booksService.updateBook(id, dto, req, file);
     }
     
+    @Delete("soft-delete/:bookId")
+    @UseGuards(AuthGuard("jwt"))
+    async softDelete(@Param("bookId") id: string, @Request() req: any) {
+        return await this.booksService.softDeleteBook(id, req);
+    }
+
     @Delete("delete/:bookId")
     @UseGuards(AuthGuard("jwt"))
-    async delete(@Param("bookId") id: string,@Request() req: any ) {
-        return await this.booksService.deleteBook(id, req);
+    async delete(@Param("bookId") id: string, @Request() req: any) {
+        return await this.booksService.softDeleteBook(id, req);
     }
 
-    @Get("pending")
-    async getPendingBooksAdmin(@Request() req:any){
-        return await this.booksService.getPendingbooks(req);
-    }
-
-    @Get("pending-author")
-    async getPendingBooksAuthor(@Request() req: any){
-        return await this.booksService.getPendingBooksPerAuthor(req);
+    @Delete("permanent-delete/:bookId")
+    @UseGuards(AuthGuard("jwt"))
+    async permanentDelete(@Param("bookId") id: string, @Request() req: any) {
+        return await this.booksService.permanentDeleteBook(id, req);
     }
 
 }
