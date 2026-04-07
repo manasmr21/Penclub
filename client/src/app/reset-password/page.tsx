@@ -63,6 +63,8 @@ export default function ResetPasswordPage() {
 
     try {
       const response = await resetUserPassword(normalizedUserId, normalizedToken, normalizedNewPassword, setLoading);
+
+      //@ts-expect-error
       setMessage(response?.message ?? "Password reset successful.");
       setTimeout(() => {
         router.push("/sign-in");
