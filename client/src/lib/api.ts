@@ -1,12 +1,6 @@
-import axios from "axios";
-import { AxiosError } from "axios";
 import { loginUser, registerUser, verifyUserOtp, updateUserProfile, deleteUserProfile, forgotPassword, resetPassword } from "./auth-api";
-
-
-export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL ?? "/api",
-  withCredentials: true,
-});
+import { api, extractErrorMessage } from "./http-client";
+export { api };
 
 export type RegisterPayload = {
   name: string;
@@ -34,15 +28,7 @@ export type UpdateUserProfilePayload = {
 
 
 function getErrorMessage(error: unknown) {
-  if (error instanceof AxiosError) {
-    return error.response?.data?.message ?? error.message;
-  }
-
-  if (error instanceof Error) {
-    return error.message;
-  }
-
-  return "Something went wrong";
+  return extractErrorMessage(error);
 }
 //new apis
 
@@ -142,7 +128,7 @@ export async function update(user: string, payload: UpdateUserProfilePayload, se
 
     const response = await updateUserProfile(user, formData);
 
-    if (response.succes) alert("User updated successfully");
+    if (response.success) alert("User updated successfully");
     return response;
   } catch (error) {
     const message = getErrorMessage(error);
@@ -159,7 +145,7 @@ export async function deleteUser(id: string, password: string, setLoading: (valu
   setLoading(true);
   try {
 
-    const response = await deleteUserProfile(`/users/delete/${id}`, password);
+    const response = await deleteUserProfile(id, password);
 
     if (response.success) alert(response.message);
     return response

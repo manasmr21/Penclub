@@ -1,6 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/src/lib/store/store';
 import { updateProfile, UpdateUserProfilePayload } from "@/src/lib/auth";
+import { resendUserOtp } from "@/src/lib/auth-api";
+import { extractErrorMessage } from "@/src/lib/http-client";
 
 interface ProfileEditorProps {
   inModal?: boolean;
@@ -17,22 +20,24 @@ interface FormInputProps {
 }
 
 const ProfileHeader = ({ onClose }: { onClose?: () => void }) => (
-  <header className="glass-header flex items-center justify-between px-4 py-2 border-b border-outline-variant/10">
-    <button type="button" onClick={onClose} className="text-sm text-primary hover:text-primary-container transition-colors">← Back</button>
-    <h1 className="font-semibold text-primary">Pen Club</h1>
+  <header className="sticky top-15 z-10 flex items-center justify-between border-b border-[var(--border)] px-4 py-3">
+    <button type="button" onClick={onClose} className="text-sm text-[var(--primary)] transition-opacity hover:opacity-80">
+      &lt; Back
+    </button>
+    <h1 className="text-xl font-semibold text-[var(--foreground)]">Edit Profile</h1>
     <div className="w-10" />
   </header>
 );
 
-const ProfilePictureUpdate = ({ 
-  currentPicture, 
-  name, 
-  email, 
-  onFileSelect 
-}: { 
-  currentPicture?: string; 
-  name?: string; 
-  email?: string; 
+const ProfilePictureUpdate = ({
+  currentPicture,
+  name,
+  email,
+  onFileSelect,
+}: {
+  currentPicture?: string;
+  name?: string;
+  email?: string;
   onFileSelect: (file: File) => void;
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -46,9 +51,11 @@ const ProfilePictureUpdate = ({
       }
       return splitName[0][0].toUpperCase();
     }
+
     if (email) {
       return email.substring(0, 2).toUpperCase();
     }
+
     return "NA";
   };
 
@@ -57,68 +64,64 @@ const ProfilePictureUpdate = ({
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      onFileSelect(file);
-      setPreview(URL.createObjectURL(file));
+      const selectedFile = e.target.files[0];
+      onFileSelect(selectedFile);
+      setPreview(URL.createObjectURL(selectedFile));
     }
   };
 
   return (
     <div className="flex flex-col items-center gap-2">
-      <div className="relative w-20 h-20">
-        <div className="w-20 h-20 rounded-full overflow-hidden ring-2 ring-primary/20 bg-primary/10 flex items-center justify-center text-primary font-bold text-2xl">
+      <div className="relative h-15 w-20">
+        <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border border-[var(--border)] bg-[var(--card)] text-2xl font-bold text-[var(--primary)] shadow-sm">
           {imageSource ? (
-            <img
-              src={imageSource}
-              className="w-full h-full object-cover"
-              alt="Profile Preview"
-            />
+            <img src={imageSource} className="h-full w-full object-cover" alt="Profile Preview" />
           ) : (
             <span className="select-none">{getInitials()}</span>
           )}
         </div>
 
-        <input 
-          type="file" 
-          ref={fileInputRef} 
-          hidden 
-          accept="image/*" 
-          onChange={handleFileChange} 
-        />
+        <input type="file" ref={fileInputRef} hidden accept="image/*" onChange={handleFileChange} />
 
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-white border flex items-center justify-center text-xs shadow hover:bg-gray-50 transition-colors text-primary"
+          className="absolute bottom-0 right-0 flex h-6 w-6 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--background)] text-[10px] text-[var(--primary)] shadow-sm transition hover:opacity-80"
         >
-          ✎
+          E
         </button>
       </div>
 
-      <button type="button" onClick={() => fileInputRef.current?.click()} className="text-xs text-secondary hover:underline">Change</button>
+      <button type="button" onClick={() => fileInputRef.current?.click()} className="text-xs text-[var(--secondary)] hover:underline p-2">
+        Change Photo
+      </button>
     </div>
   );
 };
 
 const FormInput = ({ id, label, value, onChange, type = 'text', prefix }: FormInputProps) => (
   <div className="space-y-1">
-    <label htmlFor={id} className="text-xs text-muted-foreground">{label}</label>
+    <label htmlFor={id} className="ml-1 block text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted-foreground)]">
+      {label}
+    </label>
     <div className="relative">
-      {prefix && <span className="absolute left-2 top-2 text-xs text-muted-foreground">{prefix}</span>}
+      {prefix && <span className="absolute left-3.5 top-3 text-xs text-[var(--muted-foreground)]">{prefix}</span>}
       <input
         id={id}
         type={type}
         value={value}
         onChange={onChange}
-        className={`w-full bg-surface-container-low border border-border rounded px-2 py-1 text-sm focus:ring-1 focus:ring-primary outline-none transition-colors ${prefix ? 'pl-6' : ''}`}
+        className={`h-10 w-full rounded-xl border border-[var(--border)] bg-gray-100 px-3.5 text-sm text-[var(--foreground)] outline-none transition focus:ring-2 focus:ring-[var(--primary)] ${prefix ? 'pl-7' : ''}`}
       />
     </div>
   </div>
 );
 
 export default function ProfileEditor({ onClose }: ProfileEditorProps) {
+  const router = useRouter();
   const user = useAppStore((s) => s.user);
   const updateUser = useAppStore((s) => s.updateUser);
+  const setError = useAppStore((s) => s.setError);
 
   const allInterests = ['Poetry', 'Fiction', 'Non-fiction', 'Essays', 'Memoir', 'Fantasy', 'Modernist Fiction'];
 
@@ -128,54 +131,56 @@ export default function ProfileEditor({ onClose }: ProfileEditorProps) {
   const [username, setUsername] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
+  const [verifyLoading, setVerifyLoading] = useState(false);
 
   useEffect(() => {
     if (user) {
       setName(user.name || '');
       setUsername(user.username || '');
       setBio(user.bio || '');
-      
+
       const parsed = Array.isArray(user.interests)
         ? user.interests
-        : typeof user.interests === "string"
-        ? (user.interests as string)
-            .split(",")
-            .map((interest: string) => interest.trim())
-            .filter(Boolean)
-        : [];
-        
+        : typeof user.interests === 'string'
+          ? (user.interests as string)
+              .split(',')
+              .map((interest: string) => interest.trim())
+              .filter(Boolean)
+          : [];
+
       setSelected(parsed);
     }
   }, [user]);
 
   const toggleInterest = (item: string) => {
-    setSelected(prev => prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]);
+    setSelected((prev) => (prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item]));
   };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
-    
+
     setLoading(true);
+    setError(null);
     try {
       const payload: UpdateUserProfilePayload = {
+        name,
         bio,
-        interests: selected
+        interests: selected,
       };
-      
+
       if (file) {
         payload.profilePictureFile = file;
       }
-      
-      // Update remotely
-      await updateProfile(
+
+      const response = await updateProfile(
         { id: user.id, profilePictureId: user.profilePictureId },
         payload,
-        setLoading
+        setLoading,
       );
-      
-      // Optimistic user state update (Profile picture might need re-fetch, but bio/interests match)
+
       const optimisticUpdate: Partial<typeof user> = {
+        name,
         bio,
         interests: selected,
       };
@@ -185,75 +190,137 @@ export default function ProfileEditor({ onClose }: ProfileEditorProps) {
       }
 
       updateUser(optimisticUpdate);
-      
+      if (response?.user) {
+        updateUser(response.user);
+      }
+
       if (onClose) onClose();
-      
     } catch (error) {
+      const message = extractErrorMessage(error, "Failed to update profile.");
+      setError(message);
+      alert(message);
       console.error("Failed to update profile", error);
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyNow = async () => {
+    if (!user?.email) return;
+
+    setVerifyLoading(true);
+    setError(null);
+    try {
+      const response = await resendUserOtp(user.role, user.email);
+      const expiresAt = response?.otpExpiresAt ? `&expiresAt=${encodeURIComponent(response.otpExpiresAt)}` : "";
+      router.push(`/verify-otp?email=${encodeURIComponent(user.email)}${expiresAt}`);
+    } catch (error) {
+      const message = extractErrorMessage(error, "Unable to send verification OTP.");
+      setError(message);
+      alert(message);
+    } finally {
+      setVerifyLoading(false);
     }
   };
 
   return (
-    <div className="max-w-xl mx-auto profile-surface edit-profile-theme">
-      <ProfileHeader onClose={onClose} />
+  <div className="mx-auto mt-20 max-w-2xl rounded-2xl border border-[var(--border)] bg-white text-[var(--foreground)] shadow-sm">
+    <ProfileHeader onClose={onClose} />
 
-      <div className="p-4 space-y-4">
-        <h2 className="text-lg font-semibold text-center text-primary">Edit Details</h2>
+    <div className="space-y-2 p-2">
+      <ProfilePictureUpdate
+        currentPicture={user?.profilePicture}
+        name={user?.name}
+        email={user?.email}
+        onFileSelect={setFile}
+      />
 
-        <ProfilePictureUpdate currentPicture={user?.profilePicture} name={user?.name} email={user?.email} onFileSelect={setFile} />
+      {user?.isEmailVerified === false && (
+        <div className="flex justify-center pt-1">
+          <button
+            type="button"
+            onClick={handleVerifyNow}
+            disabled={verifyLoading}
+            className="h-10 rounded-full border border-[var(--primary)] px-5 text-sm font-semibold text-[var(--primary)] transition hover:opacity-85 disabled:opacity-60"
+          >
+            {verifyLoading ? "Sending OTP..." : "Verify Now"}
+          </button>
+        </div>
+      )}
 
-        <form className="space-y-3" onSubmit={handleSave}>
-          <div className="grid grid-cols-2 gap-3">
-            <FormInput id="fullName" label="Full Name" value={name} onChange={e => setName(e.target.value)} />
-            <FormInput id="username" label="Username" value={username} onChange={e => setUsername(e.target.value)} prefix="@" />
-          </div>
+      <form className="space-y-2" onSubmit={handleSave}>
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+          <FormInput id="fullName" label="Full Name" value={name} onChange={(e) => setName(e.target.value)} />
+          <FormInput id="username" label="Username" value={username} onChange={(e) => setUsername(e.target.value)} prefix="@" />
+        </div>
 
-          <div className="space-y-1">
-            <label className="text-xs text-muted-foreground">Bio</label>
-            <textarea
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-              className="w-full bg-surface-container-low border border-border rounded px-2 py-1 text-sm focus:ring-1 focus:ring-primary outline-none resize-none transition-colors"
-              rows={3}
-            />
-            <p className="text-[10px] text-right text-muted-foreground">{bio.length} / 300</p>
-          </div>
+        <div className="space-y-1">
+          <label className="ml-1 block text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted-foreground)]">
+            Bio
+          </label>
+          <textarea
+            value={bio}
+            onChange={(e) => setBio(e.target.value)}
+            /* Changed bg-[var(--background)] to bg-gray-100 */
+            className="min-h-25 w-full resize-none rounded-xl border border-[var(--border)] bg-gray-100 p-3 text-sm outline-none transition focus:ring-2 focus:ring-[var(--primary)]"
+            rows={4}
+          />
+          <p className="text-right text-[10px] text-[var(--muted-foreground)]">{bio.length} / 300</p>
+        </div>
 
-          {selected.length > 0 && (
-            <div className="border border-border rounded p-2 flex flex-wrap gap-1 bg-surface-container transition-all">
-              {selected.map(item => (
-                <span
-                  key={item}
-                  className="text-xs px-2 py-0.5 rounded bg-secondary-container text-on-secondary-container cursor-pointer hover:bg-secondary-fixed transition-colors"
-                  onClick={() => toggleInterest(item)}
-                >
-                  {item} &times;
-                </span>
-              ))}
-            </div>
-          )}
-
-          <div className="flex flex-wrap gap-1">
-            {allInterests.map(item => (
-              <button
-                type="button"
+        {selected.length > 0 && (
+          /* Changed bg-[var(--background)] to bg-gray-100 */
+          <div className="flex flex-wrap gap-1 rounded-xl border border-[var(--border)] bg-gray-100 p-2">
+            {selected.map((item) => (
+              <span
                 key={item}
+                /* Changed bg-[var(--card)] to bg-white for contrast */
+                className="cursor-pointer rounded-full border border-[var(--border)] bg-white px-3 py-1 text-xs transition hover:opacity-80"
                 onClick={() => toggleInterest(item)}
-                className={`text-xs px-2 py-1 rounded border transition-colors ${selected.includes(item) ? 'bg-primary text-white border-primary' : 'bg-surface-container-low border-border hover:bg-surface-container-high'}`}
               >
-                {item}
-              </button>
+                {item} x
+              </span>
             ))}
           </div>
+        )}
 
-          <div className="flex gap-2 pt-2">
-            <button type="button" onClick={onClose} disabled={loading} className="flex-1 border border-border rounded py-1 text-sm hover:bg-surface-container transition-colors disabled:opacity-50">Cancel</button>
-            <button type="submit" disabled={loading} className="flex-1 ink-gradient text-white rounded py-1 text-sm shadow hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-              {loading ? 'Saving...' : 'Save Changes'}
+        <div className="flex flex-wrap gap-2">
+          {allInterests.map((item) => (
+            <button
+              type="button"
+              key={item}
+              onClick={() => toggleInterest(item)}
+              className={`rounded-full border px-3 py-1 text-xs transition ${
+                selected.includes(item)
+                  ? "border-[var(--primary)] bg-[var(--primary)] text-[var(--primary-foreground)]"
+                  : "border-[var(--border)] bg-gray-100 hover:bg-gray-200" /* Changed to gray-100 */
+              }`}
+            >
+              {item}
             </button>
-          </div>
-        </form>
-      </div>
+          ))}
+        </div>
+
+        <div className="flex gap-2.5 pt-1">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={loading}
+            /* Changed bg-[var(--card)] to bg-gray-100 */
+            className="h-11 flex-1 rounded-full border border-[var(--border)] bg-gray-100 text-sm font-medium transition hover:bg-gray-200 disabled:opacity-50"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="h-11 flex-1 rounded-full bg-[linear-gradient(90deg,var(--primary),var(--secondary))] text-sm font-semibold text-[var(--primary-foreground)] shadow-[0_12px_30px_rgba(10,56,125,0.2)] transition disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {loading ? "Saving..." : "Save Changes"}
+          </button>
+        </div>
+      </form>
     </div>
-  );
+  </div>
+);
+
 }

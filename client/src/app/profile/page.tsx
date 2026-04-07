@@ -52,11 +52,11 @@ function ProfilePageContent() {
   if (!hydrated || !user) return <ProfileLoadingView />;
 
   return (
-    <div className="pt-24 min-h-screen bg-background">
+    <div className="pt-16 min-h-screen bg-background">
       <ProfileRedesign />
 
       {isEditModalOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex justify-center items-center pt-8">
+        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 pt-12 pb-4 backdrop-blur-sm">
             <ProfileEditor
               inModal={true}
               onClose={() => {

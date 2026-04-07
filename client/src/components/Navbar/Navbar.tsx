@@ -10,10 +10,11 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import { ImCross } from "react-icons/im";
 import { useAppStore } from "@/src/lib/store/store";
 import { logoutUser } from "@/src/lib/auth-api";
+import { extractErrorMessage } from "@/src/lib/http-client";
 
 const navLinks = [
   { href: "#magazine", label: "Magazine" },
-  { href: "#books", label: "Books" },
+  { href: "/bookshelf", label: "Books" },
   { href: "#podcast", label: "Podcast" },
   { href: "#events", label: "Events" },
   { href: "#contact", label: "Contact Us" },
@@ -27,6 +28,7 @@ const Navbar = () => {
   const user = useAppStore((state) => state.user);
   const hydrated = useAppStore((state) => state.hydrated);
   const clearAuth = useAppStore((state) => state.clearAuth);
+  const setError = useAppStore((state) => state.setError);
   const isHomePage = pathname === "/";
   const showSolidNavbar = !isHomePage || scrolled;
 
@@ -50,14 +52,21 @@ const Navbar = () => {
   const closeMenu = () => setMenuOpen(false);
 
   const handleLogout = async () => {
-    if (user) {
-      await logoutUser();
+    setError(null);
+    try {
+      if (user) {
+        await logoutUser();
+      }
+    } catch (error) {
+      const message = extractErrorMessage(error, "Logout failed.");
+      setError(message);
+      alert(message);
+    } finally {
+      clearAuth();
+      closeMenu();
+      router.push("/");
+      router.refresh();
     }
-
-    clearAuth();
-    closeMenu();
-    router.push("/");
-    router.refresh();
   };
 
   const getProfileUrl = (pic: any) => {
@@ -161,9 +170,15 @@ const Navbar = () => {
               <ul className="flex gap-3">
                 {navLinks.map((link) => (
                   <li key={link.href}>
-                    <a href={link.href} onClick={closeMenu}>
-                      {link.label}
-                    </a>
+                    {link.label === "Books" ? (
+                      <Link href={link.href} onClick={closeMenu}>
+                        {link.label}
+                      </Link>
+                    ) : (
+                      <a href={link.href} onClick={closeMenu}>
+                        {link.label}
+                      </a>
+                    )}
                   </li>
                 ))}
 

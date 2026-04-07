@@ -92,8 +92,8 @@ const UserDetails = () => {
   const stats = [
     ...(isReader ? [] : [{ label: "Books", value: bookCount }]),
     ...(isAuthor ? [{ label: "Articles", value: articleCount }] : []),
-    ...(isAuthor ? [{ label: "Followers", value: "0" }] : []),
-    { label: "Following", value: "0" },
+    ...(isAuthor ? [{ label: "Followers", value: user?.followersCount ?? 0 }] : []),
+    { label: "Following", value: user?.followingCount ?? 0 },
   ];
 
   return (

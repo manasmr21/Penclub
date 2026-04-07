@@ -16,6 +16,8 @@ async function forwardRequest(
 
   try {
     const target = new URL(pathname, `${BACKEND_URL}/`);
+    target.search = request.nextUrl.search;
+
     backendResponse = await fetch(target, {
       method,
       headers: {

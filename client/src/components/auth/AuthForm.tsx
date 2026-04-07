@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useAppStore } from '@/src/lib/store/store';
 import { handleImageChange, handleSubmit, handleInputChange, type AuthFormState } from './authFunctions';
 
@@ -182,6 +183,11 @@ const AuthForm: React.FC<AuthFormProps> = ({ type = 'signup' }) => {
                   <PasswordToggleButton show={passwordShow} onToggle={() => setPasswordShow(!passwordShow)} />
                 }
               />
+              <div className="text-right">
+                <Link href="/forgot-password" className="text-xs font-semibold text-primary hover:underline">
+                  Forgot password?
+                </Link>
+              </div>
             </div>
           )
         }

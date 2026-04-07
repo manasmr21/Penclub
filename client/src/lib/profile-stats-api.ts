@@ -1,5 +1,5 @@
 import { AxiosError } from "axios";
-import { api } from "./api";
+import { api } from "./http-client";
 
 function isNotFoundError(error: unknown) {
   return error instanceof AxiosError && error.response?.status === 404;
@@ -11,6 +11,23 @@ export type AuthorBook = {
   description: string;
   genre: string;
   coverImage?: string;
+  authorId?: string;
+  author?: {
+    id: string;
+    name?: string;
+    username?: string;
+  };
+  reviews?: Array<{
+    id: string;
+    rating: number;
+    content?: string;
+    createdAt?: string;
+    user?: {
+      id: string;
+      name?: string;
+      username?: string;
+    };
+  }>;
 };
 
 export type AuthorArticle = {
@@ -19,6 +36,7 @@ export type AuthorArticle = {
   content: string;
   tags?: string[];
   coverImage?: string;
+  coverImageId?: string;
   createdAt?: string;
 };
 

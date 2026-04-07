@@ -1,9 +1,12 @@
-import React from "react";
+import React, { FormEvent, useState } from "react";
+import { Pencil, Trash2 } from "lucide-react";
 import type { AuthorArticle } from "@/src/lib/profile-stats-api";
+import { deleteArticle, updateArticle } from "@/src/lib/books-api";
 
 type ArticleShelftProps = {
   articles: AuthorArticle[];
   loading?: boolean;
+  onChanged?: () => Promise<void> | void;
 };
 
 function truncate(text: string, max = 120) {
@@ -11,7 +14,70 @@ function truncate(text: string, max = 120) {
   return `${text.slice(0, max).trim()}...`;
 }
 
-const ArticleShelft = ({ articles, loading = false }: ArticleShelftProps) => {
+const ArticleShelft = ({ articles, loading = false, onChanged }: ArticleShelftProps) => {
+  const [editingArticle, setEditingArticle] = useState<AuthorArticle | null>(null);
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [tagsInput, setTagsInput] = useState("");
+  const [coverImageFile, setCoverImageFile] = useState<File | undefined>();
+  const [isSaving, setIsSaving] = useState(false);
+
+  function openEditModal(article: AuthorArticle) {
+    setEditingArticle(article);
+    setTitle(article.title || "");
+    setContent(article.content || "");
+    setTagsInput((article.tags || []).join(", "));
+    setCoverImageFile(undefined);
+  }
+
+  function closeEditModal() {
+    setEditingArticle(null);
+    setTitle("");
+    setContent("");
+    setTagsInput("");
+    setCoverImageFile(undefined);
+  }
+
+  async function handleEditSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!editingArticle?.id) return;
+
+    setIsSaving(true);
+    try {
+      const tags = tagsInput
+        .split(",")
+        .map((tag) => tag.trim())
+        .filter(Boolean);
+
+      await updateArticle(editingArticle.id, {
+        title,
+        content,
+        tags,
+        coverImageFile,
+      });
+      closeEditModal();
+      await onChanged?.();
+    } catch (error) {
+      const maybeError = error as { response?: { data?: { message?: string } } };
+      alert(maybeError.response?.data?.message ?? "Failed to update article.");
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  async function handleDelete(articleId: string, coverImageId?: string) {
+    const confirmed = window.confirm("Are you sure you want to delete this article?");
+    if (!confirmed) return;
+
+    try {
+      await deleteArticle(articleId, coverImageId);
+      await onChanged?.();
+    } catch (error) {
+      const maybeError = error as { response?: { data?: { message?: string } } };
+      alert(maybeError.response?.data?.message ?? "Failed to delete article.");
+    }
+  }
+
   if (loading) {
     return (
       <div className="w-full pb-16">
@@ -36,7 +102,26 @@ const ArticleShelft = ({ articles, loading = false }: ArticleShelftProps) => {
     <div className="w-full pb-16 px-6">
       <div className="max-w-5xl mx-auto grid gap-5">
         {articles.map((article) => (
-          <article key={article.id} className="rounded-2xl border border-outline-variant/20 bg-white p-5 shadow-sm">
+          <article key={article.id} className="group relative rounded-2xl border border-outline-variant/20 bg-white p-5 shadow-sm">
+            <div className="absolute top-3 right-3 flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => openEditModal(article)}
+                className="h-7 w-7 grid place-items-center rounded-full bg-slate-100 text-[#1e2741] hover:bg-slate-200 opacity-0 group-hover:opacity-100 transition-opacity"
+                aria-label={`Edit ${article.title}`}
+              >
+                <Pencil size={14} />
+              </button>
+              <button
+                type="button"
+                onClick={() => handleDelete(article.id, article.coverImageId)}
+                className="h-7 w-7 grid place-items-center rounded-full bg-red-50 text-red-600 hover:bg-red-100 opacity-0 group-hover:opacity-100 transition-opacity"
+                aria-label={`Delete ${article.title}`}
+              >
+                <Trash2 size={14} />
+              </button>
+            </div>
+
             <h3 className="text-xl font-semibold text-primary">{article.title}</h3>
             <p className="mt-2 text-sm text-on-surface-variant/80 leading-relaxed">
               {truncate(article.content || "")}
@@ -51,6 +136,59 @@ const ArticleShelft = ({ articles, loading = false }: ArticleShelftProps) => {
           </article>
         ))}
       </div>
+
+      {editingArticle && (
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm grid place-items-center px-4">
+          <div className="w-full max-w-xl rounded-2xl bg-white p-6">
+            <h2 className="text-xl font-semibold text-[#1e2741]">Edit Article</h2>
+            <form onSubmit={handleEditSubmit} className="mt-4 space-y-3">
+              <input
+                className="w-full border rounded-md p-3"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Title"
+                required
+              />
+              <textarea
+                className="w-full border rounded-md p-3 min-h-32"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                placeholder="Content"
+                required
+              />
+              <input
+                className="w-full border rounded-md p-3"
+                value={tagsInput}
+                onChange={(e) => setTagsInput(e.target.value)}
+                placeholder="Tags (comma separated)"
+              />
+              <input
+                type="file"
+                accept="image/*"
+                className="w-full border rounded-md p-3"
+                onChange={(e) => setCoverImageFile(e.target.files?.[0])}
+              />
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  className="px-4 py-2 rounded-md border"
+                  onClick={closeEditModal}
+                  disabled={isSaving}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded-md bg-primary text-white disabled:opacity-50"
+                  disabled={isSaving}
+                >
+                  {isSaving ? "Saving..." : "Save"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

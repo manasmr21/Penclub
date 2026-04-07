@@ -1,58 +1,101 @@
-import { api } from "./api";
-import { type LoginPayload } from "./api";
-import { useAppStore } from "./store/store";
+import { api, requestWithFallback } from "./http-client";
+
+type LoginPayload = {
+  identifier: string;
+  password: string;
+};
 
 export async function registerUser(payload: FormData) {
-  const { data } = await api.post("/users/create", payload);
-  return data;
+  return requestWithFallback({
+    axiosRequest: () => api.post("/users/create", payload),
+    path: "/users/create",
+    method: "POST",
+    body: payload,
+  });
 }
 
 export async function verifyUserOtp(email: string, otp: string) {
-  const { data } = await api.post("/users/verify", { email, otp })
-  return data;
+  return requestWithFallback({
+    axiosRequest: () => api.post("/users/verify", { email, otp }),
+    path: "/users/verify",
+    method: "POST",
+    body: { email, otp },
+  });
 }
 
 export async function loginUser(payload: LoginPayload) {
-  const { data } = await api.post("/users/login", payload);
-  return data;
+  return requestWithFallback({
+    axiosRequest: () => api.post("/users/login", payload),
+    path: "/users/login",
+    method: "POST",
+    body: payload,
+  });
 }
 
 export async function resendUserOtp(role: string, email: string) {
   void role;
-  const { data } = await api.post("/users/resend", { email });
-  return data;
+  return requestWithFallback({
+    axiosRequest: () => api.post("/users/resend", { email }),
+    path: "/users/resend",
+    method: "POST",
+    body: { email },
+  });
 }
 
 export async function updateUserProfile(
   user: string,
   payload: FormData,
 ) {
- 
-
-  const { data } = await api.put(`/users/update/${user}`, payload);
-
-  return data;
+  return requestWithFallback({
+    axiosRequest: () => api.put(`/users/update/${user}`, payload),
+    path: `/users/update/${user}`,
+    method: "PUT",
+    body: payload,
+  });
 }
 
 export async function logoutUser() {
-  const { data } = await api.post("/users/logout");
-  return data;
+  return requestWithFallback({
+    axiosRequest: () => api.post("/users/logout"),
+    path: "/users/logout",
+    method: "POST",
+  });
 }
 
 export async function deleteUserProfile(id: string, password: string){
-  const {data} = await api.post(`/users/logout/id`, password);
-
-  return data
+  return requestWithFallback({
+    axiosRequest: () => api.delete(`/users/delete/${id}`, { data: { password } }),
+    path: `/users/delete/${id}`,
+    method: "DELETE",
+    body: { password },
+  });
 }
 
 export async function forgotPassword(email: string){
-  const {data} = await api.post("/users/forgot-password", email);
-
-  return data;
+  return requestWithFallback({
+    axiosRequest: () => api.post("/users/forgot-password", { email }),
+    path: "/users/forgot-password",
+    method: "POST",
+    body: { email },
+  });
 }
 
 export async function resetPassword(userId: string, token: string, newPassword: string){
-  const {data} = await api.post(`/users/reset-password?userId=${userId}&token=${token}`, newPassword)
+  return requestWithFallback({
+    axiosRequest: () =>
+      api.post(`/users/reset-password?userId=${encodeURIComponent(userId)}&token=${encodeURIComponent(token)}`, {
+        newPassword,
+      }),
+    path: `/users/reset-password?userId=${encodeURIComponent(userId)}&token=${encodeURIComponent(token)}`,
+    method: "POST",
+    body: { newPassword },
+  });
+}
 
-  return data
+export async function followAuthor(targetUserId: string) {
+  return requestWithFallback({
+    axiosRequest: () => api.post(`/users/follow/${targetUserId}`),
+    path: `/users/follow/${targetUserId}`,
+    method: "POST",
+  });
 }

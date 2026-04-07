@@ -1,6 +1,6 @@
-import { AxiosError } from "axios";
 import { loginUser, registerUser, verifyUserOtp, updateUserProfile } from "./auth-api";
 import { type AuthUser } from "./store/store";
+import { extractErrorMessage } from "./http-client";
 
 export type RegisterPayload = {
   name: string;
@@ -18,6 +18,7 @@ export type LoginPayload = {
 }
 
 export type UpdateUserProfilePayload = {
+  name?: string;
   interests?: string[];
   bio?: string;
   profilePicture?: string;
@@ -25,15 +26,7 @@ export type UpdateUserProfilePayload = {
 };
 
 function getErrorMessage(error: unknown) {
-  if (error instanceof AxiosError) {
-    return error.response?.data?.message ?? error.message;
-  }
-
-  if (error instanceof Error) {
-    return error.message;
-  }
-
-  return "Something went wrong";
+  return extractErrorMessage(error);
 }
 //new apis
 
@@ -105,6 +98,10 @@ export async function updateProfile(
   try {
     if (setLoading) setLoading(true);
     const formData = new FormData();
+
+    if (payload.name !== undefined) {
+      formData.append("name", payload.name);
+    }
 
     if (payload.bio !== undefined) {
       formData.append("bio", payload.bio);

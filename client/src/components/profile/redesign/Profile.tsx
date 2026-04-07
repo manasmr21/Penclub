@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import UserDetails from './UserDetails'
 import BookShelft from './BookShelft'
 import ArticleShelft from './ArticleShelft'
@@ -20,50 +20,36 @@ const Profile = () => {
   const [loadingBooks, setLoadingBooks] = useState(false);
   const [loadingArticles, setLoadingArticles] = useState(false);
 
-  useEffect(() => {
-    let isMounted = true;
+  const loadAuthorContent = useCallback(async () => {
+    if (!isAuthor || !user?.id) {
+      setBooks([]);
+      setArticles([]);
+      return;
+    }
 
-    const loadAuthorContent = async () => {
-      if (!isAuthor || !user?.id) {
-        if (isMounted) {
-          setBooks([]);
-          setArticles([]);
-        }
-        return;
-      }
+    setLoadingBooks(true);
+    setLoadingArticles(true);
 
-      setLoadingBooks(true);
-      setLoadingArticles(true);
+    try {
+      const [nextBooks, nextArticles] = await Promise.all([
+        fetchAuthorBooks(user.id),
+        fetchAuthorArticles(user.id),
+      ]);
 
-      try {
-        const [nextBooks, nextArticles] = await Promise.all([
-          fetchAuthorBooks(user.id),
-          fetchAuthorArticles(user.id),
-        ]);
-
-        if (isMounted) {
-          setBooks(nextBooks);
-          setArticles(nextArticles);
-        }
-      } catch {
-        if (isMounted) {
-          setBooks([]);
-          setArticles([]);
-        }
-      } finally {
-        if (isMounted) {
-          setLoadingBooks(false);
-          setLoadingArticles(false);
-        }
-      }
-    };
-
-    void loadAuthorContent();
-
-    return () => {
-      isMounted = false;
-    };
+      setBooks(nextBooks);
+      setArticles(nextArticles);
+    } catch {
+      setBooks([]);
+      setArticles([]);
+    } finally {
+      setLoadingBooks(false);
+      setLoadingArticles(false);
+    }
   }, [isAuthor, user?.id]);
+
+  useEffect(() => {
+    void loadAuthorContent();
+  }, [loadAuthorContent]);
 
   return (
     <div className='main-container'>
@@ -103,8 +89,12 @@ const Profile = () => {
       )}
 
       <div className="mt-8 min-h-[70vh]">
-        {isAuthor && activeTab === 'Bookshelf' && <BookShelft books={books} loading={loadingBooks} />}
-        {isAuthor && activeTab === 'Articles' && <ArticleShelft articles={articles} loading={loadingArticles} />}
+        {isAuthor && activeTab === 'Bookshelf' && (
+          <BookShelft books={books} loading={loadingBooks} onChanged={loadAuthorContent} />
+        )}
+        {isAuthor && activeTab === 'Articles' && (
+          <ArticleShelft articles={articles} loading={loadingArticles} onChanged={loadAuthorContent} />
+        )}
       </div>
     </div>
   )
