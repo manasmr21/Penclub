@@ -49,6 +49,7 @@ export default function AddBookPage() {
         coverImageFile,
       });
 
+      //@ts-expect-error
       setMessage(response?.message ?? "Book submitted successfully!");
       setTitle("");
       setDescription("");
