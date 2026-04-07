@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { resetUserPassword } from "@/src/lib/api";
 import { extractErrorMessage } from "@/src/lib/http-client";
 
-export default function ResetPasswordPage() {
+function ResetPasswordContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [userId, setUserId] = useState("");
@@ -63,6 +63,7 @@ export default function ResetPasswordPage() {
 
     try {
       const response = await resetUserPassword(normalizedUserId, normalizedToken, normalizedNewPassword, setLoading);
+
       setMessage(response?.message ?? "Password reset successful.");
       setTimeout(() => {
         router.push("/sign-in");
@@ -142,5 +143,13 @@ export default function ResetPasswordPage() {
         </Link>
       </p>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<div className="pt-28 text-center text-slate-500">Loading...</div>}>
+      <ResetPasswordContent />
+    </Suspense>
   );
 }
