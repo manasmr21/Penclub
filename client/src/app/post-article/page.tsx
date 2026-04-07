@@ -44,7 +44,6 @@ export default function PostArticlePage() {
         coverImageFile,
       });
 
-      //@ts-expect-error
       setMessage(response?.message ?? "Article posted successfully.");
       setTitle("");
       setContent("");

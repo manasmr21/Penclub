@@ -35,7 +35,7 @@ const handleSignupSubmit = async (
       profilePictureFile: formData.profilePictureFile,
     },
     setLoading,
-  );
+  ) as any;
 
   if (response?.user?.email) {
     const expiresAtQuery = response?.otpExpiresAt
@@ -59,7 +59,7 @@ const handleLoginSubmit = async (
       password: formData.password,
     },
     setLoading,
-  );
+  ) as any;
 
   if (response?.user) {
     setUser(response.user);

@@ -107,7 +107,6 @@ export default function BookDetailsPage() {
     try {
       setFollowLoading(true);
       const response = await followAuthor(book.authorId);
-      //@ts-expect-error
       const message = String(response?.message ?? "").toLowerCase();
 
       if (message.includes("unfollowed")) {

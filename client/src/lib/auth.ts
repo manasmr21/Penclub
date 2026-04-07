@@ -124,7 +124,6 @@ export async function updateProfile(
     }
 
     const response = await updateUserProfile(user.id, formData);
-    //@ts-expect-error
     if (response?.success && response?.message) alert(response.message);
     return response;
   } catch (error) {

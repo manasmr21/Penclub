@@ -49,7 +49,7 @@ function buildFetchHeaders(headers?: Record<string, string>, body?: unknown) {
   };
 }
 
-export async function requestWithFallback<T>({
+export async function requestWithFallback<T = any>({
   axiosRequest,
   path,
   method,

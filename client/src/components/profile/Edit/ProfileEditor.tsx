@@ -177,7 +177,7 @@ export default function ProfileEditor({ onClose }: ProfileEditorProps) {
         { id: user.id, profilePictureId: user.profilePictureId },
         payload,
         setLoading,
-      );
+      ) as any;
 
       const optimisticUpdate: Partial<typeof user> = {
         name,
