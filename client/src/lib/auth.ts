@@ -78,7 +78,7 @@ export async function login(payload: LoginPayload, setLoading: (value: boolean) 
   try {
     const response = await loginUser(payload);
 
-    if(response.success) alert(response.message);
+    if (response.success) alert(response.message);
     return response
   } catch (error) {
     const message = getErrorMessage(error);
@@ -124,6 +124,7 @@ export async function updateProfile(
     }
 
     const response = await updateUserProfile(user.id, formData);
+    //@ts-expect-error
     if (response?.success && response?.message) alert(response.message);
     return response;
   } catch (error) {

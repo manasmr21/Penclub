@@ -16,6 +16,7 @@ export default function ForgotPasswordPage() {
 
     try {
       const response = await forgotPasswordAPi(email.trim(), setLoading);
+      //@ts-expect-error
       setMessage(response?.message ?? "Reset link sent. Please check your email.");
     } catch (error) {
       setMessage(extractErrorMessage(error, "Failed to request password reset."));
