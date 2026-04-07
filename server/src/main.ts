@@ -2,9 +2,12 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from "cookie-parser"
+import dotenv from "dotenv"
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  dotenv.config();
 
   app.enableCors({
     origin: process.env.FRONTEND_URL || "http://localhost:3000",
