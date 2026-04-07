@@ -8,10 +8,11 @@ import { AdminService } from "./admin.service";
 import { AdminController } from "./admin.controller";
 import { Book } from "../books/entities/books.entity";
 import { BooksService } from "../books/books.service";
+import { Blog } from "../blog/entities/blogs.entity";
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([User, Book]),
+        TypeOrmModule.forFeature([User, Book, Blog]),
         MailModule,
         CloudinaryModule,
         JwtAuthModule

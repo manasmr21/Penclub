@@ -1,6 +1,7 @@
 import {
   Entity, PrimaryGeneratedColumn, Column,
-  ManyToOne
+  ManyToOne,
+  DeleteDateColumn
 } from "typeorm";
 import { AuthorEntity } from "../../author/entities/author.entity";
 import { User } from "../../users/entities/user.entity";
@@ -44,4 +45,7 @@ export class Blog {
 
   @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   createdAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
 }

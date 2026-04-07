@@ -47,11 +47,33 @@ export async function fetchAuthorArticles(authorId: string): Promise<AuthorArtic
 }
 
 export async function fetchAuthorBooksCount(authorId: string): Promise<number> {
-  const books = await fetchAuthorBooks(authorId);
-  return books.length;
+  try {
+    const { data } = await api.get(`/books/author/${authorId}?page=1&limit=1`);
+    if (typeof data?.pagination?.total === "number") {
+      return data.pagination.total as number;
+    }
+
+    return Array.isArray(data?.books) ? (data.books as AuthorBook[]).length : 0;
+  } catch (error) {
+    if (isNotFoundError(error)) {
+      return 0;
+    }
+    throw error;
+  }
 }
 
 export async function fetchAuthorArticlesCount(authorId: string): Promise<number> {
-  const articles = await fetchAuthorArticles(authorId);
-  return articles.length;
+  try {
+    const { data } = await api.get(`/blogs/fetch/${authorId}?page=1&limit=1`);
+    if (typeof data?.pagination?.total === "number") {
+      return data.pagination.total as number;
+    }
+
+    return Array.isArray(data?.blogs) ? (data.blogs as AuthorArticle[]).length : 0;
+  } catch (error) {
+    if (isNotFoundError(error)) {
+      return 0;
+    }
+    throw error;
+  }
 }

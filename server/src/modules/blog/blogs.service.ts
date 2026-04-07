@@ -4,25 +4,31 @@ import { Repository } from "typeorm";
 import { Blog } from "./entities/blogs.entity";
 import { CreateBlogDto } from "./dto/create-blog.dto";
 import { CloudinaryService } from "../../utils/cloudinary/cloudinary.service";
-import { AuthorEntity } from "../author/entities/author.entity";
 import { UpdateBlogDto } from "./dto/update-blog.dto";
-import { User } from "../users/entities/user.entity";
 
 
 @Injectable()
 export class BlogsService {
+    private readonly approvedBlogStatuses = ["posted", "edited"];
+
     constructor(
         @InjectRepository(Blog)
         private blogsRepository: Repository<Blog>,
         private cloudinaryService: CloudinaryService
     ) { }
 
-    async getAllBlogs() {
+    async getAllBlogs(page?: string | number, limit?: string | number) {
         try {
+            const { page: currentPage, limit: currentLimit, skip } = this.normalizePagination(page, limit);
 
-            const blogs = await this.blogsRepository.find();
+            const [blogs, total] = await this.blogsRepository.createQueryBuilder("blog")
+                .where("blog.status IN (:...statuses)", { statuses: this.approvedBlogStatuses })
+                .orderBy("blog.createdAt", "DESC")
+                .skip(skip)
+                .take(currentLimit)
+                .getManyAndCount();
 
-            if (blogs.length === 0) throw new NotFoundException({
+            if (total === 0) throw new NotFoundException({
                 success: true,
                 message: "No blogs found."
             })
@@ -30,7 +36,8 @@ export class BlogsService {
             return {
                 success: true,
                 message: "Blogs fetched successfully",
-                blogs
+                blogs,
+                pagination: this.buildPaginationMeta(currentPage, currentLimit, total)
             }
 
         } catch (error) {
@@ -70,17 +77,21 @@ export class BlogsService {
         }
     }
 
-    async getUsersBlogs(id: string) {
+    async getUsersBlogs(id: string, page?: string | number, limit?: string | number) {
 
         try {
-            const blogs = await this.blogsRepository.find({
-                where: {
-                    userId: id
-                },
-                relations: ["user"]
-            })
+            const { page: currentPage, limit: currentLimit, skip } = this.normalizePagination(page, limit);
 
-            if (blogs.length === 0) throw new NotFoundException({
+            const [blogs, total] = await this.blogsRepository.createQueryBuilder("blog")
+                .leftJoinAndSelect("blog.user", "user")
+                .where("blog.userId = :userId", { userId: id })
+                .andWhere("blog.status IN (:...statuses)", { statuses: this.approvedBlogStatuses })
+                .orderBy("blog.createdAt", "DESC")
+                .skip(skip)
+                .take(currentLimit)
+                .getManyAndCount();
+
+            if (total === 0) throw new NotFoundException({
                 success: true,
                 message: "No blogs found.",
             })
@@ -88,13 +99,49 @@ export class BlogsService {
             return {
                 success: true,
                 message: "Blogs fetched successfully",
-                blogs
+                blogs,
+                pagination: this.buildPaginationMeta(currentPage, currentLimit, total)
             }
 
         } catch (error) {
             this.handleServiceError(error);
         }
 
+    }
+
+    async getPendingBlogsPerAuthor(req: any, page?: string | number, limit?: string | number) {
+        try {
+            const { page: currentPage, limit: currentLimit, skip } = this.normalizePagination(page, limit);
+            const userId = req.user?.id
+            const userRole = req.user?.role
+
+            if(userRole !== "author") throw new UnauthorizedException({
+                success: false,
+                message: "You are not authorized"
+            })
+
+            const [blogs, total] = await this.blogsRepository.createQueryBuilder("blog")
+                .where("blog.userId = :userId", { userId })
+                .andWhere("blog.status = :status", { status: "pending" })
+                .orderBy("blog.createdAt", "DESC")
+                .skip(skip)
+                .take(currentLimit)
+                .getManyAndCount();
+
+            if (total === 0) throw new NotFoundException({
+                success: false,
+                message: "No blogs found."
+            })
+
+            return {
+                success: true,
+                message: "Pending blogs fetched successfully",
+                blogs,
+                pagination: this.buildPaginationMeta(currentPage, currentLimit, total)
+            }
+        } catch (error) {
+            this.handleServiceError(error);
+        }
     }
 
     async createBlog(dto: CreateBlogDto, req: any, file?: any) {
@@ -205,7 +252,6 @@ export class BlogsService {
 
     }
 
-
     async deleteBlog(id: string, coverImageId: string, req: any) {
         try {
 
@@ -234,6 +280,46 @@ export class BlogsService {
 
         } catch (error) {
             this.handleServiceError(error);
+        }
+    }
+
+    async getRecomendedBlogs(){
+        
+    }
+
+    private normalizePagination(page?: string | number, limit?: string | number) {
+        const currentPage = page === undefined ? 1 : Number(page);
+        const parsedLimit = limit === undefined ? 10 : Number(limit);
+
+        if (!Number.isInteger(currentPage) || currentPage < 1) throw new BadRequestException({
+            success: false,
+            message: "Page must be a positive integer"
+        })
+
+        if (!Number.isInteger(parsedLimit) || parsedLimit < 1) throw new BadRequestException({
+            success: false,
+            message: "Limit must be a positive integer"
+        })
+
+        const currentLimit = Math.min(parsedLimit, 10);
+
+        return {
+            page: currentPage,
+            limit: currentLimit,
+            skip: (currentPage - 1) * currentLimit
+        }
+    }
+
+    private buildPaginationMeta(page: number, limit: number, total: number) {
+        const totalPages = Math.ceil(total / limit);
+
+        return {
+            page,
+            limit,
+            total,
+            totalPages,
+            hasNextPage: page < totalPages,
+            hasPreviousPage: page > 1
         }
     }
 

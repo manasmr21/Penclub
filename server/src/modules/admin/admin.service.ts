@@ -16,6 +16,7 @@ import { CloudinaryService } from "../../utils/cloudinary/cloudinary.service";
 import { JwtService } from "@nestjs/jwt";
 import { randomInt } from "crypto";
 import { Book } from "../books/entities/books.entity";
+import { Blog } from "../blog/entities/blogs.entity";
 
 @Injectable()
 export class AdminService {
@@ -24,6 +25,8 @@ export class AdminService {
         private userRepository: Repository<User>,
         @InjectRepository(Book)
         private bookRepository: Repository<Book>,
+        @InjectRepository(Blog)
+        private blogRepository: Repository<Blog>,
         private mailService: MailService,
         private cloudinaryService: CloudinaryService,
         private jwtService: JwtService
@@ -343,7 +346,8 @@ export class AdminService {
                 message: "You are not authorized"
             })
 
-            await this.userRepository.softDelete(userId);
+            //@ts-expect-error
+            await this.userRepository.softDelete({id:userId?.userId});
 
             return{
                 success:true,
@@ -365,13 +369,95 @@ export class AdminService {
                 message: "Your are not authorized"
             })
 
-            await this.userRepository.delete(userId);
+            //@ts-expect-error
+            await this.userRepository.delete({id:userId.userId});
 
 
         } catch (error) {
             throw this.handleServiceError(error);
         }
     }
+
+    async softDeleteBlog(req: any, blogId: string) {
+        try {
+
+            const userRole = req.user?.role
+
+            if (!blogId) throw new BadRequestException({
+                success: false,
+                message: "Blog id is required"
+            })
+
+            if (userRole !== "admin") throw new UnauthorizedException({
+                success: false,
+                message: "You are not authorized"
+            })
+
+            //@ts-expect-error
+            const deletedBlog = await this.blogRepository.softDelete({id:blogId.blogId});
+
+            if (deletedBlog.affected === 0) throw new NotFoundException({
+                success: false,
+                message: "Blog not found"
+            })
+
+            return {
+                success: true,
+                message: "Blog has been deleted temporarily"
+            }
+
+        } catch (error) {
+            throw this.handleServiceError(error);
+        }
+    }
+
+    async permanentDeleteBlog(req: any, blogId: string) {
+        try {
+
+            const userRole = req.user?.role
+
+            if (!blogId) throw new BadRequestException({
+                success: false,
+                message: "Blog id is required"
+            })
+
+            if (userRole !== "admin") throw new UnauthorizedException({
+                success: false,
+                message: "You are not authorized"
+            })
+
+            const blog = await this.blogRepository.findOne({
+                where: {
+                    id: blogId
+                },
+                withDeleted: true
+            })
+
+            if (!blog) throw new NotFoundException({
+                success: false,
+                message: "Blog not found"
+            })
+
+            //@ts-expect-error
+            await this.blogRepository.delete({id:blogId.blogId});
+
+            let response = null;
+
+            if (blog.coverImageId) {
+                response = await this.cloudinaryService.deleteImage(blog.coverImageId);
+            }
+
+            return {
+                success: true,
+                message: "Blog has been deleted permanently",
+                response
+            }
+
+        } catch (error) {
+            throw this.handleServiceError(error);
+        }
+    }
+
 
     //Error handler - to maker sure that errors does not make my server crash
     private handleServiceError(error: unknown): never {

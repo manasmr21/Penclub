@@ -10,7 +10,8 @@ import {
   OneToMany,
   ManyToMany,
   JoinTable,
-  Index
+  Index,
+  DeleteDateColumn
 } from "typeorm";
 import { Review } from "../../reviews/entities/review.entity";
 
@@ -113,4 +114,7 @@ export class User {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
 }
