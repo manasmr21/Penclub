@@ -5,6 +5,7 @@ import { Blog } from "./entities/blogs.entity";
 import { CreateBlogDto } from "./dto/create-blog.dto";
 import { CloudinaryService } from "../../utils/cloudinary/cloudinary.service";
 import { UpdateBlogDto } from "./dto/update-blog.dto";
+import { User } from "../users/entities/user.entity";
 
 
 @Injectable()
@@ -14,6 +15,8 @@ export class BlogsService {
     constructor(
         @InjectRepository(Blog)
         private blogsRepository: Repository<Blog>,
+        @InjectRepository(User)
+        private userRepository: Repository<User>,
         private cloudinaryService: CloudinaryService
     ) { }
 
@@ -46,26 +49,26 @@ export class BlogsService {
 
     }
 
-    async getBlog(id: string){
+    async getBlog(id: string) {
         try {
 
-            if(!id) throw new BadRequestException({
+            if (!id) throw new BadRequestException({
                 success: false,
                 message: "Blog id is required"
             })
 
             const blog = this.blogsRepository.findOne({
-                where:{
+                where: {
                     id
                 }
             })
 
-            if(!blog) throw new NotFoundException({
+            if (!blog) throw new NotFoundException({
                 success: false,
                 message: "Blog with this blog id is not found"
             })
 
-            return{
+            return {
                 success: true,
                 message: "blog fetched successfully",
                 blog
@@ -115,7 +118,7 @@ export class BlogsService {
             const userId = req.user?.id
             const userRole = req.user?.role
 
-            if(userRole !== "author") throw new UnauthorizedException({
+            if (userRole !== "author") throw new UnauthorizedException({
                 success: false,
                 message: "You are not authorized"
             })
@@ -148,7 +151,7 @@ export class BlogsService {
         try {
 
             const userRole = req.user?.role
-            if(userRole !== "author") throw new UnauthorizedException({
+            if (userRole !== "author") throw new UnauthorizedException({
                 success: false,
                 message: "You are not authorized to post articles."
             })
@@ -191,14 +194,13 @@ export class BlogsService {
         }
     }
 
-
-    async updateBlog(id: string, dto: UpdateBlogDto, req : any, file?: any) {
+    async updateBlog(id: string, dto: UpdateBlogDto, req: any, file?: any) {
 
         try {
 
             const userRole = req.user?.role
 
-            if(userRole !== "author") throw new UnauthorizedException({
+            if (userRole !== "author") throw new UnauthorizedException({
                 success: false,
                 message: "You are not authorized to update an article"
             })
@@ -257,14 +259,14 @@ export class BlogsService {
 
             const userRole = req.user?.role
 
-            if(userRole !== "author") throw new UnauthorizedException({
+            if (userRole !== "author") throw new UnauthorizedException({
                 success: false,
                 message: "You are not authorized to delete a blog"
             })
 
             const blog = await this.blogsRepository.delete(id)
 
-            if(blog.affected === 0) throw new NotFoundException({
+            if (blog.affected === 0) throw new NotFoundException({
                 success: false,
                 message: "Blog not found, error in deleting the blog"
             })
@@ -272,7 +274,7 @@ export class BlogsService {
             //@ts-expect-error
             const response = await this.cloudinaryService.deleteImage(coverImageId.coverImageId);
 
-            return{
+            return {
                 success: true,
                 message: "Blog deleted successfully.",
                 response
@@ -283,8 +285,108 @@ export class BlogsService {
         }
     }
 
-    async getRecomendedBlogs(){
-        
+    async getRecommendedBlogs(
+        req: any,
+        page = 1,
+        limit = 10
+    ) {
+        try {
+            const userId = req.user?.id;
+
+            const user = await this.userRepository.findOne({
+                where: { id: userId }
+            });
+
+            if (!user) {
+                throw new UnauthorizedException({
+                    success: false,
+                    message: "User not logged in."
+                });
+            }
+
+            const interests = user.interests || [];
+            const skip = (page - 1) * limit;
+
+            // Base query (DRY)
+            const baseQuery = this.blogsRepository
+                .createQueryBuilder("blog")
+                .where("blog.status = :status", { status: "posted" });
+
+            // --------------------------
+            // 1️⃣ Interest-based blogs
+            // --------------------------
+            let interestBlogs: Blog[] = [];
+
+            if (interests.length) {
+                interestBlogs = await baseQuery.clone()
+                    .andWhere("blog.tags && :interests", { interests }) // overlap
+                    .orderBy("blog.createdAt", "DESC") // stable pagination
+                    .skip(skip)
+                    .take(Math.min(8, limit))
+                    .getMany();
+            }
+
+            // --------------------------
+            // 2️⃣ Trending blogs
+            // --------------------------
+            const remainingAfterInterest = limit - interestBlogs.length;
+
+            let trendingBlogs: Blog[] = [];
+
+            if (remainingAfterInterest > 0) {
+                const query = baseQuery.clone()
+                    .orderBy("blog.likesCount", "DESC")
+                    .addOrderBy("blog.createdAt", "DESC") // tie-breaker
+                    .skip(skip)
+                    .take(remainingAfterInterest);
+
+                if (interestBlogs.length) {
+                    query.andWhere("blog.id NOT IN (:...ids)", {
+                        ids: interestBlogs.map(b => b.id)
+                    });
+                }
+
+                trendingBlogs = await query.getMany();
+            }
+
+            const combined = [...interestBlogs, ...trendingBlogs];
+
+            // --------------------------
+            // 3️⃣ Fallback blogs
+            // --------------------------
+            const finalRemaining = limit - combined.length;
+
+            let fallbackBlogs: Blog[] = [];
+
+            if (finalRemaining > 0) {
+                const query = baseQuery.clone()
+                    .orderBy("blog.createdAt", "DESC") // no random → stable
+                    .skip(skip)
+                    .take(finalRemaining);
+
+                if (combined.length) {
+                    query.andWhere("blog.id NOT IN (:...ids)", {
+                        ids: combined.map(b => b.id)
+                    });
+                }
+
+                fallbackBlogs = await query.getMany();
+            }
+
+            const finalBlogs = [...combined, ...fallbackBlogs];
+
+            return {
+                success: true,
+                message: "Blogs fetched successfully",
+                page,
+                limit,
+                count: finalBlogs.length,
+                blogs: finalBlogs
+            };
+
+        } catch (error) {
+            throw this.handleServiceError(error);
+        }
     }
 
     private normalizePagination(page?: string | number, limit?: string | number) {
@@ -323,7 +425,6 @@ export class BlogsService {
         }
     }
 
-    //Error handler - to maker sure that errors does not make my server crash
     private handleServiceError(error: unknown): never {
         if (error instanceof HttpException) {
             throw error;

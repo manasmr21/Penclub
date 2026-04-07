@@ -3,7 +3,6 @@ import {
   ManyToOne,
   DeleteDateColumn
 } from "typeorm";
-import { AuthorEntity } from "../../author/entities/author.entity";
 import { User } from "../../users/entities/user.entity";
 
 @Entity("blogs")
@@ -21,12 +20,12 @@ export class Blog {
   tags: string[];
 
   @Column({ nullable: true })
-  coverImage: string ;
+  coverImage: string;
 
   @Column({ nullable: true })
   coverImageId: string;
 
-  @Column({type: "uuid"})
+  @Column({ type: "uuid" })
   userId: string
 
   @ManyToOne(() => User, (user) => user.blogs, {
@@ -36,7 +35,7 @@ export class Blog {
   user: User;
 
   @Column({
-    enum:["posted", "pending", "draft", "deleted", "edited"],
+    enum: ["posted", "pending", "draft", "deleted", "edited"],
   })
   status: string
 
