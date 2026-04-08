@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Param, Post, Put, Query, Request, Response, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Request, Response, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { UserService } from "./user.service";
 import { UserDto } from "./dto/user.dto";
@@ -13,6 +13,16 @@ export class UserController {
     constructor(
         private userService: UserService
     ) { }
+
+    @Get("/")
+    async getUser(@Request() req: any){
+        return this.userService.fetchUser(req)
+    }
+
+    @Post("/:userId")
+    async getUserPerId(@Param("userId") userId: string){
+        return this.userService.fetchUserPerId(userId);
+    }
 
     @Post("create")
     @UseInterceptors(FileInterceptor("profilePicture"))

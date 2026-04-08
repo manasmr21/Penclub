@@ -68,6 +68,118 @@ export class UserService {
         return undefined;
     }
 
+    async verifyLoggedIn(req: any){
+        try {
+
+            const userId = req.user?.id
+
+            const user = await this.userRepository.createQueryBuilder("users")
+                        .where("users.id = :id", {id: userId})
+                        .getOne();
+
+                if(!user) throw new UnauthorizedException({
+                    success: false,
+                    message: "You are unauthorized"
+                })
+
+                return{
+                    success: true,
+                    message: "User is Logged In",
+                }
+
+        } catch (error) {
+            throw this.handleServiceError(error);
+        }
+    }
+
+    async fetchUser(req: any){
+        try {
+
+            const userId = req.user?.id
+
+            const user = await this.userRepository.createQueryBuilder("users")
+                        .where("users.id = :id", {id: userId})
+                        .select([
+                            "users.id",
+                            "users.name",
+                            "users.username",
+                            "users.email",
+                            "users.role",
+                            "users.blogs",
+                            "users.bio",
+                            "users.books",
+                            "users.following",
+                            "users.follwers",
+                            "users.followersCount",
+                            "users.followingCount",
+                            "users.interests",
+                            "users.profilePicture",
+                            "users.profilePictureId",
+                            "users.comments",
+                            "users.review",
+                            "users.isLoggedIn",
+                            "users.socialLinks"
+                        ])
+
+                if(!user) throw new UnauthorizedException({
+                    success: false,
+                    message: "You are unauthorized"
+                })
+
+                return{
+                    success: true,
+                    message: "User fetched Successfully",
+                    user
+                }
+
+        } catch (error) {
+            throw this.handleServiceError(error);
+        }
+    }
+
+    async fetchUserPerId(userId: string){
+        try {
+
+            const user = this.userRepository.createQueryBuilder("users")
+                        .where("users.id = :id", {id: userId})
+                        .select([
+                            "users.id",
+                            "users.name",
+                            "users.username",
+                            "users.email",
+                            "users.role",
+                            "users.blogs",
+                            "users.bio",
+                            "users.books",
+                            "users.following",
+                            "users.follwers",
+                            "users.followersCount",
+                            "users.followingCount",
+                            "users.interests",
+                            "users.profilePicture",
+                            "users.profilePictureId",
+                            "users.comments",
+                            "users.review",
+                            "users.isLoggedIn",
+                            "users.socialLinks"
+                        ])
+
+                if(!user) throw new NotFoundException({
+                    success: false,
+                    message: "User not found"
+                })
+
+                return{
+                    success: true,
+                    message: "User fetched Successfully",
+                    user
+                }
+
+        } catch (error) {
+            throw this.handleServiceError(error);
+        }
+    }
+
     async register(dto: UserDto, file?: any) {
         try {
             const { name, email, username, password, confirmPassword, role } = dto;
