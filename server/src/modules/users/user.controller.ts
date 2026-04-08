@@ -89,7 +89,7 @@ export class UserController {
         return await this.userService.followUnfollow(targetUserId, req);
     }
 
-    @Post("verify/:userId")
+    @Get("verify/:userId")
     async getUserPerId(@Param("userId") userId: string) {
         return this.userService.fetchUserPerId(userId);
     }
