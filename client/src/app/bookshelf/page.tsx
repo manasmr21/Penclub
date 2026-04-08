@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { fetchAllBooks, fetchReviewsByBook } from "@/src/lib/books-api";
 import type { AuthorBook } from "@/src/lib/profile-stats-api";
@@ -17,49 +17,84 @@ function renderStars(rating: number) {
 
 export default function BookshelfPage() {
   const [books, setBooks] = useState<BookWithRating[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState(1);
-  const booksPerTab = 12;
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasNextPage, setHasNextPage] = useState(true);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const isFetchingRef = useRef(false);
+  const pageSize = 10;
 
-  useEffect(() => {
-    const loadBooks = async () => {
+  const loadBooksPage = useCallback(async (targetPage: number) => {
+    if (isFetchingRef.current) return;
+    isFetchingRef.current = true;
+
+    if (targetPage === 1) {
       setLoading(true);
-      try {
-        const nextBooks = await fetchAllBooks();
-        const booksWithRatings = await Promise.all(
-          nextBooks.map(async (book) => {
-            const reviews = await fetchReviewsByBook(book.id);
-            const total = reviews.reduce((sum, review) => sum + (review.rating || 0), 0);
-            const averageRating = reviews.length ? total / reviews.length : 0;
+    } else {
+      setLoadingMore(true);
+    }
 
-            return {
-              ...book,
-              averageRating,
-              reviewsCount: reviews.length,
-            };
-          }),
-        );
+    try {
+      const response = await fetchAllBooks(targetPage, pageSize);
+      const booksWithRatings = await Promise.all(
+        response.books.map(async (book) => {
+          const reviews = await fetchReviewsByBook(book.id);
+          const total = reviews.reduce((sum, review) => sum + (review.rating || 0), 0);
+          const averageRating = reviews.length ? total / reviews.length : 0;
 
-        setBooks(booksWithRatings);
-      } catch {
+          return {
+            ...book,
+            averageRating,
+            reviewsCount: reviews.length,
+          };
+        }),
+      );
+
+      setBooks((prev) => {
+        if (targetPage === 1) return booksWithRatings;
+
+        const existing = new Set(prev.map((item) => item.id));
+        const incoming = booksWithRatings.filter((item) => !existing.has(item.id));
+        return [...prev, ...incoming];
+      });
+      setHasNextPage(response.pagination?.hasNextPage ?? false);
+      setPage(targetPage);
+    } catch {
+      if (targetPage === 1) {
         setBooks([]);
-      } finally {
-        setLoading(false);
       }
-    };
-
-    void loadBooks();
+      setHasNextPage(false);
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+      isFetchingRef.current = false;
+    }
   }, []);
 
-  const totalTabs = Math.max(1, Math.ceil(books.length / booksPerTab));
-  const startIndex = (activeTab - 1) * booksPerTab;
-  const visibleBooks = books.slice(startIndex, startIndex + booksPerTab);
-
   useEffect(() => {
-    if (activeTab > totalTabs) {
-      setActiveTab(totalTabs);
-    }
-  }, [activeTab, totalTabs]);
+    void loadBooksPage(1);
+  }, [loadBooksPage]);
+
+  const setSentinelRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (observerRef.current) observerRef.current.disconnect();
+      if (!node) return;
+
+      observerRef.current = new IntersectionObserver(
+        (entries) => {
+          const first = entries[0];
+          if (!first?.isIntersecting) return;
+          if (loading || loadingMore || !hasNextPage) return;
+          void loadBooksPage(page + 1);
+        },
+        { threshold: 0.2 },
+      );
+
+      observerRef.current.observe(node);
+    },
+    [hasNextPage, loadBooksPage, loading, loadingMore, page],
+  );
 
   if (loading) {
     return (
@@ -81,7 +116,7 @@ export default function BookshelfPage() {
     <div className="main-container pt-28 pb-10">
       <div className="max-w-5xl mx-auto px-6">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-12">
-          {visibleBooks.map((book) => (
+          {books.map((book) => (
             <Link key={book.id} href={`/bookshelf/${book.id}`} className="block">
               <article className="flex flex-col w-full transition-transform duration-200 hover:-translate-y-1">
                 <div className="w-full aspect-[2/3] mb-5 bg-gray-200 rounded-md overflow-hidden">
@@ -105,47 +140,15 @@ export default function BookshelfPage() {
           ))}
         </div>
 
-        {totalTabs > 1 && (
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-2">
-            <button
-              type="button"
-              onClick={() => setActiveTab((prev) => Math.max(1, prev - 1))}
-              disabled={activeTab === 1}
-              className="h-9 rounded-md border border-[#dbe3ef] bg-white px-3 text-sm font-medium text-[#1e2741] transition hover:bg-[#f5f7fb] disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              Prev
-            </button>
-
-            {Array.from(new Set([activeTab - 1, activeTab, activeTab + 1]))
-              .filter((tab) => tab >= 1 && tab <= totalTabs)
-              .map((tab) => {
-                const isActive = tab === activeTab;
-                return (
-                  <button
-                    key={tab}
-                    type="button"
-                    onClick={() => setActiveTab(tab)}
-                    className={`h-9 min-w-9 rounded-md px-3 text-sm font-medium transition ${
-                      isActive
-                        ? "bg-[#1e2741] text-white"
-                        : "border border-[#dbe3ef] bg-white text-[#1e2741] hover:bg-[#f5f7fb]"
-                    }`}
-                  >
-                    {tab}
-                  </button>
-                );
-              })}
-
-            <button
-              type="button"
-              onClick={() => setActiveTab((prev) => Math.min(totalTabs, prev + 1))}
-              disabled={activeTab === totalTabs}
-              className="h-9 rounded-md border border-[#dbe3ef] bg-white px-3 text-sm font-medium text-[#1e2741] transition hover:bg-[#f5f7fb] disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              Next
-            </button>
-          </div>
-        )}
+        <div className="mt-10">
+          {loadingMore && (
+            <p className="text-center text-sm text-on-surface-variant/70">Loading more books...</p>
+          )}
+          {!hasNextPage && books.length > 0 && (
+            <p className="text-center text-sm text-on-surface-variant/70">You have reached the end.</p>
+          )}
+          <div ref={setSentinelRef} className="h-4 w-full" />
+        </div>
       </div>
     </div>
   );

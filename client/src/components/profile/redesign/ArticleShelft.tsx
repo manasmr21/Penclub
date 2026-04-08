@@ -103,6 +103,20 @@ const ArticleShelft = ({ articles, loading = false, onChanged }: ArticleShelftPr
       <div className="max-w-5xl mx-auto grid gap-5">
         {articles.map((article) => (
           <article key={article.id} className="group relative rounded-2xl border border-outline-variant/20 bg-white p-5 shadow-sm">
+            <div className="mb-4 overflow-hidden rounded-xl bg-slate-100">
+              {article.coverImage ? (
+                <img
+                  src={article.coverImage}
+                  alt={`${article.title} banner`}
+                  className="h-44 w-full object-cover"
+                />
+              ) : (
+                <div className="grid h-44 w-full place-items-center text-sm text-on-surface-variant/70">
+                  No banner image
+                </div>
+              )}
+            </div>
+
             <div className="absolute top-3 right-3 flex items-center gap-1.5">
               <button
                 type="button"

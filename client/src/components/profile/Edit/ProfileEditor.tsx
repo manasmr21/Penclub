@@ -72,7 +72,7 @@ const ProfilePictureUpdate = ({
 
   return (
     <div className="flex flex-col items-center gap-2">
-      <div className="relative h-15 w-20">
+      <div className="relative h-20 w-20">
         <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border border-[var(--border)] bg-[var(--card)] text-2xl font-bold text-[var(--primary)] shadow-sm">
           {imageSource ? (
             <img src={imageSource} className="h-full w-full object-cover" alt="Profile Preview" />

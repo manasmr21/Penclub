@@ -37,10 +37,22 @@ export type UpdateArticlePayload = {
   coverImageFile?: File;
 };
 
-export async function fetchAllBooks(): Promise<AuthorBook[]> {
-  const { data } = await api.get<{ books?: AuthorBook[] }>("/books");
+type BooksPagination = {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+};
 
-  return Array.isArray(data?.books) ? data.books : [];
+export async function fetchAllBooks(page = 1, limit = 10): Promise<{ books: AuthorBook[]; pagination: BooksPagination | null }> {
+  const { data } = await api.get<{ books?: AuthorBook[]; pagination?: BooksPagination }>(`/books?page=${page}&limit=${limit}`);
+
+  return {
+    books: Array.isArray(data?.books) ? data.books : [],
+    pagination: data?.pagination ?? null,
+  };
 }
 
 export async function fetchBookById(bookId: string): Promise<AuthorBook | null> {
