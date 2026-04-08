@@ -57,6 +57,11 @@ export class Book {
     })
     approved: boolean
 
+    @Column({
+        default: false
+    })
+    isAdvertised: boolean
+
     @OneToMany(()=> Review, (reviews)=> reviews.book)
     reviews: Review[]
 

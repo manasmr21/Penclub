@@ -17,6 +17,10 @@ import { JwtService } from "@nestjs/jwt";
 import { randomInt } from "crypto";
 import { Book } from "../books/entities/books.entity";
 import { Blog } from "../blog/entities/blogs.entity";
+import { SiteUpdateDto } from "./dto/site-update.dto";
+import { Site } from "./entities/site.entity";
+import { Publisher } from "./entities/publisher.entity";
+import { CreatePublisherDto, UpdatePublisherDto } from "./dto/publisher.dto";
 
 @Injectable()
 export class AdminService {
@@ -27,6 +31,10 @@ export class AdminService {
         private bookRepository: Repository<Book>,
         @InjectRepository(Blog)
         private blogRepository: Repository<Blog>,
+        @InjectRepository(Site)
+        private siteRepository: Repository<Site>,
+        @InjectRepository(Publisher)
+        private publisherRepository: Repository<Publisher>,
         private mailService: MailService,
         private cloudinaryService: CloudinaryService,
         private jwtService: JwtService
@@ -335,22 +343,47 @@ export class AdminService {
         }
     }
 
-    async softDeleteUser(req: any, userId : string){
+    async advertiseBook(req: any, bookId: string, advertise: boolean) {
+        try {
+            if (req.user?.role !== "admin") throw new UnauthorizedException({ success: false, message: "Unauthorized" });
+
+            const book = await this.bookRepository.findOne({ where: { id: bookId } });
+            if (!book) throw new NotFoundException({ success: false, message: "Book not found" });
+
+            if (advertise && !book.isAdvertised) {
+                const advertisedCount = await this.bookRepository.count({ where: { isAdvertised: true } });
+                if (advertisedCount >= 5) {
+                    throw new BadRequestException({ success: false, message: "Maximum of 5 books can be advertised at a time" });
+                }
+            }
+
+            book.isAdvertised = advertise;
+            await this.bookRepository.save(book);
+
+            return {
+                success: true,
+                message: advertise ? "Book is now advertised" : "Book advertisement removed",
+                book
+            };
+        } catch (error) { throw this.handleServiceError(error); }
+    }
+
+    async softDeleteUser(req: any, userId: string) {
         try {
 
             const adminId = req.user?.id
             const userRole = req.user?.role
 
-            if(userRole !== "admin") throw new UnauthorizedException({
+            if (userRole !== "admin") throw new UnauthorizedException({
                 success: false,
                 message: "You are not authorized"
             })
 
             //@ts-expect-error
-            await this.userRepository.softDelete({id:userId?.userId});
+            await this.userRepository.softDelete({ id: userId?.userId });
 
-            return{
-                success:true,
+            return {
+                success: true,
                 message: "User has been deleted temporarily"
             }
 
@@ -359,18 +392,18 @@ export class AdminService {
         }
     }
 
-    async permanentDelete(req: any, userId: string){
+    async permanentDelete(req: any, userId: string) {
         try {
 
             const userRole = req.user?.role
 
-            if(userRole !== "admin") throw new UnauthorizedException({
+            if (userRole !== "admin") throw new UnauthorizedException({
                 success: false,
                 message: "Your are not authorized"
             })
 
             //@ts-expect-error
-            await this.userRepository.delete({id:userId.userId});
+            await this.userRepository.delete({ id: userId.userId });
 
 
         } catch (error) {
@@ -394,7 +427,7 @@ export class AdminService {
             })
 
             //@ts-expect-error
-            const deletedBlog = await this.blogRepository.softDelete({id:blogId.blogId});
+            const deletedBlog = await this.blogRepository.softDelete({ id: blogId.blogId });
 
             if (deletedBlog.affected === 0) throw new NotFoundException({
                 success: false,
@@ -439,7 +472,7 @@ export class AdminService {
             })
 
             //@ts-expect-error
-            await this.blogRepository.delete({id:blogId.blogId});
+            await this.blogRepository.delete({ id: blogId.blogId });
 
             let response = null;
 
@@ -458,6 +491,125 @@ export class AdminService {
         }
     }
 
+
+    //Admin functions
+    async siteUpdate(req: any, dto: SiteUpdateDto) {
+        try {
+            const userRole = req.user?.role;
+            if (userRole !== "admin") throw new UnauthorizedException({
+                success: false,
+                message: "You are not authorized"
+            });
+
+            if (!dto || Object.keys(dto).length === 0) throw new BadRequestException({
+                success: false,
+                message: "Need at least one information to update."
+            });
+
+            let siteSetting = await this.siteRepository.findOne({ where: {} });
+
+            if (!siteSetting) {
+                siteSetting = this.siteRepository.create(dto);
+            } else {
+                Object.assign(siteSetting, dto);
+            }
+
+            await this.siteRepository.save(siteSetting);
+
+            return {
+                success: true,
+                message: "Site updated successfully",
+                site: siteSetting
+            };
+
+        } catch (error) {
+            throw this.handleServiceError(error);
+        }
+    }
+
+
+    // Publisher Management
+    async addPublisher(req: any, dto: CreatePublisherDto) {
+        try {
+            if (req.user?.role !== "admin") throw new UnauthorizedException({ success: false, message: "Unauthorized" });
+
+            const existingPublisher = await this.publisherRepository.findOne({
+                where: [
+                    { publisherId: dto.publisherId },
+                    { email: dto.email }
+                ]
+            });
+
+            if (existingPublisher) {
+                throw new ConflictException({ success: false, message: "Publisher with this ID or email already exists" });
+            }
+
+            const newPublisher = this.publisherRepository.create(dto);
+            await this.publisherRepository.save(newPublisher);
+
+            return { success: true, message: "Publisher created successfully", publisher: newPublisher };
+        } catch (error) { throw this.handleServiceError(error); }
+    }
+
+    async getAllPublishers(req: any) {
+        try {
+            if (req.user?.role !== "admin") throw new UnauthorizedException({ success: false, message: "Unauthorized" });
+            const publishers = await this.publisherRepository.find();
+            return { success: true, publishers };
+        } catch (error) { throw this.handleServiceError(error); }
+    }
+
+    async getPublisherById(req: any, publisherId: string) {
+        try {
+            if (req.user?.role !== "admin") throw new UnauthorizedException({ success: false, message: "Unauthorized" });
+            const publisher = await this.publisherRepository.findOne({ where: { publisherId } });
+            if (!publisher) throw new NotFoundException({ success: false, message: "Publisher not found" });
+            return { success: true, publisher };
+        } catch (error) { throw this.handleServiceError(error); }
+    }
+
+    async updatePublisher(req: any, publisherId: string, dto: UpdatePublisherDto) {
+        try {
+            if (req.user?.role !== "admin") throw new UnauthorizedException({ success: false, message: "Unauthorized" });
+
+            // Prevent modifying critical fields at runtime
+            // @ts-expect-error 
+            if (dto.publisherId || dto.email) {
+                throw new BadRequestException({ success: false, message: "publisherId and email cannot be updated" });
+            }
+
+            const publisher = await this.publisherRepository.findOne({ where: { publisherId } });
+            if (!publisher) throw new NotFoundException({ success: false, message: "Publisher not found" });
+
+            Object.assign(publisher, dto);
+            await this.publisherRepository.save(publisher);
+            return { success: true, message: "Publisher updated successfully", publisher };
+        } catch (error) { throw this.handleServiceError(error); }
+    }
+
+    async softDeletePublisher(req: any, publisherId: string) {
+        try {
+            if (req.user?.role !== "admin") throw new UnauthorizedException({ success: false, message: "Unauthorized" });
+            
+            const publisher = await this.publisherRepository.findOne({ where: { publisherId } });
+            if (!publisher) throw new NotFoundException({ success: false, message: "Publisher not found" });
+
+            await this.publisherRepository.softRemove(publisher);
+            return { success: true, message: "Publisher soft deleted gracefully" };
+        } catch (error) { throw this.handleServiceError(error); }
+    }
+
+    async permanentDeletePublisher(req: any, publisherId: string) {
+        try {
+            if (req.user?.role !== "admin") throw new UnauthorizedException({ success: false, message: "Unauthorized" });
+            
+            const publisher = await this.publisherRepository.findOne({ where: { publisherId }, withDeleted: true });
+            if (!publisher) throw new NotFoundException({ success: false, message: "Publisher not found" });
+
+            await this.publisherRepository.remove(publisher);
+            return { success: true, message: "Publisher permanently deleted" };
+        } catch (error) { throw this.handleServiceError(error); }
+    }
 
     //Error handler - to maker sure that errors does not make my server crash
     private handleServiceError(error: unknown): never {
