@@ -120,6 +120,7 @@ export class UserService {
                             "users.isLoggedIn",
                             "users.socialLinks"
                         ])
+                        .getOne()
 
                 if(!user) throw new UnauthorizedException({
                     success: false,
@@ -163,6 +164,7 @@ export class UserService {
                             "users.isLoggedIn",
                             "users.socialLinks"
                         ])
+                        .getOne()
 
                 if(!user) throw new NotFoundException({
                     success: false,

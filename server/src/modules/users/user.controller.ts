@@ -14,14 +14,9 @@ export class UserController {
         private userService: UserService
     ) { }
 
-    @Get("/")
-    async getUser(@Request() req: any){
+    @Get()
+    async getUser(@Request() req: any) {
         return this.userService.fetchUser(req)
-    }
-
-    @Post("/:userId")
-    async getUserPerId(@Param("userId") userId: string){
-        return this.userService.fetchUserPerId(userId);
     }
 
     @Post("create")
@@ -92,5 +87,10 @@ export class UserController {
     @UseGuards(AuthGuard("jwt"))
     async followUser(@Request() req: any, @Param("targetUserId") targetUserId: string) {
         return await this.userService.followUnfollow(targetUserId, req);
+    }
+
+    @Post("verify/:userId")
+    async getUserPerId(@Param("userId") userId: string) {
+        return this.userService.fetchUserPerId(userId);
     }
 }
