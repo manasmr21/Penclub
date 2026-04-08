@@ -118,6 +118,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type = 'signup' }) => {
                 disabled={isLoading}
                 id="name"
                 label="Full Name"
+                value={formData.name}
                 type="text"
                 placeholder="E.g. Julian Barnes"
                 onChange={(e) => handleInputChange(e, setFormData)}
@@ -126,6 +127,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type = 'signup' }) => {
                 disabled={isLoading}
                 id="username"
                 label="Username"
+                value={formData.username}
                 type="text"
                 placeholder="julian123"
                 onChange={(e) => handleInputChange(e, setFormData)}
@@ -135,6 +137,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type = 'signup' }) => {
                 id="email"
                 label="Email Address"
                 type="email"
+                value={formData.email}
                 placeholder="julian@bibliophile.com"
                 onChange={(e) => handleInputChange(e, setFormData)}
                 className="md:col-span-2"
@@ -142,6 +145,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type = 'signup' }) => {
               <InputField
                 disabled={isLoading}
                 id="password"
+                value={formData.password}
                 label="Password"
                 type={passwordShow ? "text" : "password"}
                 placeholder="••••••••"
@@ -154,6 +158,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type = 'signup' }) => {
                 disabled={isLoading}
                 id="confirmPassword"
                 label="Confirm"
+                value={formData.confirmPassword}
                 type={passwordShow ? "text" : "password"}
                 placeholder="••••••••"
                 onChange={(e) => handleInputChange(e, setFormData)}

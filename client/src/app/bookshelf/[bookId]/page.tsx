@@ -26,7 +26,7 @@ export default function BookDetailsPage() {
   const [reviews, setReviews] = useState<BookReview[]>([]);
   const [authorName, setAuthorName] = useState<string>("Unknown author");
   const [loading, setLoading] = useState(true);
-  const [rating, setRating] = useState<number>(5);
+  const [rating, setRating] = useState<number>(0);
   const [content, setContent] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
@@ -90,7 +90,7 @@ export default function BookDetailsPage() {
 
   useEffect(() => {
     if (myReview) {
-      setRating(myReview.rating || 5);
+      setRating(myReview.rating || 0);
       setContent(myReview.content ?? "");
     }
   }, [myReview]);
@@ -131,6 +131,10 @@ export default function BookDetailsPage() {
   const handleSubmitReview = async (e: FormEvent) => {
     e.preventDefault();
     if (!bookId || !canReview) return;
+    if (rating < 1) {
+      alert("Please select a star rating before submitting.");
+      return;
+    }
 
     try {
       setSubmitting(true);
@@ -151,7 +155,7 @@ export default function BookDetailsPage() {
       setReviews(latest);
       if (!myReview?.id) {
         setContent("");
-        setRating(5);
+        setRating(0);
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unable to submit review.";
@@ -223,7 +227,7 @@ export default function BookDetailsPage() {
             <section className="mt-6">
               <h2 className="text-xl font-bold text-[#1e2741]">Ratings</h2>
               {reviews.length ? (
-                <p className="mt-2 text-[14px] text-[#3b4a64]">
+                <p className="mt-2 text-[14px] text-[#f5b301]">
                   {renderStars(averageRating)} ({reviews.length} review{reviews.length > 1 ? "s" : ""})
                 </p>
               ) : (
@@ -237,7 +241,7 @@ export default function BookDetailsPage() {
                 {reviews.length ? (
                   reviews.map((review) => (
                     <article key={review.id} className="rounded-md border border-[#dbe3ef] bg-white px-4 py-3">
-                      <p className="text-[13px] text-[#1e2741]">{renderStars(review.rating)}</p>
+                      <p className="text-[13px] text-[#f5b301]">{renderStars(review.rating)}</p>
                       <p className="mt-2 text-[14px] text-[#1e2741]">{review.content?.trim() || "No written comment."}</p>
                       <p className="mt-2 text-[12px] text-[#697282]">
                         By {review.user?.name || review.user?.username || "Reader"}
@@ -267,7 +271,7 @@ export default function BookDetailsPage() {
                           type="button"
                           onClick={() => setRating(value)}
                           aria-label={`Set rating to ${value} star${value > 1 ? "s" : ""}`}
-                          className="text-2xl leading-none text-[#1e2741]"
+                          className="text-2xl leading-none text-[#f5b301]"
                         >
                           {value <= rating ? "\u2605" : "\u2606"}
                         </button>
