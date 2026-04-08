@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { fetchAllBooks, fetchReviewsByBook } from "@/src/lib/books-api";
 import type { AuthorBook } from "@/src/lib/profile-stats-api";
@@ -17,6 +17,7 @@ function renderStars(rating: number) {
 
 export default function BookshelfPage() {
   const [books, setBooks] = useState<BookWithRating[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [page, setPage] = useState(1);
@@ -96,6 +97,17 @@ export default function BookshelfPage() {
     [hasNextPage, loadBooksPage, loading, loadingMore, page],
   );
 
+  const filteredBooks = useMemo(() => {
+    const query = searchTerm.trim().toLowerCase();
+    if (!query) return books;
+
+    return books.filter((book) => {
+      const title = (book.title || "").toLowerCase();
+      const genre = (book.genre || "").toLowerCase();
+      return title.includes(query) || genre.includes(query);
+    });
+  }, [books, searchTerm]);
+
   if (loading) {
     return (
       <div className="main-container pt-24 pb-10">
@@ -115,8 +127,24 @@ export default function BookshelfPage() {
   return (
     <div className="main-container pt-28 pb-10">
       <div className="max-w-5xl mx-auto px-6">
+        <div className="mb-8">
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search books by title or genre..."
+            className="h-11 w-full rounded-xl border border-[#dbe3ef] bg-white px-4 text-sm text-[#1e2741] outline-none focus:ring-2 focus:ring-[#1e2741]/20"
+          />
+        </div>
+
+        {!filteredBooks.length && (
+          <div className="py-12 text-center text-on-surface-variant/70">
+            No books match your search.
+          </div>
+        )}
+
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-12">
-          {books.map((book) => (
+          {filteredBooks.map((book) => (
             <Link key={book.id} href={`/bookshelf/${book.id}`} className="block">
               <article className="flex flex-col w-full transition-transform duration-200 hover:-translate-y-1">
                 <div className="w-full aspect-[2/3] mb-5 bg-gray-200 rounded-md overflow-hidden">

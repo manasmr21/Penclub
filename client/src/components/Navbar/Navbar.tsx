@@ -15,11 +15,11 @@ import { extractErrorMessage } from "@/src/lib/http-client";
 const navLinks = [
   { href: "#magazine", label: "Magazine" },
   { href: "/bookshelf", label: "Books" },
+  { href: "/articles", label: "Articles" },
   { href: "#podcast", label: "Podcast" },
   { href: "#events", label: "Events" },
   { href: "#contact", label: "Contact Us" },
 ];
-
 const Navbar = () => {
   const pathname = usePathname();
   const router = useRouter();
@@ -69,7 +69,7 @@ const Navbar = () => {
     }
   };
 
-  const getProfileUrl = (pic: any) => {
+  const getProfileUrl = (pic: unknown) => {
     if (!pic) return null;
     if (typeof pic === "string") {
       try {
@@ -170,7 +170,7 @@ const Navbar = () => {
               <ul className="flex gap-3">
                 {navLinks.map((link) => (
                   <li key={link.href}>
-                    {link.label === "Books" ? (
+                    {link.href.startsWith("/") ? (
                       <Link href={link.href} onClick={closeMenu}>
                         {link.label}
                       </Link>

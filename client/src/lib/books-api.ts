@@ -46,11 +46,40 @@ type BooksPagination = {
   hasPreviousPage: boolean;
 };
 
+type ArticlesPagination = {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+};
+
+export type PublicArticle = {
+  id: string;
+  title: string;
+  content: string;
+  tags?: string[];
+  coverImage?: string;
+  coverImageId?: string;
+  userId?: string;
+  createdAt?: string;
+};
+
 export async function fetchAllBooks(page = 1, limit = 10): Promise<{ books: AuthorBook[]; pagination: BooksPagination | null }> {
   const { data } = await api.get<{ books?: AuthorBook[]; pagination?: BooksPagination }>(`/books?page=${page}&limit=${limit}`);
 
   return {
     books: Array.isArray(data?.books) ? data.books : [],
+    pagination: data?.pagination ?? null,
+  };
+}
+
+export async function fetchAllArticles(page = 1, limit = 10): Promise<{ articles: PublicArticle[]; pagination: ArticlesPagination | null }> {
+  const { data } = await api.get<{ blogs?: PublicArticle[]; pagination?: ArticlesPagination }>(`/blogs?page=${page}&limit=${limit}`);
+
+  return {
+    articles: Array.isArray(data?.blogs) ? data.blogs : [],
     pagination: data?.pagination ?? null,
   };
 }
