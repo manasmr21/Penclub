@@ -99,6 +99,7 @@ const Navbar = () => {
       }
     }
     if (typeof pic === "object") {
+      //@ts-expect-error
       return pic.secure_url || pic.url || null;
     }
     return null;
@@ -106,7 +107,7 @@ const Navbar = () => {
 
   const picUrl = getProfileUrl(user?.profilePicture);
   const hasProfilePicture = typeof picUrl === "string" && picUrl.trim().length > 0;
-  
+
   const profileDisplayName = user?.name ?? user?.username ?? "User";
   const nameParts = profileDisplayName.trim().split(/\s+/).filter(Boolean);
   const profileInitials =
@@ -159,9 +160,8 @@ const Navbar = () => {
   return (
     <>
       <nav
-        className={`navbar fixed w-full top-0 z-[999] transition-all duration-300 ${
-          showSolidNavbar ? "bg-background" : "bg-transparent"
-        }`}
+        className={`navbar fixed w-full top-0 z-[999] transition-all duration-300 ${showSolidNavbar ? "bg-background" : "bg-transparent"
+          }`}
       >
         <div className="main-container relative flex items-center justify-between py-2 font-inter">
           <Link href="/" className="logo" onClick={closeMenu}>

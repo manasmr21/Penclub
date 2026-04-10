@@ -9,10 +9,12 @@ import { AdminController } from "./admin.controller";
 import { Book } from "../books/entities/books.entity";
 import { BooksService } from "../books/books.service";
 import { Blog } from "../blog/entities/blogs.entity";
+import { Site } from "./entities/site.entity";
+import { Publisher } from "./entities/publisher.entity";
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([User, Book, Blog]),
+        TypeOrmModule.forFeature([User, Book, Blog, Site, Publisher]),
         MailModule,
         CloudinaryModule,
         JwtAuthModule
@@ -21,4 +23,4 @@ import { Blog } from "../blog/entities/blogs.entity";
     controllers: [AdminController],
     exports: [AdminService]
 })
-export class AdminModule {}
+export class AdminModule { }
