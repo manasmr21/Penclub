@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { FormEvent, useState } from "react";
-import { forgotPasswordAPi } from "@/src/lib/api";
+import { forgotPasswordAPi } from "@/src/lib/auth";
 import { extractErrorMessage } from "@/src/lib/http-client";
 
 export default function ForgotPasswordPage() {

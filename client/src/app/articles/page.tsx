@@ -56,13 +56,13 @@ export default function ArticlesPage() {
 
   return (
     <div className="main-container pt-24 pb-10">
-      <div className="max-w-5xl mx-auto px-6">
+      <div className="max-w-7xl mx-auto px-6">
         <h1 className="text-3xl font-bold text-[#1e2741]">Articles</h1>
         <p className="mt-2 text-sm text-[#697282]">Read all published articles from Pen Club authors.</p>
 
-        <div className="mt-8 grid gap-5">
+        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {articles.map((article) => (
-            <article key={article.id} className="rounded-2xl border border-[#dbe3ef] bg-white p-5 shadow-sm">
+            <article key={article.id} className="flex h-full flex-col rounded-2xl border border-[#dbe3ef] bg-white p-5 shadow-sm">
               {article.coverImage ? (
                 <div className="mb-4 overflow-hidden rounded-xl bg-slate-100">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -89,4 +89,3 @@ export default function ArticlesPage() {
     </div>
   );
 }
-

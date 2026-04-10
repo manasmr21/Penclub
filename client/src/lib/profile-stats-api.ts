@@ -11,6 +11,7 @@ export type AuthorBook = {
   description: string;
   genre: string;
   coverImage?: string;
+  createdAt?: string;
   authorId?: string;
   author?: {
     id: string;
@@ -40,13 +41,30 @@ export type AuthorArticle = {
   createdAt?: string;
 };
 
+type PaginationMeta = {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+};
+
 export async function fetchAuthorBooks(authorId: string): Promise<AuthorBook[]> {
+  const response = await fetchAuthorBooksPage(authorId, 1, 10);
+  return response.books;
+}
+
+export async function fetchAuthorBooksPage(authorId: string, page = 1, limit = 10): Promise<{ books: AuthorBook[]; pagination: PaginationMeta | null }> {
   try {
-    const { data } = await api.get(`/books/author/${authorId}`);
-    return Array.isArray(data?.books) ? (data.books as AuthorBook[]) : [];
+    const { data } = await api.get(`/books/author/${authorId}?page=${page}&limit=${limit}`);
+    return {
+      books: Array.isArray(data?.books) ? (data.books as AuthorBook[]) : [],
+      pagination: data?.pagination ?? null,
+    };
   } catch (error) {
     if (isNotFoundError(error)) {
-      return [];
+      return { books: [], pagination: null };
     }
     throw error;
   }

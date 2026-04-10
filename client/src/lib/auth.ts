@@ -1,6 +1,7 @@
-import { loginUser, registerUser, verifyUserOtp, updateUserProfile } from "./auth-api";
+import { loginUser, registerUser, verifyUserOtp, updateUserProfile, deleteUserProfile, forgotPassword, resetPassword } from "./auth-api";
 import { type AuthUser } from "./store/store";
-import { extractErrorMessage } from "./http-client";
+import { api, extractErrorMessage } from "./http-client";
+export { api };
 
 export type RegisterPayload = {
   name: string;
@@ -22,7 +23,10 @@ export type UpdateUserProfilePayload = {
   interests?: string[];
   bio?: string;
   profilePicture?: string;
+  profilePictureId?: string;
   profilePictureFile?: File;
+  socialLinks?: string[];
+  socileLinks?: string[];
 };
 
 function getErrorMessage(error: unknown) {
@@ -114,13 +118,23 @@ export async function updateProfile(
       });
     }
 
+    const socialLinks = payload.socialLinks ?? payload.socileLinks;
+    if (socialLinks?.length) {
+      socialLinks.forEach((link) => {
+        formData.append("socialLinks", link);
+      });
+    }
+
     if (payload.profilePictureFile) {
       formData.append("profilePicture", payload.profilePictureFile);
       if (user.profilePictureId) {
         formData.append("profilePictureId", user.profilePictureId);
       }
-    } else if (payload.profilePicture !== undefined) {
-      formData.append("profilePicture", payload.profilePicture);
+    } else {
+      const selectedProfilePicture = payload.profilePicture ?? payload.profilePictureId;
+      if (selectedProfilePicture !== undefined) {
+        formData.append("profilePicture", selectedProfilePicture);
+      }
     }
 
     const response = await updateUserProfile(user.id, formData);
@@ -133,5 +147,61 @@ export async function updateProfile(
     throw error;
   } finally {
     if (setLoading) setLoading(false);
+  }
+}
+
+export async function update(user: string, payload: UpdateUserProfilePayload, setLoading: (value: boolean) => void) {
+  return updateProfile(
+    { id: user, profilePictureId: payload.profilePictureId },
+    payload,
+    setLoading
+  );
+}
+
+export async function deleteUser(id: string, password: string, setLoading: (value: boolean) => void) {
+  setLoading(true);
+  try {
+    const response = await deleteUserProfile(id, password);
+    if (response.success) alert(response.message);
+    return response;
+  } catch (error) {
+    const message = getErrorMessage(error);
+    alert(message);
+    console.log(message);
+    throw error;
+  } finally {
+    setLoading(false);
+  }
+}
+
+export async function forgotPasswordAPi(email: string, setLoading: (value: boolean) => void) {
+  setLoading(true);
+  try {
+    const response = await forgotPassword(email);
+    if (response.success) alert(response.message);
+    return response;
+  } catch (error) {
+    const message = getErrorMessage(error);
+    alert(message);
+    console.log(message);
+    throw error;
+  } finally {
+    setLoading(false);
+  }
+}
+
+export async function resetUserPassword(userId: string, token: string, newPassword: string, setLoading: (value: boolean) => void) {
+  setLoading(true);
+  try {
+    const response = await resetPassword(userId, token, newPassword);
+    if (response.success) alert(response.message);
+    return response;
+  } catch (error) {
+    const message = getErrorMessage(error);
+    alert(message);
+    console.log(message);
+    throw error;
+  } finally {
+    setLoading(false);
   }
 }

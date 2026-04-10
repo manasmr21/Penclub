@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { FormEvent, useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { resetUserPassword } from "@/src/lib/api";
+import { resetUserPassword } from "@/src/lib/auth";
 import { extractErrorMessage } from "@/src/lib/http-client";
 
 function ResetPasswordContent() {

@@ -1,6 +1,6 @@
 "use client";
 
-import "./Navbar.css"
+import "../Navbar/Navbar.css"
 import { logo } from "@/public/images";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -25,6 +25,7 @@ const Navbar = () => {
   const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [currentHash, setCurrentHash] = useState("");
   const user = useAppStore((state) => state.user);
   const hydrated = useAppStore((state) => state.hydrated);
   const clearAuth = useAppStore((state) => state.clearAuth);
@@ -49,7 +50,25 @@ const Navbar = () => {
     }
   }, [menuOpen]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const syncHash = () => setCurrentHash(window.location.hash || "");
+    syncHash();
+    window.addEventListener("hashchange", syncHash);
+    return () => window.removeEventListener("hashchange", syncHash);
+  }, []);
+
   const closeMenu = () => setMenuOpen(false);
+
+  const isActiveLink = (href: string) => {
+    if (href.startsWith("#")) {
+      return isHomePage && currentHash === href;
+    }
+
+    if (href === "/bookshelf") return pathname.startsWith("/bookshelf");
+    if (href === "/articles") return pathname.startsWith("/articles");
+    return pathname === href;
+  };
 
   const handleLogout = async () => {
     setError(null);
@@ -99,7 +118,7 @@ const Navbar = () => {
     <div className="group relative">
       <Link
         href="/profile"
-        className="flex items-center gap-3 rounded-full border border-primary/15 bg-white/80 px-3 py-2 text-primary transition hover:border-primary"
+        className="flex items-center rounded-full border border-primary/15 bg-white/80 p-2 text-primary transition hover:border-primary"
         onClick={closeMenu}
       >
         <span className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-slate-100">
@@ -115,9 +134,6 @@ const Navbar = () => {
               {profileInitials}
             </span>
           )}
-        </span>
-        <span className="max-w-[120px] truncate text-sm font-semibold">
-          {user?.name}
         </span>
       </Link>
 
@@ -169,13 +185,13 @@ const Navbar = () => {
             >
               <ul className="flex gap-3">
                 {navLinks.map((link) => (
-                  <li key={link.href}>
+                  <li key={link.href} className={isActiveLink(link.href) ? "active" : ""}>
                     {link.href.startsWith("/") ? (
                       <Link href={link.href} onClick={closeMenu}>
                         {link.label}
                       </Link>
                     ) : (
-                      <a href={link.href} onClick={closeMenu}>
+                      <a href={link.href} onClick={() => { setCurrentHash(link.href); closeMenu(); }}>
                         {link.label}
                       </a>
                     )}

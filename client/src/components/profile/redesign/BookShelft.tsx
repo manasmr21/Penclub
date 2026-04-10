@@ -1,21 +1,69 @@
-import React, { FormEvent, useState } from 'react';
-import { Pencil, Star, Trash2 } from 'lucide-react';
+import React, { FormEvent, useCallback, useRef, useState } from 'react';
+import { Pencil, Trash2 } from 'lucide-react';
+import Link from "next/link";
 import type { AuthorBook } from "@/src/lib/profile-stats-api";
-import { deleteBook, updateBook } from "@/src/lib/books-api";
+import { deleteBook, fetchReviewsByBook, updateBook } from "@/src/lib/books-api";
 
 type BookShelftProps = {
   books: AuthorBook[];
   loading?: boolean;
+  loadingMore?: boolean;
+  hasMore?: boolean;
+  onLoadMore?: () => Promise<void> | void;
   onChanged?: () => Promise<void> | void;
 };
 
-const BookShelft = ({ books, loading = false, onChanged }: BookShelftProps) => {
+const BookShelft = ({ books, loading = false, loadingMore = false, hasMore = false, onLoadMore, onChanged }: BookShelftProps) => {
   const [editingBook, setEditingBook] = useState<AuthorBook | null>(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [genre, setGenre] = useState("");
   const [coverImageFile, setCoverImageFile] = useState<File | undefined>();
   const [isSaving, setIsSaving] = useState(false);
+  const [ratingsByBook, setRatingsByBook] = useState<Record<string, { average: number; count: number }>>({});
+  const observerRef = useRef<IntersectionObserver | null>(null);
+
+  const renderStars = (rating: number) => {
+    const safe = Math.max(0, Math.min(5, Math.round(rating)));
+    return "★".repeat(safe) + "☆".repeat(5 - safe);
+  };
+
+  React.useEffect(() => {
+    let isMounted = true;
+
+    const loadRatings = async () => {
+      if (!books.length) {
+        if (isMounted) setRatingsByBook({});
+        return;
+      }
+
+      const nextEntries = await Promise.all(
+        books.map(async (book) => {
+          try {
+            const reviews = await fetchReviewsByBook(book.id);
+            const total = reviews.reduce((sum, review) => sum + (review.rating || 0), 0);
+            const average = reviews.length ? total / reviews.length : 0;
+            return [book.id, { average, count: reviews.length }] as const;
+          } catch {
+            return [book.id, { average: 0, count: 0 }] as const;
+          }
+        }),
+      );
+
+      if (isMounted) {
+        setRatingsByBook((prev) => ({
+          ...prev,
+          ...Object.fromEntries(nextEntries),
+        }));
+      }
+    };
+
+    void loadRatings();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [books]);
 
   function openEditModal(book: AuthorBook) {
     setEditingBook(book);
@@ -68,6 +116,22 @@ const BookShelft = ({ books, loading = false, onChanged }: BookShelftProps) => {
     }
   }
 
+  const setSentinelRef = useCallback((node: HTMLDivElement | null) => {
+    if (observerRef.current) observerRef.current.disconnect();
+    if (!node || !hasMore || loadingMore) return;
+
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        const first = entries[0];
+        if (!first?.isIntersecting) return;
+        void onLoadMore?.();
+      },
+      { threshold: 0.2 },
+    );
+
+    observerRef.current.observe(node);
+  }, [hasMore, loadingMore, onLoadMore]);
+
   if (loading) {
     return (
       <div className="w-full pb-16">
@@ -93,12 +157,12 @@ const BookShelft = ({ books, loading = false, onChanged }: BookShelftProps) => {
       <div className="max-w-4xl mx-auto">
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-8 gap-y-12">
           {books.map((book) => (
-            <div key={book.id} className="relative flex flex-col group cursor-pointer w-full max-w-56 mx-auto">
+            <div key={book.id} className="relative flex flex-col group w-full max-w-56 mx-auto">
               <div className="absolute top-2 right-2 z-10 flex items-center gap-1.5">
                 <button
                   type="button"
                   onClick={() => openEditModal(book)}
-                  className="h-7 w-7 grid place-items-center rounded-full bg-white/90 text-[#1e2741] shadow-sm hover:bg-white opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="h-7 w-7 grid place-items-center rounded-full bg-white text-[#1e2741] shadow-sm hover:bg-slate-100"
                   aria-label={`Edit ${book.title}`}
                 >
                   <Pencil size={14} />
@@ -106,34 +170,48 @@ const BookShelft = ({ books, loading = false, onChanged }: BookShelftProps) => {
                 <button
                   type="button"
                   onClick={() => handleDelete(book.id)}
-                  className="h-7 w-7 grid place-items-center rounded-full bg-white/90 text-red-600 shadow-sm hover:bg-white opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="h-7 w-7 grid place-items-center rounded-full bg-white text-red-600 shadow-sm hover:bg-red-50"
                   aria-label={`Delete ${book.title}`}
                 >
                   <Trash2 size={14} />
                 </button>
               </div>
 
-              <div className="w-full aspect-[2/3] mb-6 bg-gray-200">
-                {book.coverImage ? (
-                  <img src={book.coverImage} alt={book.title} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full grid place-items-center text-on-surface-variant/70 text-sm px-4 text-center">
-                    No cover image
-                  </div>
-                )}
-              </div>
-
-              <div className="flex flex-col px-1">
-                <h3 className="text-[17px] font-bold text-[#1e2741] tracking-normal leading-snug">{book.title}</h3>
-                <p className="text-[#697282] italic text-[15px] mt-[2px] font-serif capitalize">{book.genre}</p>
-                <div className="flex gap-[3px] mt-2.5">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} size={12} className="fill-[#ffaf8e] text-[#ffaf8e]" />
-                  ))}
+              <Link href={`/bookshelf/${book.id}?from=profile`} className="block">
+                <div className="w-full aspect-[2/3] mb-6 bg-gray-200">
+                  {book.coverImage ? (
+                    <img src={book.coverImage} alt={book.title} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full grid place-items-center text-on-surface-variant/70 text-sm px-4 text-center">
+                      No cover image
+                    </div>
+                  )}
                 </div>
-              </div>
+
+                <div className="flex flex-col px-1">
+                  <h3 className="text-[17px] font-bold text-[#1e2741] tracking-normal leading-snug">{book.title}</h3>
+                  <p className="text-[#697282] italic text-[15px] mt-[2px] font-serif capitalize">{book.genre}</p>
+                  <p className="mt-2.5 text-[13px] text-[#f5b301]">
+                    {renderStars(ratingsByBook[book.id]?.average ?? 0)}
+                    {" "}
+                    <span className="text-[#697282]">
+                      ({ratingsByBook[book.id]?.count ?? 0})
+                    </span>
+                  </p>
+                </div>
+              </Link>
             </div>
           ))}
+        </div>
+
+        <div className="mt-8">
+          {loadingMore && (
+            <p className="text-center text-sm text-on-surface-variant/70">Loading more books...</p>
+          )}
+          {!hasMore && books.length > 0 && (
+            <p className="text-center text-sm text-on-surface-variant/70">You have reached the end.</p>
+          )}
+          <div ref={setSentinelRef} className="h-4 w-full" />
         </div>
       </div>
 

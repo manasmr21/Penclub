@@ -1,12 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useState, useEffect } from "react";
+import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
 import { createBook } from "@/src/lib/books-api";
 import { useAppStore } from "@/src/lib/store/store";
 import { extractErrorMessage } from "@/src/lib/http-client";
 
 export default function AddBookPage() {
+  const router = useRouter();
   const user = useAppStore((s) => s.user);
   const hydrated = useAppStore((s) => s.hydrated);
   const setError = useAppStore((s) => s.setError);
@@ -18,20 +20,10 @@ export default function AddBookPage() {
   const [purchaseLinksInput, setPurchaseLinksInput] = useState("");
   const [coverImageFile, setCoverImageFile] = useState<File | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [message, setMessage] = useState("");
-
-  // Clear the message popup after 5 seconds
-  useEffect(() => {
-    if (message) {
-      const timer = setTimeout(() => setMessage(""), 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [message]);
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setIsSubmitting(true);
-    setMessage("");
     setError(null);
 
     try {
@@ -49,17 +41,18 @@ export default function AddBookPage() {
         coverImageFile,
       });
 
-      setMessage(response?.message ?? "Book submitted successfully!");
+      alert(response?.message ?? "Book submitted successfully!");
       setTitle("");
       setDescription("");
       setGenre("");
       setReleaseDate("");
       setPurchaseLinksInput("");
       setCoverImageFile(undefined);
+      router.push("/profile?tab=Bookshelf");
     } catch (error) {
       const message = extractErrorMessage(error, "Failed to submit book.");
       setError(message);
-      setMessage(message);
+      alert(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -94,19 +87,6 @@ export default function AddBookPage() {
 
   return (
     <div className="relative mx-auto max-w-xl mt-24 mb-12 rounded-2xl border border-[var(--border)] bg-[var(--card)] p-8 shadow-sm">
-      {/* Pop-up Message Box */}
-      {message && (
-        <div className="fixed bottom-5 right-5 z-50 animate-in fade-in slide-in-from-bottom-4 duration-300">
-          <div className="flex items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--card)] p-4 shadow-2xl">
-            <div className={`h-2 w-2 rounded-full ${message.includes("Failed") ? "bg-red-500" : "bg-green-500"}`} />
-            <p className="text-sm font-medium text-[var(--foreground)]">{message}</p>
-            <button onClick={() => setMessage("")} className="ml-2 text-[var(--muted-foreground)] hover:text-[var(--foreground)]">
-              x
-            </button>
-          </div>
-        </div>
-      )}
-
       <div className="mb-8">
         <h1 className="text-2xl font-extrabold text-center text-[var(--foreground)]">Add Book</h1>
       </div>
@@ -187,4 +167,3 @@ export default function AddBookPage() {
     </div>
   );
 }
-
