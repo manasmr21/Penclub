@@ -69,6 +69,11 @@ export class AdminController {
         return await this.adminService.permanentDeleteBlog(req, blogId);
     }
 
+    @Get("site")
+    async getSiteData() {
+        return await this.adminService.getSiteData();
+    }
+
     @Put("site/update")
     @UseGuards(AuthGuard("jwt"))
     async updateSiteConfig(@Request() req: any, @Body() dto: SiteUpdateDto) {

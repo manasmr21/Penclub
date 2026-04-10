@@ -72,6 +72,9 @@ export class Book {
     @Column({nullable: true})
     trial: string
 
+    @Column({ default: 0 })
+    likesCount: number
+
     @OneToMany(() => Review, (reviews) => reviews.book)
     reviews: Review[]
 

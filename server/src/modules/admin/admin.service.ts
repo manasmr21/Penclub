@@ -492,7 +492,21 @@ export class AdminService {
     }
 
 
-    //Admin functions
+    //Site APIs
+    async getSiteData() {
+        try {
+            const siteData = await this.siteRepository.findOne({ where: {} });
+            
+            return {
+                success: true,
+                message: "Site data fetched successfully",
+                siteData
+            };
+        } catch (error) {
+            throw this.handleServiceError(error);
+        }
+    }
+
     async siteUpdate(req: any, dto: SiteUpdateDto) {
         try {
             const userRole = req.user?.role;
@@ -590,7 +604,7 @@ export class AdminService {
     async softDeletePublisher(req: any, publisherId: string) {
         try {
             if (req.user?.role !== "admin") throw new UnauthorizedException({ success: false, message: "Unauthorized" });
-            
+
             const publisher = await this.publisherRepository.findOne({ where: { publisherId } });
             if (!publisher) throw new NotFoundException({ success: false, message: "Publisher not found" });
 
@@ -602,7 +616,7 @@ export class AdminService {
     async permanentDeletePublisher(req: any, publisherId: string) {
         try {
             if (req.user?.role !== "admin") throw new UnauthorizedException({ success: false, message: "Unauthorized" });
-            
+
             const publisher = await this.publisherRepository.findOne({ where: { publisherId }, withDeleted: true });
             if (!publisher) throw new NotFoundException({ success: false, message: "Publisher not found" });
 

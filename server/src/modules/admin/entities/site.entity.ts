@@ -30,9 +30,6 @@ export class Site {
   @Column({ nullable: true })
   logoId?: string;
 
-  @Column({ nullable: true })
-  apiKey?: string;
-
   @CreateDateColumn()
   createdAt: Date;
 
