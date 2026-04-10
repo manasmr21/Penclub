@@ -121,7 +121,7 @@ export class BooksService {
                 .where("book.authorId = :authorId", { authorId })
                 .andWhere("book.approved = true")
                 .andWhere("book.state = :state", { state: "approved" })
-                .select(["book.id", "book.title", "book.description", "book.genre", "book.coverImage",])
+                .select(["book.id", "book.title", "book.description", "book.genre", "book.coverImage", "book.createdAt"])
                 .orderBy("book.createdAt", "DESC")
                 .skip(skip)
                 .take(currentLimit)
