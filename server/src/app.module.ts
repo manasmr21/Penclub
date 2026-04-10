@@ -12,6 +12,7 @@ import { CommentsModule } from './modules/comments/comments.module';
 import { ReviewModule } from './modules/reviews/review.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { LikesModule } from './modules/likes/likes.module';
+import { ReadlistModule } from './modules/readlist/readlist.module';
 
 @Module({
   imports: [
@@ -27,7 +28,8 @@ import { LikesModule } from './modules/likes/likes.module';
     CommentsModule,
     ReviewModule,
     AdminModule,
-    LikesModule
+    LikesModule,
+    ReadlistModule
   ],
   controllers: [AppController],
   providers: [AppService],
