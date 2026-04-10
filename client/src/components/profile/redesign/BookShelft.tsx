@@ -18,7 +18,7 @@ const BookShelft = ({ books, loading = false, loadingMore = false, hasMore = fal
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [genre, setGenre] = useState("");
-  const [coverImageFile, setCoverImageFile] = useState<File | undefined>();
+  const [coverImageFiles, setCoverImageFiles] = useState<File[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [ratingsByBook, setRatingsByBook] = useState<Record<string, { average: number; count: number }>>({});
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -65,12 +65,17 @@ const BookShelft = ({ books, loading = false, loadingMore = false, hasMore = fal
     };
   }, [books]);
 
+  const getBookPrimaryImage = (book: AuthorBook) => {
+    if (book.coverImage) return book.coverImage;
+    return book.images?.[0]?.url;
+  };
+
   function openEditModal(book: AuthorBook) {
     setEditingBook(book);
     setTitle(book.title || "");
     setDescription(book.description || "");
     setGenre(book.genre || "");
-    setCoverImageFile(undefined);
+    setCoverImageFiles([]);
   }
 
   function closeEditModal() {
@@ -78,7 +83,7 @@ const BookShelft = ({ books, loading = false, loadingMore = false, hasMore = fal
     setTitle("");
     setDescription("");
     setGenre("");
-    setCoverImageFile(undefined);
+    setCoverImageFiles([]);
   }
 
   async function handleEditSubmit(e: FormEvent<HTMLFormElement>) {
@@ -91,7 +96,7 @@ const BookShelft = ({ books, loading = false, loadingMore = false, hasMore = fal
         title,
         description,
         genre,
-        coverImageFile,
+        coverImageFiles,
       });
       closeEditModal();
       await onChanged?.();
@@ -179,8 +184,8 @@ const BookShelft = ({ books, loading = false, loadingMore = false, hasMore = fal
 
               <Link href={`/bookshelf/${book.id}?from=profile`} className="block">
                 <div className="w-full aspect-[2/3] mb-6 bg-gray-200">
-                  {book.coverImage ? (
-                    <img src={book.coverImage} alt={book.title} className="w-full h-full object-cover" />
+                  {getBookPrimaryImage(book) ? (
+                    <img src={getBookPrimaryImage(book)} alt={book.title} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full grid place-items-center text-on-surface-variant/70 text-sm px-4 text-center">
                       No cover image
@@ -244,9 +249,11 @@ const BookShelft = ({ books, loading = false, loadingMore = false, hasMore = fal
               <input
                 type="file"
                 accept="image/*"
+                multiple
                 className="w-full border rounded-md p-3"
-                onChange={(e) => setCoverImageFile(e.target.files?.[0])}
+                onChange={(e) => setCoverImageFiles(Array.from(e.target.files ?? []))}
               />
+              {!!coverImageFiles.length && <p className="text-xs text-gray-500">{coverImageFiles.length} image(s) selected</p>}
               <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"

@@ -10,7 +10,39 @@ import { followAuthor } from "@/src/lib/auth-api";
 
 function renderStars(rating: number) {
   const safeRating = Math.max(0, Math.min(5, Math.round(rating)));
-  return "\u2605".repeat(safeRating) + "\u2606".repeat(5 - safeRating);
+  return Array.from({ length: 5 }, (_, index) => index < safeRating);
+}
+
+function formatPublishedDate(dateInput?: string) {
+  if (!dateInput) return "Unknown";
+  const date = new Date(dateInput);
+  if (Number.isNaN(date.getTime())) return "Unknown";
+  return new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric" }).format(date);
+}
+
+function formatRelativeTime(dateInput?: string) {
+  if (!dateInput) return "Recently";
+  const date = new Date(dateInput);
+  if (Number.isNaN(date.getTime())) return "Recently";
+
+  const diffMs = date.getTime() - Date.now();
+  const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+  const formatter = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
+
+  if (Math.abs(diffDays) < 1) return "Today";
+  if (Math.abs(diffDays) < 30) return formatter.format(diffDays, "day");
+
+  const diffMonths = Math.round(diffDays / 30);
+  if (Math.abs(diffMonths) < 12) return formatter.format(diffMonths, "month");
+
+  const diffYears = Math.round(diffMonths / 12);
+  return formatter.format(diffYears, "year");
+}
+
+function getInitials(name?: string) {
+  if (!name?.trim()) return "RD";
+  const parts = name.trim().split(/\s+/).slice(0, 2);
+  return parts.map((part) => part[0]?.toUpperCase() ?? "").join("") || "RD";
 }
 
 export default function BookDetailsPage() {
@@ -32,6 +64,7 @@ export default function BookDetailsPage() {
   const [submitting, setSubmitting] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   useEffect(() => {
     if (!bookId) return;
@@ -81,6 +114,27 @@ export default function BookDetailsPage() {
     const total = reviews.reduce((sum, review) => sum + (review.rating || 0), 0);
     return total / reviews.length;
   }, [reviews]);
+  const bookImageUrls = useMemo(() => {
+    if (!book) return [];
+    const urls = (book.images ?? []).map((image) => image?.url).filter((url): url is string => Boolean(url));
+    if (book.coverImage && !urls.includes(book.coverImage)) {
+      return [book.coverImage, ...urls];
+    }
+    return urls;
+  }, [book]);
+  const mainImage = selectedImage ?? bookImageUrls[0] ?? null;
+  const roundedAverageRating = useMemo(() => Math.round(averageRating * 10) / 10, [averageRating]);
+  const ratingDistribution = useMemo(() => {
+    const totalReviews = reviews.length || 1;
+    return [5, 4, 3, 2, 1].map((star) => {
+      const count = reviews.filter((review) => Math.round(review.rating || 0) === star).length;
+      return {
+        star,
+        count,
+        width: `${Math.max(4, Math.round((count / totalReviews) * 100))}%`,
+      };
+    });
+  }, [reviews]);
 
   const canReview = Boolean(user && user.isEmailVerified);
   const canFollowAuthor = Boolean(user && user.role === "reader" && book?.authorId && user.id !== book.authorId);
@@ -104,6 +158,10 @@ export default function BookDetailsPage() {
     const followedAuthors = followedAuthorsByUser[user.id] ?? [];
     setIsFollowing(followedAuthors.includes(book.authorId));
   }, [user?.id, book?.authorId, followedAuthorsByUser]);
+
+  useEffect(() => {
+    setSelectedImage(bookImageUrls[0] ?? null);
+  }, [bookImageUrls]);
 
   const handleFollowAuthor = async () => {
     if (!book?.authorId || !canFollowAuthor || !user?.id) return;
@@ -171,19 +229,21 @@ export default function BookDetailsPage() {
 
   if (loading) {
     return (
-      <div className="main-container pt-24 pb-10">
-        <div className="max-w-4xl mx-auto px-6 py-20 text-center text-on-surface-variant/70">Loading book details...</div>
+      <div className="main-container px-4 md:px-8 pt-28 pb-16">
+        <div className="mx-auto max-w-4xl rounded-2xl border border-border bg-card p-12 text-center text-muted-foreground">
+          Loading book details...
+        </div>
       </div>
     );
   }
 
   if (!book) {
     return (
-      <div className="main-container pt-24 pb-10">
-        <div className="max-w-4xl mx-auto px-6 py-20 text-center text-on-surface-variant/70">
+      <div className="main-container px-4 md:px-8 pt-28 pb-16">
+        <div className="mx-auto max-w-4xl rounded-2xl border border-border bg-card p-12 text-center text-muted-foreground">
           Book not found.
           <div className="mt-4">
-            <Link href={backHref} className="text-[#1e2741] underline">
+            <Link href={backHref} className="font-medium text-primary underline">
               {backLabel}
             </Link>
           </div>
@@ -193,128 +253,231 @@ export default function BookDetailsPage() {
   }
 
   return (
-    <div className="main-container pt-24 pb-10">
-      <div className="max-w-4xl mx-auto px-6">
-        <Link href={backHref} className="text-[14px] text-[#1e2741] underline">
-          {backLabel}
-        </Link>
+    <div className="main-container px-4 md:px-8 pt-28 pb-16">
+      <Link
+        href={backHref}
+        className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary transition hover:-translate-x-1"
+      >
+        <span aria-hidden="true">&larr;</span>
+        {backLabel}
+      </Link>
 
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-[220px_1fr] gap-8">
-          <div className="w-full aspect-[2/3] bg-gray-200 rounded-md overflow-hidden">
-            {book.coverImage ? (
+      <section className="mt-10 grid grid-cols-1 items-start gap-8 lg:grid-cols-12 lg:gap-10">
+        <div className="relative lg:col-span-3">
+          <div className="mx-auto aspect-[3/4] max-w-[260px] overflow-hidden rounded-xl border border-border bg-muted shadow-xl">
+            {mainImage ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={book.coverImage} alt={book.title} className="w-full h-full object-cover" />
+              <img src={mainImage} alt={book.title} className="h-full w-full object-cover" />
             ) : (
-              <div className="w-full h-full grid place-items-center text-on-surface-variant/70 text-sm px-4 text-center">
-                No cover image
+              <div className="grid h-full w-full place-items-center px-4 text-center text-sm text-muted-foreground">
+                No cover image available
               </div>
             )}
           </div>
-
-          <div>
-            <h1 className="text-3xl font-bold text-[#1e2741]">{book.title}</h1>
-            <p className="text-[#697282] italic text-[15px] mt-2 font-serif capitalize">{book.genre}</p>
-            <div className="mt-3 flex items-center gap-3">
-              <p className="text-[#3b4a64] text-[15px]">Author: {authorName}</p>
-              {canFollowAuthor && (
-                <button
-                  type="button"
-                  onClick={handleFollowAuthor}
-                  disabled={followLoading}
-                  className="h-8 rounded-md border border-[#1e2741] px-3 text-xs font-semibold text-[#1e2741] transition hover:bg-[#f5f7fb] disabled:opacity-60"
-                >
-                  {followLoading ? "Please wait..." : isFollowing ? "Following" : "Follow"}
-                </button>
-              )}
-            </div>
-
-            <section className="mt-6">
-              <h2 className="text-xl font-bold text-[#1e2741]">Ratings</h2>
-              {reviews.length ? (
-                <p className="mt-2 text-[14px] text-[#f5b301]">
-                  {renderStars(averageRating)} ({reviews.length} review{reviews.length > 1 ? "s" : ""})
-                </p>
-              ) : (
-                <p className="mt-2 text-[14px] text-[#697282]">No ratings yet.</p>
-              )}
-            </section>
-
-            <section className="mt-6">
-              <h2 className="text-xl font-bold text-[#1e2741]">Comments & Reviews</h2>
-              <div className="mt-4 space-y-3">
-                {reviews.length ? (
-                  reviews.map((review) => (
-                    <article key={review.id} className="rounded-md border border-[#dbe3ef] bg-white px-4 py-3">
-                      <p className="text-[13px] text-[#f5b301]">{renderStars(review.rating)}</p>
-                      <p className="mt-2 text-[14px] text-[#1e2741]">{review.content?.trim() || "No written comment."}</p>
-                      <p className="mt-2 text-[12px] text-[#697282]">
-                        By {review.user?.name || review.user?.username || "Reader"}
-                      </p>
-                    </article>
-                  ))
-                ) : (
-                  <p className="text-[14px] text-[#697282]">No comments or reviews yet.</p>
-                )}
-              </div>
-            </section>
-
-            <section className="mt-8">
-              <h2 className="text-xl font-bold text-[#1e2741]">
-                {myReview ? "Edit Your Rating & Comment" : "Add Your Rating & Comment"}
-              </h2>
-              {canReview ? (
-                <form className="mt-4 space-y-3" onSubmit={handleSubmitReview}>
-                  <div>
-                    <p className="text-[13px] text-[#3b4a64]">
-                      Rating
-                    </p>
-                    <div className="mt-1 flex items-center gap-1">
-                      {[1, 2, 3, 4, 5].map((value) => (
-                        <button
-                          key={value}
-                          type="button"
-                          onClick={() => setRating(value)}
-                          aria-label={`Set rating to ${value} star${value > 1 ? "s" : ""}`}
-                          className="text-2xl leading-none text-[#f5b301]"
-                        >
-                          {value <= rating ? "\u2605" : "\u2606"}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label htmlFor="content" className="text-[13px] text-[#3b4a64]">
-                      Comment
-                    </label>
-                    <textarea
-                      id="content"
-                      value={content}
-                      onChange={(e) => setContent(e.target.value)}
-                      rows={4}
-                      placeholder="Write your review..."
-                      className="mt-1 w-full rounded-md border border-[#dbe3ef] p-3 text-sm text-[#1e2741] outline-none"
-                    />
-                  </div>
-
+          {bookImageUrls.length > 1 && (
+            <div className="mx-auto mt-3 flex max-w-[260px] items-center gap-2 overflow-x-auto pb-1">
+              {bookImageUrls.map((url, index) => {
+                const isActive = url === mainImage;
+                return (
                   <button
-                    type="submit"
-                    disabled={submitting}
-                    className="rounded-md bg-[#1e2741] px-4 py-2 text-sm font-semibold text-white transition disabled:opacity-60"
+                    key={`${url}-${index}`}
+                    type="button"
+                    onClick={() => setSelectedImage(url)}
+                    className={`h-14 w-12 shrink-0 overflow-hidden rounded-md border bg-muted transition ${
+                      isActive ? "border-primary ring-1 ring-primary/40" : "border-border"
+                    }`}
+                    aria-label={`View image ${index + 1}`}
                   >
-                    {submitting ? "Saving..." : myReview ? "Update Review" : "Submit Review"}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={url} alt={`${book.title} thumbnail ${index + 1}`} className="h-full w-full object-cover" />
                   </button>
-                </form>
-              ) : (
-                <p className="mt-3 text-[14px] text-[#697282]">
-                  Only verified users can add rating and comment.
-                </p>
-              )}
-            </section>
+                );
+              })}
+            </div>
+          )}
+          <div className="pointer-events-none absolute -bottom-6 -right-6 h-24 w-24 rounded-full bg-secondary/20 blur-2xl" />
+        </div>
 
+        <div className="lg:col-span-6">
+          <div className="mb-5 flex flex-wrap items-center gap-3">
+            <span className="rounded-full bg-primary/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
+              {book.genre || "General"}
+            </span>
+            <span className="rounded-full bg-secondary/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-secondary">
+              Featured
+            </span>
+          </div>
+
+          <h1 className="font-quicksand text-3xl font-bold tracking-tight text-primary md:text-4xl">{book.title}</h1>
+
+          <div className="mt-1 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+            <p className="italic">
+              by <span className="not-italic font-semibold text-foreground">{authorName}</span>
+            </p>
+            {canFollowAuthor && (
+              <button
+                type="button"
+                onClick={handleFollowAuthor}
+                disabled={followLoading}
+                className=" text-xs font-semibold lowercase tracking-[0.12em] text-primary transition hover:bg-primary/10 disabled:opacity-60"
+              >
+                {followLoading ? "Please wait..." : isFollowing ? "Following" : "Follow author"}
+              </button>
+            )}
+          </div>
+
+          <div className="mt-6">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">First Published</p>
+            <p className="mt-1 text-base font-semibold text-foreground">{formatPublishedDate(book.createdAt)}</p>
+          </div>
+
+          <p className="mt-8 max-w-3xl text-base leading-relaxed text-muted-foreground">
+            {book.description?.trim() || "No description provided for this book yet."}
+          </p>
+
+          <div className="mt-8 flex flex-wrap gap-3">
+            <button className="rounded-full bg-primary px-6 py-3 text-xs font-bold uppercase tracking-[0.16em] text-primary-foreground transition hover:opacity-90">
+              Read now
+            </button>
+            <button className="rounded-full border border-border bg-card px-6 py-3 text-xs font-bold uppercase tracking-[0.16em] text-primary transition hover:bg-muted/60">
+              Add to Readlist
+            </button>
           </div>
         </div>
-      </div>
+
+        <div className="lg:col-span-3">
+          <div className="relative overflow-hidden rounded-xl bg-primary p-6 text-primary-foreground shadow-xl">
+            <h3 className="mb-4 text-[11px] font-semibold uppercase tracking-[0.22em] opacity-80">Reader Consensus</h3>
+            <div className="mb-2 flex items-baseline gap-2">
+              <span className="text-5xl font-bold md:text-6xl">{roundedAverageRating.toFixed(1)}</span>
+              <span className="text-lg opacity-70">/ 5.0</span>
+            </div>
+            <div className="mb-5 flex items-center gap-1 text-2xl leading-none text-[#f5c542]">
+              {renderStars(averageRating).map((filled, index) => (
+                <span key={`avg-star-${index}`} aria-hidden="true">
+                  {filled ? "\u2605" : "\u2606"}
+                </span>
+              ))}
+            </div>
+
+            <div className="space-y-3">
+              {ratingDistribution.map(({ star, width }) => (
+                <div key={star} className="flex items-center gap-3">
+                  <span className="w-3 text-xs font-semibold">{star}</span>
+                  <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-primary-foreground/20">
+                    <div className="h-full rounded-full bg-secondary" style={{ width }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="pointer-events-none absolute -right-10 -top-8 h-28 w-28 rounded-full bg-primary-foreground/10 blur-2xl" />
+          </div>
+        </div>
+      </section>
+
+      <section className="mt-16 grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10">
+        <div className="lg:col-span-9">
+          <div className="mb-8 flex flex-wrap items-end justify-between gap-3">
+            <h2 className="font-quicksand text-3xl font-bold text-primary md:text-4xl">Comments &amp; Reviews</h2>
+            <span className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              {reviews.length} Discussion{reviews.length === 1 ? "" : "s"}
+            </span>
+          </div>
+
+          <div className="space-y-5">
+            {reviews.length ? (
+              reviews.map((review) => {
+                const reviewerName = review.user?.name || review.user?.username || "Reader";
+                return (
+                  <article key={review.id} className="rounded-xl border border-border bg-card p-4">
+                    <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <div className="grid h-10 w-10 place-items-center rounded-full bg-secondary/20 text-sm font-bold text-primary">
+                          {getInitials(reviewerName)}
+                        </div>
+                        <div>
+                          <p className="font-semibold text-foreground">{reviewerName}</p>
+                          <p className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+                            Verified Reader &bull; {formatRelativeTime(review.createdAt)}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 text-lg leading-none text-[#d4a017]">
+                        {renderStars(review.rating).map((filled, index) => (
+                          <span key={`${review.id}-star-${index}`} aria-hidden="true">
+                            {filled ? "\u2605" : "\u2606"}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <p className="leading-relaxed text-muted-foreground">
+                      {review.content?.trim() || "No written comment shared for this rating."}
+                    </p>
+                  </article>
+                );
+              })
+            ) : (
+              <div className="rounded-2xl border border-border bg-card p-6 text-muted-foreground">
+                No comments or reviews yet.
+              </div>
+            )}
+          </div>
+        </div>
+
+        <aside className="space-y-8 lg:col-span-3">
+          <div className="rounded-xl border border-border bg-card p-5">
+            <h3 className="text-xl font-bold text-primary">{myReview ? "Edit Your Thoughts" : "Share Your Thoughts"}</h3>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              Your perspective helps readers discover what to pick up next.
+            </p>
+
+            {canReview ? (
+              <form className="mt-5 space-y-4" onSubmit={handleSubmitReview}>
+                <div className="rounded-lg border border-border bg-background p-2.5">
+                  <div className="flex items-center justify-center gap-1 text-2xl leading-none text-[#d4a017]">
+                    {[1, 2, 3, 4, 5].map((value) => (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => setRating(value)}
+                        aria-label={`Set rating to ${value} star${value > 1 ? "s" : ""}`}
+                        className="transition hover:scale-110"
+                      >
+                        {value <= rating ? "\u2605" : "\u2606"}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="content" className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                    Comment
+                  </label>
+                  <textarea
+                    id="content"
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                    rows={4}
+                    placeholder="Write your review..."
+                    className="mt-2 w-full rounded-xl border border-border bg-background p-3 text-sm text-foreground outline-none focus:border-primary/50"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="w-full rounded-full bg-primary px-5 py-3 text-xs font-bold uppercase tracking-[0.14em] text-primary-foreground transition hover:opacity-90 disabled:opacity-60"
+                >
+                  {submitting ? "Saving..." : myReview ? "Update Rating & Comment" : "Add Your Rating & Comment"}
+                </button>
+              </form>
+            ) : (
+              <p className="mt-4 text-sm text-muted-foreground">Only verified users can add rating and comment.</p>
+            )}
+          </div>
+        </aside>
+      </section>
     </div>
   );
 }

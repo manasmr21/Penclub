@@ -15,6 +15,11 @@ function renderStars(rating: number) {
   return "★".repeat(safe) + "☆".repeat(5 - safe);
 }
 
+function getBookPrimaryImage(book: AuthorBook) {
+  if (book.coverImage) return book.coverImage;
+  return book.images?.[0]?.url;
+}
+
 export default function BookshelfPage() {
   const [books, setBooks] = useState<BookWithRating[]>([]);
   const [searchInput, setSearchInput] = useState("");
@@ -163,9 +168,9 @@ export default function BookshelfPage() {
             <Link key={book.id} href={`/bookshelf/${book.id}?from=bookshelf`} className="block">
               <article className="flex flex-col w-full transition-transform duration-200 hover:-translate-y-1">
                 <div className="w-full aspect-[2/3] mb-5 bg-gray-200 rounded-md overflow-hidden">
-                  {book.coverImage ? (
+                  {getBookPrimaryImage(book) ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={book.coverImage} alt={book.title} className="w-full h-full object-cover" />
+                    <img src={getBookPrimaryImage(book)} alt={book.title} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full grid place-items-center text-on-surface-variant/70 text-sm px-4 text-center">
                       No cover image
@@ -196,3 +201,4 @@ export default function BookshelfPage() {
     </div>
   );
 }
+

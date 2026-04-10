@@ -18,7 +18,7 @@ export default function AddBookPage() {
   const [genre, setGenre] = useState("");
   const [releaseDate, setReleaseDate] = useState("");
   const [purchaseLinksInput, setPurchaseLinksInput] = useState("");
-  const [coverImageFile, setCoverImageFile] = useState<File | undefined>();
+  const [coverImageFiles, setCoverImageFiles] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
@@ -38,7 +38,7 @@ export default function AddBookPage() {
         genre,
         releaseDate: releaseDate || undefined,
         purchaseLinks,
-        coverImageFile,
+        coverImageFiles,
       });
 
       alert(response?.message ?? "Book submitted successfully!");
@@ -47,7 +47,7 @@ export default function AddBookPage() {
       setGenre("");
       setReleaseDate("");
       setPurchaseLinksInput("");
-      setCoverImageFile(undefined);
+      setCoverImageFiles([]);
       router.push("/profile?tab=Bookshelf");
     } catch (error) {
       const message = extractErrorMessage(error, "Failed to submit book.");
@@ -147,13 +147,17 @@ export default function AddBookPage() {
         </div>
 
         <div className="space-y-1.5">
-          <label className="ml-1 block text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted-foreground)]">Cover Image</label>
+          <label className="ml-1 block text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted-foreground)]">Book Images</label>
           <input
             className={`block w-full cursor-pointer rounded-xl border border-[var(--border)] ${inputBgClass} text-sm text-[var(--muted-foreground)] file:mr-4 file:h-11 file:border-0 file:bg-[var(--primary)] file:px-4 file:text-sm file:font-semibold file:text-[var(--primary-foreground)] hover:file:opacity-90`}
             type="file"
             accept="image/*"
-            onChange={(e) => setCoverImageFile(e.target.files?.[0])}
+            multiple
+            onChange={(e) => setCoverImageFiles(Array.from(e.target.files ?? []))}
           />
+          {!!coverImageFiles.length && (
+            <p className="text-xs text-[var(--muted-foreground)]">{coverImageFiles.length} image(s) selected</p>
+          )}
         </div>
 
         <button

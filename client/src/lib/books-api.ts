@@ -9,6 +9,7 @@ export type CreateBookPayload = {
   releaseDate?: string;
   purchaseLinks?: string[];
   coverImageFile?: File;
+  coverImageFiles?: File[];
 };
 
 export type CreateArticlePayload = {
@@ -27,6 +28,7 @@ export type UpdateBookPayload = {
   releaseDate?: string;
   purchaseLinks?: string[];
   coverImageFile?: File;
+  coverImageFiles?: File[];
 };
 
 export type UpdateArticlePayload = {
@@ -182,9 +184,13 @@ export async function createBook(payload: CreateBookPayload) {
     });
   }
 
-  if (payload.coverImageFile) {
-    formData.append("coverImage", payload.coverImageFile);
-  }
+  const files = payload.coverImageFiles?.length
+    ? payload.coverImageFiles
+    : payload.coverImageFile
+      ? [payload.coverImageFile]
+      : [];
+
+  files.forEach((file) => formData.append("images", file));
 
   const { data } = await api.post("/books/create", formData);
   return data;
@@ -223,9 +229,13 @@ export async function updateBook(bookId: string, payload: UpdateBookPayload) {
     payload.purchaseLinks.forEach((link) => formData.append("purchaseLinks", link));
   }
 
-  if (payload.coverImageFile) {
-    formData.append("coverImage", payload.coverImageFile);
-  }
+  const files = payload.coverImageFiles?.length
+    ? payload.coverImageFiles
+    : payload.coverImageFile
+      ? [payload.coverImageFile]
+      : [];
+
+  files.forEach((file) => formData.append("images", file));
 
   const { data } = await api.put(`/books/update/${bookId}`, formData);
   return data;

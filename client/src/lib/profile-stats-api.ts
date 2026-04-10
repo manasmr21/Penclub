@@ -11,6 +11,10 @@ export type AuthorBook = {
   description: string;
   genre: string;
   coverImage?: string;
+  images?: Array<{
+    url: string;
+    publicId?: string;
+  }>;
   createdAt?: string;
   authorId?: string;
   author?: {
