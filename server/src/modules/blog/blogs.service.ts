@@ -184,6 +184,11 @@ export class BlogsService {
 
             const createdBlog = await this.blogsRepository.save(blogMns);
 
+            await this.userRepository.query(
+                `UPDATE users SET "blogsId" = array_append("blogsId", $1) WHERE id = $2`,
+                [createdBlog.id, dto.userId]
+            );
+
             return {
                 success: true,
                 message: "Blog posted successfully",
@@ -264,12 +269,21 @@ export class BlogsService {
                 message: "You are not authorized to delete a blog"
             })
 
-            const blog = await this.blogsRepository.delete(id)
+            const blog = await this.blogsRepository.findOne({ where: { id } });
 
-            if (blog.affected === 0) throw new NotFoundException({
+            const deleteResult = await this.blogsRepository.delete(id)
+
+            if (deleteResult.affected === 0) throw new NotFoundException({
                 success: false,
                 message: "Blog not found, error in deleting the blog"
             })
+
+            if (blog) {
+                await this.userRepository.query(
+                    `UPDATE users SET "blogsId" = array_remove("blogsId", $1) WHERE id = $2`,
+                    [id, blog.userId]
+                );
+            }
 
             //@ts-expect-error
             const response = await this.cloudinaryService.deleteImage(coverImageId.coverImageId);

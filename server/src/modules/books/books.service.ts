@@ -199,6 +199,11 @@ export class BooksService {
 
             const createdBook = await this.booksRepository.save(bookPayload);
 
+            await this.userRepository.query(
+                `UPDATE users SET "booksId" = array_append("booksId", $1) WHERE id = $2`,
+                [createdBook.id, authorId]
+            );
+
             return {
                 success: true,
                 message: "Book created successfully",
@@ -322,6 +327,8 @@ export class BooksService {
                 message: "Book not found"
             })
 
+            await this.deleteBookAssets(book);
+
             const result = await this.booksRepository.delete(id);
 
             if (result.affected === 0) throw new NotFoundException({
@@ -329,7 +336,10 @@ export class BooksService {
                 message: "Book not found, error in deleting the book"
             })
 
-            await this.deleteBookAssets(book);
+            await this.userRepository.query(
+                `UPDATE users SET "booksId" = array_remove("booksId", $1) WHERE id = $2`,
+                [id, book.authorId]
+            );
 
             return {
                 success: true,
@@ -340,7 +350,7 @@ export class BooksService {
         }
     }
 
-    async getRecomendedBooks(req: any, page = 1, limit = 10) {
+    async getRecomendedBooks(req: any, page = 1, limit : any) {
         try {
             const userId = req.user?.id;
 
@@ -357,11 +367,9 @@ export class BooksService {
 
             const interests = user.interests || [];
 
-            const skip = (page - 1) * limit;
+            const skip = (page - 1) * parseInt(limit);
 
-            // --------------------------
-            // 1️⃣ Interest-based books
-            // --------------------------
+            // Interest-based books
             let interestBooks: Book[] = [];
 
             if (interests.length) {
