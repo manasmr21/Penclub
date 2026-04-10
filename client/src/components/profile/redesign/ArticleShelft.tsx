@@ -100,9 +100,9 @@ const ArticleShelft = ({ articles, loading = false, onChanged }: ArticleShelftPr
 
   return (
     <div className="w-full pb-16 px-6">
-      <div className="max-w-5xl mx-auto grid gap-5">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
         {articles.map((article) => (
-          <article key={article.id} className="group relative rounded-2xl border border-outline-variant/20 bg-white p-5 shadow-sm">
+          <article key={article.id} className="group relative flex h-full flex-col rounded-2xl border border-outline-variant/20 bg-white p-5 shadow-sm">
             <div className="mb-4 overflow-hidden rounded-xl bg-slate-100">
               {article.coverImage ? (
                 <img

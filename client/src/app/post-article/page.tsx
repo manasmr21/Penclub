@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
 import { createArticle } from "@/src/lib/books-api";
 import { useAppStore } from "@/src/lib/store/store";
 import { extractErrorMessage } from "@/src/lib/http-client";
 
 export default function PostArticlePage() {
+  const router = useRouter();
   const user = useAppStore((s) => s.user);
   const hydrated = useAppStore((s) => s.hydrated);
   const setError = useAppStore((s) => s.setError);
@@ -16,18 +18,16 @@ export default function PostArticlePage() {
   const [tagsInput, setTagsInput] = useState("");
   const [coverImageFile, setCoverImageFile] = useState<File | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [message, setMessage] = useState("");
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     if (!user?.id) {
-      setMessage("User not found. Please sign in again.");
+      alert("User not found. Please sign in again.");
       return;
     }
 
     setIsSubmitting(true);
-    setMessage("");
     setError(null);
 
     try {
@@ -44,15 +44,16 @@ export default function PostArticlePage() {
         coverImageFile,
       });
 
-      setMessage(response?.message ?? "Article posted successfully.");
+      alert(response?.message ?? "Article posted successfully.");
       setTitle("");
       setContent("");
       setTagsInput("");
       setCoverImageFile(undefined);
+      router.push("/profile?tab=Articles");
     } catch (error) {
       const message = extractErrorMessage(error, "Failed to post article.");
       setError(message);
-      setMessage(message);
+      alert(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -157,7 +158,6 @@ export default function PostArticlePage() {
           </button>
         </form>
 
-        {message && <p className="mt-4 text-sm text-gray-500">{message}</p>}
       </div>
     </div>
   );

@@ -328,4 +328,13 @@ body{
       background-color: rgba(251, 250, 238, 0.8);
       backdrop-filter: blur(12px);
   }
+
+  .menu-items ul li.active {
+      background-color: var(--color-primary);
+      border: 1px solid var(--color-primary);
+  }
+
+  .menu-items ul li.active a {
+      color: white;
+  }
 }

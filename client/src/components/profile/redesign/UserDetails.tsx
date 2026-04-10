@@ -97,7 +97,9 @@ const UserDetails = () => {
   ];
 
   return (
-    <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-12 w-full max-w-5xl mx-auto py-12 px-6">
+    <div className={`w-full max-w-5xl mx-auto px-6 ${isReader ? "pt-8" : "py-12"}`}>
+      <div className={isReader ? "rounded-3xl border border-outline-variant/20 bg-white px-6 py-10 shadow-[0_18px_45px_rgba(15,23,42,0.08)]" : ""}>
+      <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-12 w-full">
       <div className="flex flex-col md:flex-row items-center md:items-start gap-10 w-full md:w-auto">
         {/* Profile Image */}
         <div
@@ -180,6 +182,8 @@ const UserDetails = () => {
           Edit Profile
         </button>
       </div>
+    </div>
+    </div>
     </div>
   );
 };

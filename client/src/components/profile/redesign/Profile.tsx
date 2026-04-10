@@ -6,50 +6,123 @@ import BookShelft from './BookShelft'
 import ArticleShelft from './ArticleShelft'
 import { Plus } from 'lucide-react';
 import { useAppStore } from '@/src/lib/store/store';
-import { fetchAuthorArticles, fetchAuthorBooks } from "@/src/lib/profile-stats-api";
+import { fetchAuthorArticles, fetchAuthorBooksPage } from "@/src/lib/profile-stats-api";
 import type { AuthorArticle, AuthorBook } from "@/src/lib/profile-stats-api";
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+
+function sortBooksNewestFirst(items: AuthorBook[]) {
+  return [...items].sort((a, b) => {
+    const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+    const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+    return bTime - aTime;
+  });
+}
 
 const Profile = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const user = useAppStore((state) => state.user);
   const isAuthor = user?.role === "author";
   const [activeTab, setActiveTab] = useState<'Bookshelf' | 'Articles'>('Bookshelf');
   const [books, setBooks] = useState<AuthorBook[]>([]);
   const [articles, setArticles] = useState<AuthorArticle[]>([]);
   const [loadingBooks, setLoadingBooks] = useState(false);
+  const [loadingMoreBooks, setLoadingMoreBooks] = useState(false);
+  const [booksPage, setBooksPage] = useState(1);
+  const [hasMoreBooks, setHasMoreBooks] = useState(true);
   const [loadingArticles, setLoadingArticles] = useState(false);
+  const [articlesLoaded, setArticlesLoaded] = useState(false);
 
-  const loadAuthorContent = useCallback(async () => {
+  const loadBooks = useCallback(async (targetPage = 1) => {
     if (!isAuthor || !user?.id) {
       setBooks([]);
-      setArticles([]);
+      setBooksPage(1);
+      setHasMoreBooks(false);
       return;
     }
 
-    setLoadingBooks(true);
+    if (targetPage === 1) {
+      setLoadingBooks(true);
+    } else {
+      setLoadingMoreBooks(true);
+    }
+
+    try {
+      const response = await fetchAuthorBooksPage(user.id, targetPage, 10);
+
+      setBooks((prev) => {
+        if (targetPage === 1) return sortBooksNewestFirst(response.books);
+        const existing = new Set(prev.map((item) => item.id));
+        const incoming = response.books.filter((item) => !existing.has(item.id));
+        return sortBooksNewestFirst([...prev, ...incoming]);
+      });
+      setBooksPage(targetPage);
+      setHasMoreBooks(response.pagination?.hasNextPage ?? false);
+    } catch {
+      setBooks([]);
+      setHasMoreBooks(false);
+    } finally {
+      setLoadingBooks(false);
+      setLoadingMoreBooks(false);
+    }
+  }, [isAuthor, user?.id]);
+
+  const loadArticles = useCallback(async () => {
+    if (!isAuthor || !user?.id) {
+      setArticles([]);
+      setArticlesLoaded(false);
+      return;
+    }
+
     setLoadingArticles(true);
 
     try {
-      const [nextBooks, nextArticles] = await Promise.all([
-        fetchAuthorBooks(user.id),
-        fetchAuthorArticles(user.id),
-      ]);
-
-      setBooks(nextBooks);
+      const nextArticles = await fetchAuthorArticles(user.id);
       setArticles(nextArticles);
+      setArticlesLoaded(true);
     } catch {
-      setBooks([]);
       setArticles([]);
+      setLoadingArticles(false);
+      setArticlesLoaded(true);
+      return;
     } finally {
-      setLoadingBooks(false);
       setLoadingArticles(false);
     }
   }, [isAuthor, user?.id]);
 
   useEffect(() => {
-    void loadAuthorContent();
-  }, [loadAuthorContent]);
+    void loadBooks(1);
+  }, [loadBooks]);
+
+  useEffect(() => {
+    const tabParam = (searchParams.get("tab") || "").toLowerCase();
+    if (tabParam === "articles") {
+      setActiveTab("Articles");
+      return;
+    }
+    if (tabParam === "bookshelf") {
+      setActiveTab("Bookshelf");
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (activeTab === "Articles" && !articlesLoaded) {
+      void loadArticles();
+    }
+  }, [activeTab, articlesLoaded, loadArticles]);
+
+  const handleBooksChanged = useCallback(async () => {
+    await loadBooks(1);
+  }, [loadBooks]);
+
+  const handleArticlesChanged = useCallback(async () => {
+    await loadArticles();
+  }, [loadArticles]);
+
+  const handleLoadMoreBooks = useCallback(async () => {
+    if (!hasMoreBooks || loadingMoreBooks || loadingBooks) return;
+    await loadBooks(booksPage + 1);
+  }, [booksPage, hasMoreBooks, loadBooks, loadingBooks, loadingMoreBooks]);
 
   return (
     <div className='main-container'>
@@ -90,10 +163,17 @@ const Profile = () => {
 
       <div className="mt-8 min-h-[70vh]">
         {isAuthor && activeTab === 'Bookshelf' && (
-          <BookShelft books={books} loading={loadingBooks} onChanged={loadAuthorContent} />
+          <BookShelft
+            books={books}
+            loading={loadingBooks}
+            loadingMore={loadingMoreBooks}
+            hasMore={hasMoreBooks}
+            onLoadMore={handleLoadMoreBooks}
+            onChanged={handleBooksChanged}
+          />
         )}
         {isAuthor && activeTab === 'Articles' && (
-          <ArticleShelft articles={articles} loading={loadingArticles} onChanged={loadAuthorContent} />
+          <ArticleShelft articles={articles} loading={loadingArticles} onChanged={handleArticlesChanged} />
         )}
       </div>
     </div>

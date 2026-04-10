@@ -224,6 +224,7 @@ export default function ProfileEditor({ onClose }: ProfileEditorProps) {
         updateUser(response.user);
       }
 
+      alert(response?.message ?? "Profile updated successfully.");
       if (onClose) onClose();
     } catch (error) {
       const message = extractErrorMessage(error, "Failed to update profile.");

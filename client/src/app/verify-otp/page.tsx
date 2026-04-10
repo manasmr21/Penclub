@@ -3,7 +3,7 @@
 import { AxiosError } from "axios";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { api } from "@/lib/api";
+import { api } from "@/lib/auth";
 import { useAppStore } from "@/lib/store/store";
 import { type AuthUser } from "@/lib/store/store";
 

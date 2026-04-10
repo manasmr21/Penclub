@@ -17,7 +17,8 @@ function renderStars(rating: number) {
 
 export default function BookshelfPage() {
   const [books, setBooks] = useState<BookWithRating[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const [appliedSearch, setAppliedSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [page, setPage] = useState(1);
@@ -98,7 +99,7 @@ export default function BookshelfPage() {
   );
 
   const filteredBooks = useMemo(() => {
-    const query = searchTerm.trim().toLowerCase();
+    const query = appliedSearch.trim().toLowerCase();
     if (!query) return books;
 
     return books.filter((book) => {
@@ -106,7 +107,7 @@ export default function BookshelfPage() {
       const genre = (book.genre || "").toLowerCase();
       return title.includes(query) || genre.includes(query);
     });
-  }, [books, searchTerm]);
+  }, [books, appliedSearch]);
 
   if (loading) {
     return (
@@ -126,15 +127,29 @@ export default function BookshelfPage() {
 
   return (
     <div className="main-container pt-28 pb-10">
-      <div className="max-w-5xl mx-auto px-6">
-        <div className="mb-8">
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search books by title or genre..."
-            className="h-11 w-full rounded-xl border border-[#dbe3ef] bg-white px-4 text-sm text-[#1e2741] outline-none focus:ring-2 focus:ring-[#1e2741]/20"
-          />
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="mb-8 max-w-xl mx-auto">
+          <form
+            className="flex gap-3"
+            onSubmit={(e) => {
+              e.preventDefault();
+              setAppliedSearch(searchInput.trim());
+            }}
+          >
+            <input
+              type="text"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              placeholder="Search books by title or genre..."
+              className="h-11 w-full rounded-xl border border-[#dbe3ef] bg-gray-100 px-4 text-sm text-[#1e2741] outline-none focus:ring-2 focus:ring-[#1e2741]/20"
+            />
+            <button
+              type="submit"
+              className="h-11 rounded-xl bg-[#1e2741] px-5 text-sm font-semibold text-white hover:opacity-90"
+            >
+              Search
+            </button>
+          </form>
         </div>
 
         {!filteredBooks.length && (
@@ -145,7 +160,7 @@ export default function BookshelfPage() {
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-12">
           {filteredBooks.map((book) => (
-            <Link key={book.id} href={`/bookshelf/${book.id}`} className="block">
+            <Link key={book.id} href={`/bookshelf/${book.id}?from=bookshelf`} className="block">
               <article className="flex flex-col w-full transition-transform duration-200 hover:-translate-y-1">
                 <div className="w-full aspect-[2/3] mb-5 bg-gray-200 rounded-md overflow-hidden">
                   {book.coverImage ? (

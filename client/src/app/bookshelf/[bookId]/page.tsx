@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { type FormEvent, useEffect, useMemo, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { createBookReview, fetchAuthorNameById, fetchBookById, fetchReviewsByBook, type BookReview, updateBookReview } from "@/src/lib/books-api";
 import type { AuthorBook } from "@/src/lib/profile-stats-api";
 import { useAppStore } from "@/src/lib/store/store";
@@ -15,6 +15,7 @@ function renderStars(rating: number) {
 
 export default function BookDetailsPage() {
   const params = useParams<{ bookId: string }>();
+  const searchParams = useSearchParams();
   const bookId = params?.bookId;
   const user = useAppStore((s) => s.user);
   const updateUser = useAppStore((s) => s.updateUser);
@@ -83,6 +84,9 @@ export default function BookDetailsPage() {
 
   const canReview = Boolean(user && user.isEmailVerified);
   const canFollowAuthor = Boolean(user && user.role === "reader" && book?.authorId && user.id !== book.authorId);
+  const from = searchParams.get("from");
+  const backHref = from === "profile" ? "/profile" : "/bookshelf";
+  const backLabel = from === "profile" ? "Back to profile" : "Back to bookshelf";
   const myReview = useMemo(
     () => (user?.id ? reviews.find((review) => review.user?.id === user.id) ?? null : null),
     [reviews, user?.id],
@@ -179,8 +183,8 @@ export default function BookDetailsPage() {
         <div className="max-w-4xl mx-auto px-6 py-20 text-center text-on-surface-variant/70">
           Book not found.
           <div className="mt-4">
-            <Link href="/bookshelf" className="text-[#1e2741] underline">
-              Back to bookshelf
+            <Link href={backHref} className="text-[#1e2741] underline">
+              {backLabel}
             </Link>
           </div>
         </div>
@@ -191,8 +195,8 @@ export default function BookDetailsPage() {
   return (
     <div className="main-container pt-24 pb-10">
       <div className="max-w-4xl mx-auto px-6">
-        <Link href="/bookshelf" className="text-[14px] text-[#1e2741] underline">
-          Back to bookshelf
+        <Link href={backHref} className="text-[14px] text-[#1e2741] underline">
+          {backLabel}
         </Link>
 
         <div className="mt-6 grid grid-cols-1 md:grid-cols-[220px_1fr] gap-8">
