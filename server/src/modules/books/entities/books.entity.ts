@@ -3,6 +3,7 @@ import {
     PrimaryGeneratedColumn,
     Column,
     ManyToOne,
+    JoinColumn,
     CreateDateColumn,
     UpdateDateColumn,
     OneToMany,
@@ -10,6 +11,11 @@ import {
 } from "typeorm";
 import { User } from "../../users/entities/user.entity";
 import { Review } from "../../reviews/entities/review.entity";
+
+export type BookImage = {
+    url: string;
+    publicId: string;
+};
 
 @Entity("books")
 export class Book {
@@ -19,11 +25,11 @@ export class Book {
     @Column()
     title: string;
 
-    @Column({ nullable: true })
-    coverImage: string;
-
-    @Column({ nullable: true })
-    coverImageId: string;
+    @Column({
+        type: "jsonb",
+        default: () => "'[]'"
+    })
+    images: BookImage[];
 
     @Column("text")
     description: string;
@@ -37,13 +43,14 @@ export class Book {
     @Column("text", { array: true, default: [] })
     purchaseLinks: string[];
 
-    @Column()
+    @Column({ type: "uuid" })
     authorId: string;
 
-    @ManyToOne(() => User, {
+    @ManyToOne(() => User, (user) => user.books, {
         onDelete: "CASCADE",
         onUpdate: "RESTRICT"
     })
+    @JoinColumn({ name: "authorId" })
     author: User;
 
     @Column({
@@ -62,7 +69,10 @@ export class Book {
     })
     isAdvertised: boolean
 
-    @OneToMany(()=> Review, (reviews)=> reviews.book)
+    @Column({nullable: true})
+    trial: string
+
+    @OneToMany(() => Review, (reviews) => reviews.book)
     reviews: Review[]
 
     @CreateDateColumn()

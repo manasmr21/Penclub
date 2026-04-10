@@ -1,5 +1,5 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, Request, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
-import { FileInterceptor } from "@nestjs/platform-express";
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Request, UploadedFiles, UseGuards, UseInterceptors } from "@nestjs/common";
+import { AnyFilesInterceptor } from "@nestjs/platform-express";
 import { BooksService } from "./books.service";
 import { CreateBookDto } from "./dto/create-book.dto";
 import { UpdateBookDto } from "./dto/update-book.dto";
@@ -54,25 +54,25 @@ export class BooksController {
 
     @Post("create")
     @UseGuards(AuthGuard("jwt"))
-    @UseInterceptors(FileInterceptor("coverImage"))
+    @UseInterceptors(AnyFilesInterceptor())
     async create(
         @Body() dto: CreateBookDto,
         @Request() req: any,
-        @UploadedFile() file?: any
+        @UploadedFiles() files?: any[]
     ) {
-        return await this.booksService.createBook(dto, req, file);
+        return await this.booksService.createBook(dto, req, files);
     }
     
     @Put("update/:bookId")
     @UseGuards(AuthGuard("jwt"))
-    @UseInterceptors(FileInterceptor("coverImage"))
+    @UseInterceptors(AnyFilesInterceptor())
     async update(
         @Param("bookId") id: string,
         @Body() dto: UpdateBookDto,
         @Request() req: any,
-        @UploadedFile() file?: any
+        @UploadedFiles() files?: any[]
     ) {
-        return await this.booksService.updateBook(id, dto, req, file);
+        return await this.booksService.updateBook(id, dto, req, files);
     }
     
     @Delete("soft-delete/:bookId")

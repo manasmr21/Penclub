@@ -37,7 +37,7 @@ export class ReviewService {
                 "user.role",
                 "book.id",
                 "book.title",
-                "book.coverImage",
+                "book.images",
                 "book.genre"
             ]);
     }

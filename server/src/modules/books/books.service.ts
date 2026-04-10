@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, HttpException, InternalServerErrorException, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { Book } from "./entities/books.entity";
+import { DeepPartial, Repository } from "typeorm";
+import { Book, BookImage } from "./entities/books.entity";
 import { CreateBookDto } from "./dto/create-book.dto";
 import { CloudinaryService } from "../../utils/cloudinary/cloudinary.service";
 import { UpdateBookDto } from "./dto/update-book.dto";
@@ -121,7 +121,13 @@ export class BooksService {
                 .where("book.authorId = :authorId", { authorId })
                 .andWhere("book.approved = true")
                 .andWhere("book.state = :state", { state: "approved" })
-                .select(["book.id", "book.title", "book.description", "book.genre", "book.coverImage",])
+                .select([
+                    "book.id",
+                    "book.title",
+                    "book.description",
+                    "book.genre",
+                    "book.images"
+                ])
                 .orderBy("book.createdAt", "DESC")
                 .skip(skip)
                 .take(currentLimit)
@@ -144,7 +150,7 @@ export class BooksService {
         }
     }
 
-    async createBook(dto: CreateBookDto, req: any, file?: any) {
+    async createBook(dto: CreateBookDto, req: any, files?: any[]) {
         try {
             const { title, description, genre } = dto;
             const authorId = req.user?.id
@@ -165,21 +171,30 @@ export class BooksService {
                 message: "You are not authorized to publish a book"
             })
 
-            if (file) {
+            let images: BookImage[] = [];
+
+            if (files?.length) {
                 const folder = "books";
                 const organization = "penclub";
 
-                const cloudinaryResponse = await this.cloudinaryService.uploadImage(file, organization, folder);
+                const cloudinaryResponses = await Promise.all(
+                    files.map((file) => this.cloudinaryService.uploadImage(file, organization, folder))
+                );
 
-                var coverImage = cloudinaryResponse.secure_url;
-                var coverImageId = cloudinaryResponse.public_id;
+                images = cloudinaryResponses.map((image) => ({
+                    url: image.secure_url,
+                    publicId: image.public_id
+                }));
+            }
+
+            if (typeof dto.purchaseLinks === "string") {
+                dto.purchaseLinks = JSON.parse(dto.purchaseLinks);
             }
 
             const bookPayload = this.booksRepository.create({
                 ...dto,
                 authorId,
-                coverImage,
-                coverImageId
+                images
             });
 
             const createdBook = await this.booksRepository.save(bookPayload);
@@ -187,13 +202,14 @@ export class BooksService {
             return {
                 success: true,
                 message: "Book created successfully",
+                book: createdBook
             }
         } catch (error) {
             this.handleServiceError(error);
         }
     }
 
-    async updateBook(id: string, dto: UpdateBookDto, req: any, file?: any) {
+    async updateBook(id: string, dto: UpdateBookDto, req: any, files?: any[]) {
         try {
             if (!dto) throw new BadRequestException({
                 success: false,
@@ -216,30 +232,37 @@ export class BooksService {
                 message: "Book not found"
             })
 
-            if (file) {
-                if (book.coverImageId) await this.cloudinaryService.deleteImage(book.coverImageId);
+            const updatedPayload: DeepPartial<Book> = { ...dto };
+            const shouldRemoveExistingImages = Boolean(dto.removeImages || files?.length);
 
+            if (shouldRemoveExistingImages) {
+                await this.deleteBookAssets(book);
+            }
+
+            if (files?.length) {
                 const folder = "books";
                 const organization = "penclub";
-                const cloudinaryResponse = await this.cloudinaryService.uploadImage(file, organization, folder);
+                const cloudinaryResponses = await Promise.all(
+                    files.map((file) => this.cloudinaryService.uploadImage(file, organization, folder))
+                );
+                const images = cloudinaryResponses.map((image) => ({
+                    url: image.secure_url,
+                    publicId: image.public_id
+                }));
 
-                var coverImage = cloudinaryResponse.secure_url;
-                var coverImageId = cloudinaryResponse.public_id;
-                dto.coverImage = coverImage;
-                dto.coverImageId = coverImageId;
+                updatedPayload.images = images;
+            } else if (dto.removeImages) {
+                updatedPayload.images = [];
             }
 
-            if (dto.removeCoverImage && book.coverImageId) {
-                await this.cloudinaryService.deleteImage(book.coverImageId);
-            }
-
-            const updatedBook = this.booksRepository.merge(book, dto);
+            const updatedBook = this.booksRepository.merge(book, updatedPayload);
 
             const savedBook = await this.booksRepository.save(updatedBook);
 
             return {
                 success: true,
-                message: "Book updated successfully"
+                message: "Book updated successfully",
+                book: savedBook
             }
         } catch (error) {
             this.handleServiceError(error);
@@ -306,7 +329,7 @@ export class BooksService {
                 message: "Book not found, error in deleting the book"
             })
 
-            if (book.coverImageId) await this.cloudinaryService.deleteImage(book.coverImageId);
+            await this.deleteBookAssets(book);
 
             return {
                 success: true,
@@ -457,5 +480,17 @@ export class BooksService {
             success: false,
             message: "Internal server error"
         });
+    }
+
+    private async deleteBookAssets(book: Pick<Book, "images">) {
+        const publicIds = Array.from(new Set(
+            (book.images ?? [])
+                .map((image) => image?.publicId)
+                .filter((publicId): publicId is string => Boolean(publicId))
+        ));
+
+        if (!publicIds.length) return;
+
+        await Promise.all(publicIds.map((publicId) => this.cloudinaryService.deleteImage(publicId)));
     }
 }

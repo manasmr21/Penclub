@@ -44,8 +44,12 @@ export class BookSeeder {
                 authorId: randomUser.id,
                 approved: true,
                 state: "approved",
-                coverImage: "https://via.placeholder.com/150",
-                coverImageId: "sample-image-id"
+                images: [
+                    {
+                        url: "https://via.placeholder.com/150",
+                        publicId: "sample-image-id"
+                    }
+                ]
             });
         }
 

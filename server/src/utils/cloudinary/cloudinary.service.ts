@@ -4,7 +4,8 @@ import { v2 as Cloudinary } from "cloudinary"
 @Injectable()
 export class CloudinaryService {
 
-    async uploadImage(file: any, organization:string, folder: string): Promise<any> {
+   
+ async uploadImage(file: any, organization:string, folder: string): Promise<any> {
 
         return new Promise((resolve, reject) => {
             Cloudinary.uploader.upload_stream({
@@ -17,7 +18,6 @@ export class CloudinaryService {
                 }).end(file.buffer)
         })
     }
-
     async getImages(folder: string, organizationId: string){
         return Cloudinary.api.resources({
             resource_type:"image",

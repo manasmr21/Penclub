@@ -32,20 +32,8 @@ export class UpdateBookDto {
     purchaseLinks?: string[];
 
     @ApiProperty({
-        example: "https://images.example.com/cover-updated.jpg",
-        required: false
-    })
-    coverImage?: string;
-
-    @ApiProperty({
-        example: "cover-image-public-id",
-        required: false
-    })
-    coverImageId?: string;
-
-    @ApiProperty({
         example: true,
         required: false
     })
-    removeCoverImage?: boolean;
+    removeImages?: boolean;
 }
