@@ -55,6 +55,7 @@ export class BlogsController {
     }
 
     @Delete("delete/:blogId")
+    @UseGuards(AuthGuard("jwt"))
     async deleteABlog(@Param("blogId")id: string, @Body() coverImageId : string, @Request() req: any ){
         return await this.blogsService.deleteBlog(id, coverImageId, req)
     }

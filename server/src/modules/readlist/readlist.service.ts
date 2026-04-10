@@ -149,10 +149,7 @@ export class ReadlistService {
 
     async toggleBook(readlistId: string, bookId: string, userId: string) {
         try {
-            // Single query: check → add/remove → return result, all in one round-trip.
-            // RETURNING evaluates AFTER the update, so:
-            //   - book was added   → array_position returns non-null  → added = true
-            //   - book was removed → array_position returns null       → added = false
+
             const result = await this.dataSource.query(
                 `UPDATE readlists
                  SET "booksId" = CASE
