@@ -264,6 +264,8 @@ export class BlogsService {
 
             const userRole = req.user?.role
 
+            console.log(userRole);
+
             if (userRole !== "author") throw new UnauthorizedException({
                 success: false,
                 message: "You are not authorized to delete a blog"

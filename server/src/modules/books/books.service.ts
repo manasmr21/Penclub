@@ -255,7 +255,10 @@ export class BooksService {
                     publicId: image.public_id
                 }));
 
-                updatedPayload.images = images;
+                updatedPayload.images = [
+                    ...(book.images || []),
+                    ...images
+                ];
             } else if (dto.removeImages) {
                 updatedPayload.images = [];
             }
@@ -350,7 +353,7 @@ export class BooksService {
         }
     }
 
-    async getRecomendedBooks(req: any, page = 1, limit : any) {
+    async getRecomendedBooks(req: any, page = 1, limit: any) {
         try {
             const userId = req.user?.id;
 
