@@ -9,7 +9,7 @@ import {
   Library,
   Settings,
 } from "lucide-react";
-
+import { usePathname } from "next/navigation"; 
 import { Sidebar } from "@/src/components/Dashboard/Sidebar";
 import { Header } from "@/src/components/Dashboard/Header";
 
@@ -26,8 +26,8 @@ const iconMap = {
 export default function DashboardShell({ children, menuItems }) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const pathname = usePathname(); // ✅ for active route
 
-  // ✅ inject icons here
   const menuWithIcons = menuItems.map((item) => ({
     ...item,
     icon: iconMap[item.icon],
@@ -37,10 +37,10 @@ export default function DashboardShell({ children, menuItems }) {
     <div className="flex h-screen bg-gray-100 overflow-hidden">
       <Sidebar
         collapsed={collapsed}
-        setCollapsed={setCollapsed}
-        menuItems={menuWithIcons} // ✅ now contains actual components
+        menuItems={menuWithIcons}
         mobileOpen={mobileOpen}
         setMobileOpen={setMobileOpen}
+        activePath={pathname} // ✅ REQUIRED
       />
 
       <div className="flex-1 flex flex-col">
