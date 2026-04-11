@@ -417,7 +417,6 @@ export default function SettingsPage() {
     { id: "profile", label: "Profile", icon: User },
     { id: "security", label: "Security", icon: Shield },
     { id: "notifications", label: "Notifications", icon: Bell },
-    { id: "appearance", label: "Appearance", icon: Palette },
     { id: "danger", label: "Danger Zone", icon: AlertCircle },
   ];
 

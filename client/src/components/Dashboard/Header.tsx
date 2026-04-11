@@ -88,19 +88,8 @@ export function Header({ collapsed, setCollapsed, setMobileOpen }) {
                 <X className="w-3 h-3 text-gray-400" />
               </button>
             )}
-            <kbd className="hidden lg:inline-block text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-md ml-2">
-              ⌘K
-            </kbd>
+           
           </form>
-        </div>
-
-        {/* Center - Page Title with Breadcrumb */}
-        <div className="hidden lg:block absolute left-1/2 transform -translate-x-1/2">
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-500">Pages</span>
-            <ChevronDown className="w-3 h-3 text-gray-400" />
-            <span className="text-sm font-medium text-gray-900">Dashboard</span>
-          </div>
         </div>
 
         {/* Right section - Actions */}
@@ -113,13 +102,6 @@ export function Header({ collapsed, setCollapsed, setMobileOpen }) {
           >
             <Search className="w-5 h-5 text-gray-600" />
           </button>
-
-          {/* Quick Actions Dropdown */}
-          <div className="relative hidden sm:block">
-            <button className="cursor-pointer p-2 rounded-xl hover:bg-gray-100 transition-all duration-200">
-              <Grid className="w-5 h-5 text-gray-600" />
-            </button>
-          </div>
 
           {/* Help Button */}
           <button className="hidden sm:flex cursor-pointer items-center gap-1 px-3 py-2 rounded-xl hover:bg-gray-100 transition-all duration-200">

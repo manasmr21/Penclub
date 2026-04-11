@@ -6,7 +6,7 @@ export default function DashboardLayout({ children }) {
     { name: "Dashboard", icon: "dashboard", path: "/dashboard" },
     { name: "Users", icon: "users", path: "/users" },
     { name: "Publications", icon: "publications", path: "/publications" }, // ✅ fixed
-    { name: "Articles", icon: "articles", path: "/articles" },
+    { name: "Articles", icon: "articles", path: "/all-articles" },
     { name: "Books", icon: "books", path: "/books" },
     { name: "Settings", icon: "settings", path: "/settings" },
   ];
