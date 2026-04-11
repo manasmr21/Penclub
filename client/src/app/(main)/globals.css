@@ -161,7 +161,7 @@ body{
 }
 
 .section-hero {
-  background: url("../../public/images/hero-bottom.png") no-repeat bottom;
+  background: url("../../../public/images/hero-bottom.png") no-repeat bottom;
   background-size: contain;
   background-position: bottom;
 }
