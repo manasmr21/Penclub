@@ -33,6 +33,7 @@ export default function ProfileSettingsPage() {
     if (!user) return [];
     if (Array.isArray(user.interests)) return user.interests;
     if (typeof user.interests === "string") {
+      //@ts-expect-error
       return user.interests.split(",").map((interest) => interest.trim()).filter(Boolean);
     }
     return [];
