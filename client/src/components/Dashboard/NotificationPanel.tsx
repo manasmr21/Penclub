@@ -27,6 +27,7 @@ function NotificationItem({ notification, onMarkAsRead, onDelete }) {
   };
 
   const getTimeAgo = (date) => {
+    //@ts-expect-error
     const seconds = Math.floor((new Date() - new Date(date)) / 1000);
     const intervals = {
       year: 31536000,
