@@ -56,7 +56,7 @@ function ProfilePageContent() {
       <ProfileRedesign />
 
       {isEditModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 pt-12 pb-4 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 px-3 pt-6 sm:px-4 sm:pt-14 pb-4 backdrop-blur-sm">
             <ProfileEditor
               inModal={true}
               onClose={() => {

@@ -20,11 +20,11 @@ interface FormInputProps {
 }
 
 const ProfileHeader = ({ onClose }: { onClose?: () => void }) => (
-  <header className="sticky top-15 z-10 flex items-center justify-between border-b border-[var(--border)] px-4 py-3">
+  <header className="sticky top-0 z-10 flex items-center justify-between border-b border-[var(--border)] bg-white px-3 py-3 sm:px-4">
     <button type="button" onClick={onClose} className="text-sm text-[var(--primary)] transition-opacity hover:opacity-80">
       &lt; Back
     </button>
-    <h1 className="text-xl font-semibold text-[var(--foreground)]">Edit Profile</h1>
+    <h1 className="text-base sm:text-xl font-semibold text-[var(--foreground)]">Edit Profile</h1>
     <div className="w-10" />
   </header>
 );
@@ -117,11 +117,13 @@ const FormInput = ({ id, label, value, onChange, type = 'text', prefix }: FormIn
   </div>
 );
 
-export default function ProfileEditor({ onClose }: ProfileEditorProps) {
+export default function ProfileEditor({ inModal = false, onClose }: ProfileEditorProps) {
   const router = useRouter();
   const user = useAppStore((s) => s.user);
   const updateUser = useAppStore((s) => s.updateUser);
   const setError = useAppStore((s) => s.setError);
+  type UserPatch = Parameters<typeof updateUser>[0];
+  type ProfileResponse = { user?: UserPatch; message?: string };
 
   const allInterests = ['Poetry', 'Fiction', 'Non-fiction', 'Essays', 'Memoir', 'Fantasy', 'Modernist Fiction'];
 
@@ -133,6 +135,13 @@ export default function ProfileEditor({ onClose }: ProfileEditorProps) {
   const [loading, setLoading] = useState(false);
   const [verifyLoading, setVerifyLoading] = useState(false);
   const [initialSyncLoading, setInitialSyncLoading] = useState(false);
+  const handleClose = () => {
+    if (onClose) {
+      onClose();
+      return;
+    }
+    router.push("/profile");
+  };
 
   useEffect(() => {
     if (!user?.id) return;
@@ -143,7 +152,7 @@ export default function ProfileEditor({ onClose }: ProfileEditorProps) {
       try {
         setInitialSyncLoading(true);
         // Reuses authenticated endpoint to read latest persisted profile fields.
-        const response = await updateUserProfile(user.id, new FormData()) as any;
+        const response = await updateUserProfile(user.id, new FormData()) as ProfileResponse;
         if (isMounted && response?.user) {
           updateUser(response.user);
         }
@@ -207,7 +216,7 @@ export default function ProfileEditor({ onClose }: ProfileEditorProps) {
         { id: user.id, profilePictureId: user.profilePictureId },
         payload,
         setLoading,
-      ) as any;
+      ) as ProfileResponse;
 
       const optimisticUpdate: Partial<typeof user> = {
         name,
@@ -254,10 +263,16 @@ export default function ProfileEditor({ onClose }: ProfileEditorProps) {
   };
 
   return (
-  <div className="mx-auto mt-20 max-w-2xl rounded-2xl border border-[var(--border)] bg-white text-[var(--foreground)] shadow-sm">
-    <ProfileHeader onClose={onClose} />
+  <div
+    className={`w-full rounded-2xl border border-[var(--border)] bg-white text-[var(--foreground)] shadow-sm ${
+      inModal
+        ? "mx-auto mt-4 sm:mt-10 max-w-2xl max-h-[92vh] overflow-y-auto"
+        : "mx-auto max-w-none"
+    }`}
+  >
+    <ProfileHeader onClose={handleClose} />
 
-    <div className="space-y-2 p-2">
+    <div className="space-y-3 p-3 sm:p-4">
       <ProfilePictureUpdate
         currentPicture={user?.profilePicture}
         name={user?.name}
@@ -331,20 +346,20 @@ export default function ProfileEditor({ onClose }: ProfileEditorProps) {
           ))}
         </div>
 
-        <div className="flex gap-2.5 pt-1">
+        <div className="flex flex-col-reverse sm:flex-row gap-2.5 pt-1">
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleClose}
             disabled={loading}
             /* Changed bg-[var(--card)] to bg-gray-100 */
-            className="h-11 flex-1 rounded-full border border-[var(--border)] bg-gray-100 text-sm font-medium transition hover:bg-gray-200 disabled:opacity-50"
+            className="h-11 w-full sm:flex-1 rounded-full border border-[var(--border)] bg-gray-100 text-sm font-medium transition hover:bg-gray-200 disabled:opacity-50"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={loading || initialSyncLoading}
-            className="h-11 flex-1 rounded-full bg-[linear-gradient(90deg,var(--primary),var(--secondary))] text-sm font-semibold text-[var(--primary-foreground)] shadow-[0_12px_30px_rgba(10,56,125,0.2)] transition disabled:cursor-not-allowed disabled:opacity-50"
+            className="h-11 w-full sm:flex-1 rounded-full bg-[linear-gradient(90deg,var(--primary),var(--secondary))] text-sm font-semibold text-[var(--primary-foreground)] shadow-[0_12px_30px_rgba(10,56,125,0.2)] transition disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading ? "Saving..." : initialSyncLoading ? "Loading..." : "Save Changes"}
           </button>

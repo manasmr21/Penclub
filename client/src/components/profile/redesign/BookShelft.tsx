@@ -159,10 +159,10 @@ const BookShelft = ({ books, loading = false, loadingMore = false, hasMore = fal
 
   return (
     <div className="w-full pb-16">
-      <div className="max-w-4xl mx-auto">
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-8 gap-y-12">
+      <div className="max-w-4xl mx-auto px-3 sm:px-0">
+        <div className="grid grid-cols-1 min-[420px]:grid-cols-2 md:grid-cols-3 gap-x-5 sm:gap-x-8 gap-y-10 sm:gap-y-12">
           {books.map((book) => (
-            <div key={book.id} className="relative flex flex-col group w-full max-w-56 mx-auto">
+            <div key={book.id} className="relative flex flex-col group w-full max-w-[15rem] mx-auto">
               <div className="absolute top-2 right-2 z-10 flex items-center gap-1.5">
                 <button
                   type="button"
@@ -221,8 +221,8 @@ const BookShelft = ({ books, loading = false, loadingMore = false, hasMore = fal
       </div>
 
       {editingBook && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm grid place-items-center px-4">
-          <div className="w-full max-w-xl rounded-2xl bg-white p-6">
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm grid place-items-center p-3 sm:px-4">
+          <div className="w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-4 sm:p-6">
             <h2 className="text-xl font-semibold text-[#1e2741]">Edit Book</h2>
             <form onSubmit={handleEditSubmit} className="mt-4 space-y-3">
               <input
@@ -254,10 +254,10 @@ const BookShelft = ({ books, loading = false, loadingMore = false, hasMore = fal
                 onChange={(e) => setCoverImageFiles(Array.from(e.target.files ?? []))}
               />
               {!!coverImageFiles.length && <p className="text-xs text-gray-500">{coverImageFiles.length} image(s) selected</p>}
-              <div className="flex justify-end gap-2 pt-2">
+              <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-2">
                 <button
                   type="button"
-                  className="px-4 py-2 rounded-md border"
+                  className="w-full sm:w-auto px-4 py-2 rounded-md border"
                   onClick={closeEditModal}
                   disabled={isSaving}
                 >
@@ -265,7 +265,7 @@ const BookShelft = ({ books, loading = false, loadingMore = false, hasMore = fal
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-md bg-primary text-white disabled:opacity-50"
+                  className="w-full sm:w-auto px-4 py-2 rounded-md bg-primary text-white disabled:opacity-50"
                   disabled={isSaving}
                 >
                   {isSaving ? "Saving..." : "Save"}

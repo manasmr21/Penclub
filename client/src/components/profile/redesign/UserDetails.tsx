@@ -1,6 +1,6 @@
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { BiEdit } from "react-icons/bi";
+import { IoSettingsOutline } from "react-icons/io5";
 import { useEffect, useState } from "react";
 import { useAppStore } from "@/src/lib/store/store";
 import {
@@ -13,7 +13,8 @@ const UserDetails = () => {
   const user = useAppStore((state) => state.user);
   const isAuthor = user?.role === "author";
   const isReader = user?.role === "reader";
-  const getProfileUrl = (pic: any) => {
+  type PictureLike = string | { secure_url?: string; url?: string } | null | undefined;
+  const getProfileUrl = (pic: PictureLike) => {
     if (!pic) return null;
     if (typeof pic === "string") {
       try {
@@ -42,9 +43,8 @@ const UserDetails = () => {
   const parsedInterests = Array.isArray(user?.interests)
     ? user.interests
     : typeof user?.interests === "string"
-      ? 
-      user.interests
-      //@ts-expect-error
+      ? user.interests
+          // @ts-expect-error interests may be string from persisted API payload
           .split(",")
           .map((interest: string) => interest.trim())
           .filter(Boolean)
@@ -103,8 +103,7 @@ const UserDetails = () => {
       <div className="flex flex-col md:flex-row items-center md:items-start gap-10 w-full md:w-auto">
         {/* Profile Image */}
         <div
-          onClick={() => router.push("/profile?edit=1")}
-          className="group cursor-pointer relative w-[160px] md:w-[200px] shrink-0 aspect-square overflow-hidden rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.08)] ring-4 ring-offset-4 ring-outline-variant/10 transition-transform duration-500 hover:scale-[1.02]"
+          className="relative w-[160px] md:w-[200px] shrink-0 aspect-square overflow-hidden rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.08)] ring-4 ring-offset-4 ring-outline-variant/10"
         >
           {hasProfilePicture ? (
             <Image
@@ -119,9 +118,6 @@ const UserDetails = () => {
               {fallbackInitials}
             </div>
           )}
-          <div className="absolute inset-0 grid place-items-center bg-black/20 backdrop-blur-sm opacity-0 transition-all duration-300 group-hover:opacity-100">
-            <BiEdit className="text-3xl text-white drop-shadow-md" />
-          </div>
         </div>
 
         {/* Info */}
@@ -176,10 +172,11 @@ const UserDetails = () => {
       {/* Actions */}
       <div className="flex w-full md:w-auto mt-6 md:mt-4 items-center justify-center md:justify-end shrink-0">
         <button
-          onClick={() => router.push("/profile?edit=1")}
-          className="px-8 py-3 bg-primary text-white font-semibold text-[11px] tracking-widest uppercase rounded-full hover:bg-primary/90 transition-all duration-300 shadow-md hover:shadow-[0_8px_20px_rgb(0,0,0,0.12)] hover:-translate-y-0.5 cursor-pointer"
+          onClick={() => router.push("/profile/settings")}
+          className="group flex h-12 w-12 items-center justify-center rounded-full border border-primary/20 bg-white text-primary shadow-sm transition-all duration-300 hover:bg-primary/10"
+          aria-label="Open profile settings"
         >
-          Edit Profile
+          <IoSettingsOutline className="text-[22px] transition-transform group-hover:rotate-45" />
         </button>
       </div>
     </div>

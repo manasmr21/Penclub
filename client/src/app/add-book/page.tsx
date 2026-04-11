@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import { X } from "lucide-react";
 import { createBook } from "@/src/lib/books-api";
 import { useAppStore } from "@/src/lib/store/store";
 import { extractErrorMessage } from "@/src/lib/http-client";
@@ -86,12 +87,21 @@ export default function AddBookPage() {
   const inputBgClass = "bg-[#f3f4f6]";
 
   return (
-    <div className="relative mx-auto max-w-xl mt-24 mb-12 rounded-2xl border border-[var(--border)] bg-[var(--card)] p-8 shadow-sm">
-      <div className="mb-8">
-        <h1 className="text-2xl font-extrabold text-center text-[var(--foreground)]">Add Book</h1>
-      </div>
+    <div className="mx-auto mt-20 mb-12 w-full max-w-xl px-3 sm:px-4">
+      <div className="relative rounded-2xl border border-[var(--border)] bg-[var(--card)] p-5 sm:p-8 shadow-sm">
+        <button
+          type="button"
+          onClick={() => router.push("/profile?tab=Bookshelf")}
+          className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full border border-[var(--border)] text-[var(--muted-foreground)] transition hover:bg-[var(--muted)]/60 sm:right-4 sm:top-4"
+          aria-label="Close add book form"
+        >
+          <X size={18} />
+        </button>
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-center text-2xl font-extrabold text-[var(--foreground)]">Add Book</h1>
+        </div>
 
-      <form onSubmit={onSubmit} className="space-y-6">
+        <form onSubmit={onSubmit} className="space-y-5 sm:space-y-6">
         <div className="space-y-1.5">
           <label className="ml-1 block text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted-foreground)]">Title</label>
           <input
@@ -167,7 +177,8 @@ export default function AddBookPage() {
         >
           {isSubmitting ? "Submitting..." : "Add Book"}
         </button>
-      </form>
+        </form>
+      </div>
     </div>
   );
 }

@@ -1,3 +1,8 @@
+/* Hidden by default; enabled in mobile menu */
+.responsive-contact {
+  display: none;
+}
+
 @media only screen and (max-width: 800px) {
   .contacts {
     display: none;
@@ -5,14 +10,18 @@
 
   .burger-menu {
     display: block;
-    z-index: 0;
+    z-index: 1001;
     cursor: pointer;
   }
+
 
   /* FULLSCREEN GLASS MENU */
   .menu-items {
     position: fixed;
     inset: 0;
+    width: 100dvw;
+    height: 100dvh;
+    padding: 5.5rem 1.25rem 2rem;
     backdrop-filter: blur(18px);
     background: linear-gradient(
       135deg,
@@ -21,22 +30,31 @@
     );
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
-    transform: translateY(-200%);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    transform: translateY(calc(-100% - 24px));
     transition: transform 0.45s cubic-bezier(0.77, 0, 0.18, 1);
     z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
   }
 
   .menu-items[menu-open="true"] {
-    transform: translateY(-1%);
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
   }
 
   /* MENU ITEMS */
   .menu-items ul {
     flex-direction: column;
-    gap: 35px;
-    font-size: 28px;
+    gap: 10px;
+    width: min(90vw, 26rem);
+    font-size: clamp(1.1rem, 4.8vw, 1.45rem);
     font-weight: 700;
     text-align: center;
     letter-spacing: 1px;
@@ -46,34 +64,35 @@
   .menu-items ul li {
     position: relative;
     cursor: pointer;
-    transition: all 0.3s ease;
+    width: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 999px;
+    padding: 0;
+    transition: background-color 0.2s ease;
   }
 
-  .menu-items ul li::after {
-    content: "";
-    position: absolute;
-    bottom: -8px;
-    left: 50%;
-    width: 0%;
-    height: 2px;
-    background: white;
-    transition: 0.3s ease;
-    transform: translateX(-50%);
+  .menu-items ul li a {
+    display: block;
+    width: 100%;
+    padding: 10px 16px;
   }
 
   .menu-items ul li:hover {
-    transform: translateY(-3px);
-    opacity: 0.85;
+    transform: none;
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.1);
   }
 
-  .menu-items ul li:hover::after {
-    width: 60%;
+  .menu-items ul li.active {
+    background: rgba(255, 255, 255, 0.18);
+    border-color: white;
   }
 
   /* CONTACT BUTTON */
   .responsive-contact {
     display: block;
-    margin-top: 50px;
+    margin-top: 10px;
+    width: min(90vw, 26rem);
   }
 
   .responsive-contact button {
@@ -99,6 +118,38 @@
     transition: 0.3s ease;
   }
 
+  .mobile-auth-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .mobile-auth-actions a,
+  .mobile-auth-actions button {
+    width: 100%;
+    display: block;
+    padding: 12px 16px;
+    border-radius: 999px;
+    border: 2px solid white;
+    background: transparent;
+    font-weight: 600;
+    font-size: 16px;
+    color: white;
+    text-align: center;
+    transition: 0.2s ease;
+  }
+
+  .mobile-auth-actions button {
+    cursor: pointer;
+  }
+
+  .mobile-auth-actions a:hover,
+  .mobile-auth-actions button:hover {
+    background: white;
+    color: black;
+  }
+
   .responsive-contact button:hover {
     background: white;
     color: black;
@@ -113,12 +164,13 @@
   .close-burger {
     display: block;
     position: absolute;
-    top: 30px;
-    right: 30px;
+    top: 16px;
+    right: 16px;
     font-size: 30px;
     color: white;
     cursor: pointer;
     transition: 0.3s ease;
+    z-index: 1002;
   }
 
   .close-burger:hover {

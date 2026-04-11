@@ -129,14 +129,14 @@ const Profile = () => {
       <UserDetails />
 
       {isAuthor && (
-        <div className="mb-12 border-b border-outline-variant/10 mt-12 px-6">
-          <div className="max-w-5xl mx-auto flex justify-between items-center overflow-x-auto no-scrollbar">
-            <div className="flex gap-10">
+        <div className="mt-10 mb-10 border-b border-outline-variant/10 px-3 sm:px-6">
+          <div className="mx-auto flex max-w-5xl flex-col gap-4 pb-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex gap-6 overflow-x-auto no-scrollbar sm:gap-10">
               {(['Bookshelf', 'Articles'] as const).map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`pb-4 font-label text-sm uppercase tracking-widest relative transition-all duration-300 ease-out cursor-pointer ${activeTab === tab
+                  className={`relative pb-3 font-label text-xs uppercase tracking-[0.18em] transition-all duration-300 ease-out cursor-pointer sm:text-sm ${activeTab === tab
                     ? 'text-primary font-bold border-b-2 border-primary opacity-100'
                     : 'text-on-surface-variant opacity-60 hover:opacity-100 hover:text-primary border-b-2 border-transparent'
                     }`}
@@ -148,10 +148,10 @@ const Profile = () => {
                 </button>
               ))}
             </div>
-            <div className="pb-4">
+            <div className="pb-2 sm:pb-3">
               <button
                 onClick={() => router.push(activeTab === 'Bookshelf' ? '/add-book' : '/post-article')}
-                className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white font-bold text-[11px] tracking-[0.15em] uppercase rounded-full hover:bg-primary/90 transition-all duration-300 shadow-[0_4px_12px_rgba(13,56,125,0.2)] hover:shadow-[0_6px_20px_rgba(13,56,125,0.3)] hover:-translate-y-0.5 cursor-pointer group"
+                className="group flex w-full items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 text-[10px] font-bold uppercase tracking-[0.15em] text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-primary/90 shadow-[0_4px_12px_rgba(13,56,125,0.2)] hover:shadow-[0_6px_20px_rgba(13,56,125,0.3)] sm:w-auto sm:px-6 sm:text-[11px]"
               >
                 <Plus size={16} className="transition-transform group-hover:rotate-90" />
                 {activeTab === 'Bookshelf' ? 'Add Book' : 'Post Article'}
