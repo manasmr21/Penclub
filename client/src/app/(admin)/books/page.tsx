@@ -348,7 +348,7 @@ export default function BooksPage() {
         )}
       </div>
 
-      {/* Details Modal */}
+      
       {showDetailsModal && (
         <BookDetailsModal
           book={selectedBook}

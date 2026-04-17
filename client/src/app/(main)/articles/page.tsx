@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { fetchAllArticles, type PublicArticle } from "@/src/lib/books-api";
+import { fetchAllArticles, type PublicArticle } from "@/src/lib/articles-api";
+import Loader from "@/components/Loader";
 
 function truncate(text: string, max = 220) {
   if (text.length <= max) return text;
@@ -39,11 +40,7 @@ export default function ArticlesPage() {
   }, []);
 
   if (loading) {
-    return (
-      <div className="main-container pt-24 pb-10">
-        <div className="max-w-5xl mx-auto px-6 py-20 text-center text-on-surface-variant/70">Loading articles...</div>
-      </div>
-    );
+    return <Loader fullScreen />;
   }
 
   if (!articles.length) {

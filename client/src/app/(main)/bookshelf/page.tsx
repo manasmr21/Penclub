@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { fetchAllBooks, fetchReviewsByBook } from "@/src/lib/books-api";
 import type { AuthorBook } from "@/src/lib/profile-stats-api";
+import Loader from "@/components/Loader";
 
 type BookWithRating = AuthorBook & {
   averageRating: number;
@@ -115,11 +116,7 @@ export default function BookshelfPage() {
   }, [books, appliedSearch]);
 
   if (loading) {
-    return (
-      <div className="main-container pt-24 pb-10">
-        <div className="max-w-5xl mx-auto px-6 py-20 text-center text-on-surface-variant/70">Loading books...</div>
-      </div>
-    );
+   return <Loader fullScreen />;
   }
 
   if (!books.length) {
