@@ -3,17 +3,36 @@ import { Pencil, Trash2 } from 'lucide-react';
 import Link from "next/link";
 import type { AuthorBook } from "@/src/lib/profile-stats-api";
 import { deleteBook, fetchReviewsByBook, updateBook } from "@/src/lib/books-api";
+import Loader from "@/components/Loader";
+import { Skeleton } from "@/src/components/ui/skeleton";
 
-type BookShelftProps = {
-  books: AuthorBook[];
-  loading?: boolean;
-  loadingMore?: boolean;
-  hasMore?: boolean;
-  onLoadMore?: () => Promise<void> | void;
-  onChanged?: () => Promise<void> | void;
-};
+const BookCardSkeleton = () => (
+  <div className="relative flex flex-col w-full max-w-[15rem] mx-auto animate-pulse">
+    <Skeleton className="w-full aspect-[2/3] mb-6 rounded-none bg-slate-200/50" />
+    <div className="flex flex-col px-1 gap-2">
+      <Skeleton className="h-5 w-3/4 rounded-sm" />
+      <Skeleton className="h-4 w-1/2 rounded-sm" />
+      <Skeleton className="h-3 w-1/3 mt-1 rounded-sm" />
+    </div>
+  </div>
+);
 
-const BookShelft = ({ books, loading = false, loadingMore = false, hasMore = false, onLoadMore, onChanged }: BookShelftProps) => {
+import { useAppStore } from '@/src/lib/store/store';
+
+const BookShelft = () => {
+  const { 
+    user,
+    books, 
+    loading, 
+    hasMoreBooks, 
+    booksPage,
+    fetchBooks,
+    fetchCounts
+  } = useAppStore();
+
+  const loadingBooks = loading.books;
+  const loadingMore = loading.moreBooks;
+
   const [editingBook, setEditingBook] = useState<AuthorBook | null>(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -88,7 +107,7 @@ const BookShelft = ({ books, loading = false, loadingMore = false, hasMore = fal
 
   async function handleEditSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (!editingBook?.id) return;
+    if (!editingBook?.id || !user?.id) return;
 
     setIsSaving(true);
     try {
@@ -99,7 +118,7 @@ const BookShelft = ({ books, loading = false, loadingMore = false, hasMore = fal
         coverImageFiles,
       });
       closeEditModal();
-      await onChanged?.();
+      await fetchBooks(user.id, 1);
     } catch (error) {
       const maybeError = error as { response?: { data?: { message?: string } } };
       alert(maybeError.response?.data?.message ?? "Failed to update book.");
@@ -110,11 +129,14 @@ const BookShelft = ({ books, loading = false, loadingMore = false, hasMore = fal
 
   async function handleDelete(bookId: string) {
     const confirmed = window.confirm("Are you sure you want to delete this book?");
-    if (!confirmed) return;
+    if (!confirmed || !user?.id) return;
 
     try {
       await deleteBook(bookId);
-      await onChanged?.();
+      await Promise.all([
+        fetchBooks(user.id, 1),
+        fetchCounts(user.id)
+      ]);
     } catch (error) {
       const maybeError = error as { response?: { data?: { message?: string } } };
       alert(maybeError.response?.data?.message ?? "Failed to delete book.");
@@ -123,25 +145,29 @@ const BookShelft = ({ books, loading = false, loadingMore = false, hasMore = fal
 
   const setSentinelRef = useCallback((node: HTMLDivElement | null) => {
     if (observerRef.current) observerRef.current.disconnect();
-    if (!node || !hasMore || loadingMore) return;
+    if (!node || !hasMoreBooks || loadingMore || !user?.id) return;
 
     observerRef.current = new IntersectionObserver(
       (entries) => {
         const first = entries[0];
         if (!first?.isIntersecting) return;
-        void onLoadMore?.();
+        void fetchBooks(user.id, booksPage + 1);
       },
       { threshold: 0.2 },
     );
 
     observerRef.current.observe(node);
-  }, [hasMore, loadingMore, onLoadMore]);
+  }, [hasMoreBooks, loadingMore, user?.id, booksPage, fetchBooks]);
 
-  if (loading) {
+  if (loadingBooks) {
     return (
       <div className="w-full pb-16">
-        <div className="max-w-4xl mx-auto text-center py-20 text-on-surface-variant/70">
-          Loading books...
+        <div className="max-w-4xl mx-auto px-3 sm:px-0">
+          <div className="grid grid-cols-1 min-[420px]:grid-cols-2 md:grid-cols-3 gap-x-5 sm:gap-x-8 gap-y-10 sm:gap-y-12">
+            {[...Array(6)].map((_, i) => (
+              <BookCardSkeleton key={i} />
+            ))}
+          </div>
         </div>
       </div>
     );
@@ -213,7 +239,7 @@ const BookShelft = ({ books, loading = false, loadingMore = false, hasMore = fal
           {loadingMore && (
             <p className="text-center text-sm text-on-surface-variant/70">Loading more books...</p>
           )}
-          {!hasMore && books.length > 0 && (
+          {!hasMoreBooks && books.length > 0 && (
             <p className="text-center text-sm text-on-surface-variant/70">You have reached the end.</p>
           )}
           <div ref={setSentinelRef} className="h-4 w-full" />

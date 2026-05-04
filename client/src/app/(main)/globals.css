@@ -338,3 +338,22 @@ body{
       color: white;
   }
 }
+
+.loader-overlay {
+  position: fixed;
+  inset: 0;
+  background: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  width:auto;
+  height:auto;
+}
+
+.loader-inline {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+}
