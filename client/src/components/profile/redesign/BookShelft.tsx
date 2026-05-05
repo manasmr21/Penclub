@@ -60,7 +60,7 @@ const BookShelft = () => {
   const handleDeleteBook = async (id: string, coverImages: string[]) => {
     if (!window.confirm("Are you sure you want to delete this publication?") || !user?.id) return;
     try {
-      await deleteBook(id, coverImages);
+      await deleteBook(id);
       await Promise.all([fetchBooks(user.id, 1), fetchCounts(user.id)]);
     } catch {
       alert("Failed to delete publication");
