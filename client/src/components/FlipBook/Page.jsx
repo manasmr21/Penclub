@@ -10,4 +10,6 @@ const Page = React.forwardRef(({ src }, ref) => {
   );
 });
 
+Page.displayName = "Page";
+
 export default Page;
