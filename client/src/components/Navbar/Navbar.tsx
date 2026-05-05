@@ -1,6 +1,6 @@
 "use client";
 
-import "../Navbar/Navbar.css"
+import "../Navbar/Navbar.css";
 import { logo } from "@/public/images";
 import Image from "next/image";
 import { useEffect, useState } from "react";

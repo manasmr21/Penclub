@@ -1,24 +1,15 @@
 import { api } from "./http-client";
 import type { AuthorBook } from "./profile-stats-api";
-import { AxiosError } from "axios";
 
 export type CreateBookPayload = {
   title: string;
   description: string;
   genre: string;
+  authorname: string;
   releaseDate?: string;
   purchaseLinks?: string[];
   coverImageFile?: File;
   coverImageFiles?: File[];
-};
-
-export type CreateArticlePayload = {
-  title: string;
-  content: string;
-  tags?: string[];
-  userId: string;
-  status?: string;
-  coverImageFile?: File;
 };
 
 export type UpdateBookPayload = {
@@ -31,14 +22,6 @@ export type UpdateBookPayload = {
   coverImageFiles?: File[];
 };
 
-export type UpdateArticlePayload = {
-  title?: string;
-  content?: string;
-  tags?: string[];
-  status?: string;
-  coverImageFile?: File;
-};
-
 type BooksPagination = {
   page: number;
   limit: number;
@@ -47,91 +30,6 @@ type BooksPagination = {
   hasNextPage: boolean;
   hasPreviousPage: boolean;
 };
-
-type ArticlesPagination = {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
-};
-
-export type PublicArticle = {
-  id: string;
-  title: string;
-  content: string;
-  tags?: string[];
-  coverImage?: string;
-  coverImageId?: string;
-  userId?: string;
-  createdAt?: string;
-};
-
-export async function fetchAllBooks(page = 1, limit = 10): Promise<{ books: AuthorBook[]; pagination: BooksPagination | null }> {
-  const { data } = await api.get<{ books?: AuthorBook[]; pagination?: BooksPagination }>(`/books?page=${page}&limit=${limit}`);
-
-  return {
-    books: Array.isArray(data?.books) ? data.books : [],
-    pagination: data?.pagination ?? null,
-  };
-}
-
-export async function fetchAllArticles(page = 1, limit = 10): Promise<{ articles: PublicArticle[]; pagination: ArticlesPagination | null }> {
-  const { data } = await api.get<{ blogs?: PublicArticle[]; pagination?: ArticlesPagination }>(`/blogs?page=${page}&limit=${limit}`);
-
-  return {
-    articles: Array.isArray(data?.blogs) ? data.blogs : [],
-    pagination: data?.pagination ?? null,
-  };
-}
-
-export async function fetchBookById(bookId: string): Promise<AuthorBook | null> {
-  try {
-    const { data } = await api.get<{ book?: AuthorBook }>(`/books/${bookId}`);
-
-    return data?.book ?? null;
-  } catch (error) {
-    if (error instanceof AxiosError && error.response?.status === 404) {
-      return null;
-    }
-    throw error;
-  }
-}
-
-export async function fetchAuthorNameById(authorId: string): Promise<string | null> {
-  if (!authorId?.trim()) return null;
-
-  try {
-    const { data } = await api.get<{ blogs?: Array<{ user?: { name?: string; username?: string } }> }>(
-      `/blogs/fetch/${authorId}`,
-    );
-
-    const firstUser = data?.blogs?.[0]?.user;
-    const name = firstUser?.name?.trim();
-    const username = firstUser?.username?.trim();
-    if (name || username) return name || username || null;
-  } catch (error) {
-    if (!(error instanceof AxiosError && error.response?.status === 404)) {
-      throw error;
-    }
-  }
-
-  try {
-    const { data } = await api.get<{ author?: { name?: string; penName?: string } }>(
-      `/authors/get-author/${authorId}`,
-    );
-
-    const name = data?.author?.name?.trim();
-    const penName = data?.author?.penName?.trim();
-    return name || penName || null;
-  } catch (error) {
-    if (error instanceof AxiosError && error.response?.status === 404) {
-      return null;
-    }
-    throw error;
-  }
-}
 
 export type BookReview = {
   id: string;
@@ -145,17 +43,74 @@ export type BookReview = {
   };
 };
 
-export async function fetchReviewsByBook(bookId: string): Promise<BookReview[]> {
-  try {
-    const { data } = await api.get<{ reviews?: BookReview[] }>(`/reviews/get-book/${bookId}`);
+const okOrNotFound = (status: number) => status === 200 || status === 404;
 
-    return Array.isArray(data?.reviews) ? data.reviews : [];
-  } catch (error) {
-    if (error instanceof AxiosError && error.response?.status === 404) {
-      return [];
-    }
-    throw error;
+function appendMany(formData: FormData, key: string, values?: string[]) {
+  if (!values?.length) return;
+  values.forEach((value) => formData.append(key, value));
+}
+
+function appendBookFiles(
+  formData: FormData,
+  files?: File[],
+  singleFile?: File,
+) {
+  const nextFiles = files?.length ? files : singleFile ? [singleFile] : [];
+  nextFiles.forEach((file) => formData.append("files", file));
+}
+
+export async function fetchAllBooks(
+  page = 1,
+  limit = 10,
+): Promise<{ books: AuthorBook[]; pagination: BooksPagination | null }> {
+  const { data } = await api.get<{ books?: AuthorBook[]; pagination?: BooksPagination }>(
+    `/books?page=${page}&limit=${limit}`,
+  );
+  return {
+    books: Array.isArray(data?.books) ? data.books : [],
+    pagination: data?.pagination ?? null,
+  };
+}
+
+export async function fetchBookById(bookId: string): Promise<AuthorBook | null> {
+  const response = await api.get<{ book?: AuthorBook }>(`/books/${bookId}`, {
+    validateStatus: okOrNotFound,
+  });
+  if (response.status === 404) return null;
+  return response.data?.book ?? null;
+}
+
+export async function fetchAuthorNameById(authorId: string): Promise<string | null> {
+  if (!authorId?.trim()) return null;
+
+  const blogResponse = await api.get<{ blogs?: Array<{ user?: { name?: string; username?: string } }> }>(
+    `/blogs/fetch/${authorId}`,
+    { validateStatus: okOrNotFound },
+  );
+  if (blogResponse.status !== 404) {
+    const firstUser = blogResponse.data?.blogs?.[0]?.user;
+    const name = firstUser?.name?.trim();
+    const username = firstUser?.username?.trim();
+    if (name || username) return name || username || null;
   }
+
+  const authorResponse = await api.get<{ author?: { name?: string; penName?: string } }>(
+    `/authors/get-author/${authorId}`,
+    { validateStatus: okOrNotFound },
+  );
+  if (authorResponse.status === 404) return null;
+
+  const name = authorResponse.data?.author?.name?.trim();
+  const penName = authorResponse.data?.author?.penName?.trim();
+  return name || penName || null;
+}
+
+export async function fetchReviewsByBook(bookId: string): Promise<BookReview[]> {
+  const response = await api.get<{ reviews?: BookReview[] }>(`/reviews/get-book/${bookId}`, {
+    validateStatus: okOrNotFound,
+  });
+  if (response.status === 404) return [];
+  return Array.isArray(response.data?.reviews) ? response.data.reviews : [];
 }
 
 export async function createBookReview(payload: { bookId: string; rating: number; content?: string }) {
@@ -173,47 +128,13 @@ export async function createBook(payload: CreateBookPayload) {
   formData.append("title", payload.title);
   formData.append("description", payload.description);
   formData.append("genre", payload.genre);
+  formData.append("authorname", payload.authorname);
 
-  if (payload.releaseDate) {
-    formData.append("releaseDate", payload.releaseDate);
-  }
-
-  if (payload.purchaseLinks?.length) {
-    payload.purchaseLinks.forEach((link) => {
-      formData.append("purchaseLinks", link);
-    });
-  }
-
-  const files = payload.coverImageFiles?.length
-    ? payload.coverImageFiles
-    : payload.coverImageFile
-      ? [payload.coverImageFile]
-      : [];
-
-  files.forEach((file) => formData.append("images", file));
+  if (payload.releaseDate) formData.append("releaseDate", payload.releaseDate);
+  appendMany(formData, "purchaseLinks", payload.purchaseLinks);
+  appendBookFiles(formData, payload.coverImageFiles, payload.coverImageFile);
 
   const { data } = await api.post("/books/create", formData);
-  return data;
-}
-
-export async function createArticle(payload: CreateArticlePayload) {
-  const formData = new FormData();
-  formData.append("title", payload.title);
-  formData.append("content", payload.content);
-  formData.append("userId", payload.userId);
-  formData.append("status", payload.status ?? "posted");
-
-  if (payload.tags?.length) {
-    payload.tags.forEach((tag) => {
-      formData.append("tags", tag);
-    });
-  }
-
-  if (payload.coverImageFile) {
-    formData.append("coverImage", payload.coverImageFile);
-  }
-
-  const { data } = await api.post("/blogs/create", formData);
   return data;
 }
 
@@ -224,18 +145,8 @@ export async function updateBook(bookId: string, payload: UpdateBookPayload) {
   if (payload.description !== undefined) formData.append("description", payload.description);
   if (payload.genre !== undefined) formData.append("genre", payload.genre);
   if (payload.releaseDate !== undefined) formData.append("releaseDate", payload.releaseDate);
-
-  if (payload.purchaseLinks?.length) {
-    payload.purchaseLinks.forEach((link) => formData.append("purchaseLinks", link));
-  }
-
-  const files = payload.coverImageFiles?.length
-    ? payload.coverImageFiles
-    : payload.coverImageFile
-      ? [payload.coverImageFile]
-      : [];
-
-  files.forEach((file) => formData.append("images", file));
+  appendMany(formData, "purchaseLinks", payload.purchaseLinks);
+  appendBookFiles(formData, payload.coverImageFiles, payload.coverImageFile);
 
   const { data } = await api.put(`/books/update/${bookId}`, formData);
   return data;
@@ -243,33 +154,5 @@ export async function updateBook(bookId: string, payload: UpdateBookPayload) {
 
 export async function deleteBook(bookId: string) {
   const { data } = await api.delete(`/books/delete/${bookId}`);
-  return data;
-}
-
-export async function updateArticle(articleId: string, payload: UpdateArticlePayload) {
-  const formData = new FormData();
-
-  if (payload.title !== undefined) formData.append("title", payload.title);
-  if (payload.content !== undefined) formData.append("content", payload.content);
-  if (payload.status !== undefined) formData.append("status", payload.status);
-
-  if (payload.tags?.length) {
-    payload.tags.forEach((tag) => formData.append("tags", tag));
-  }
-
-  if (payload.coverImageFile) {
-    formData.append("coverImage", payload.coverImageFile);
-  }
-
-  const { data } = await api.put(`/blogs/update/${articleId}`, formData);
-  return data;
-}
-
-export async function deleteArticle(articleId: string, coverImageId?: string) {
-  const { data } = await api.delete(`/blogs/delete/${articleId}`, {
-    data: {
-      coverImageId: coverImageId ?? "",
-    },
-  });
   return data;
 }

@@ -26,7 +26,7 @@ const iconMap = {
 export default function DashboardShell({ children, menuItems }) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const pathname = usePathname(); // ✅ for active route
+  const pathname = usePathname(); 
 
   const menuWithIcons = menuItems.map((item) => ({
     ...item,
@@ -40,7 +40,7 @@ export default function DashboardShell({ children, menuItems }) {
         menuItems={menuWithIcons}
         mobileOpen={mobileOpen}
         setMobileOpen={setMobileOpen}
-        activePath={pathname} // ✅ REQUIRED
+        activePath={pathname} 
       />
 
       <div className="flex-1 flex flex-col">
