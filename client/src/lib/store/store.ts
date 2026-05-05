@@ -31,6 +31,7 @@ export type AuthUser = {
   articleCount?: number;
   isEmailVerified?: boolean;
   isLoggedIn?: boolean;
+  createdAt?: string;
 };
 
 type AppStore = {
