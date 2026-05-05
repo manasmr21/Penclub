@@ -99,9 +99,10 @@ export function BookHeader({
           {/* Close Button */}
           <button
             onClick={() => setOpenReader(false)}
-            className="absolute top-5 right-5 text-white text-xl"
+            aria-label="Close book reader"
+            className="absolute right-4 top-4 z-[60] grid h-10 w-10 place-items-center rounded-full bg-white/15 text-2xl leading-none text-white backdrop-blur transition hover:bg-white/25"
           >
-            ✕
+            &times;
           </button>
 
           {/* FlipBook */}
@@ -114,3 +115,5 @@ export function BookHeader({
     </>
   );
 }
+
+

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams, useSearchParams, useRouter } from "next/navigation";
 import { useBookDetails } from "./useBookDetails";
 import { BookHeader } from "@/src/components/book/BookHeader";
 import { BookRating } from "@/src/components/book/BookRating";
@@ -13,6 +13,7 @@ export default function BookDetailsPage() {
   const from = useSearchParams().get("from");
   const backHref = from === "profile" ? "/profile" : "/bookshelf";
   const backLabel = from === "profile" ? "Back to profile" : "Back to bookshelf";
+  const router = useRouter();
 
   const {
     book, reviews, authorName, loading,
@@ -44,13 +45,13 @@ export default function BookDetailsPage() {
 
   return (
     <div className="main-container px-4 md:px-8 pt-28 pb-16">
-      <Link
-        href={backHref}
-        className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary transition hover:-translate-x-1"
+      <p
+        onClick={() => router.back()}
+        className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary transition hover:-translate-x-1 cursor-pointer"
       >
         <span aria-hidden="true">&larr;</span>
         {backLabel}
-      </Link>
+      </p>
 
       <section className="mt-10 grid grid-cols-1 items-start gap-8 lg:grid-cols-12 lg:gap-10">
         <BookHeader
