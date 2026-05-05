@@ -1,5 +1,6 @@
 import React, { FormEvent, useCallback, useRef, useState } from 'react';
-import { Pencil, Trash2 } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { Pencil, Trash2, X, Image as ImageIcon } from 'lucide-react';
 import Link from "next/link";
 import type { AuthorBook } from "@/src/lib/profile-stats-api";
 import { deleteBook, fetchReviewsByBook, updateBook } from "@/src/lib/books-api";
@@ -246,60 +247,104 @@ const BookShelft = () => {
         </div>
       </div>
 
-      {editingBook && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm grid place-items-center p-3 sm:px-4">
-          <div className="w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-4 sm:p-6">
-            <h2 className="text-xl font-semibold text-[#1e2741]">Edit Book</h2>
-            <form onSubmit={handleEditSubmit} className="mt-4 space-y-3">
-              <input
-                className="w-full border rounded-md p-3"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Title"
-                required
-              />
-              <textarea
-                className="w-full border rounded-md p-3 min-h-28"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Description"
-                required
-              />
-              <input
-                className="w-full border rounded-md p-3"
-                value={genre}
-                onChange={(e) => setGenre(e.target.value)}
-                placeholder="Genre"
-                required
-              />
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                className="w-full border rounded-md p-3"
-                onChange={(e) => setCoverImageFiles(Array.from(e.target.files ?? []))}
-              />
-              {!!coverImageFiles.length && <p className="text-xs text-gray-500">{coverImageFiles.length} image(s) selected</p>}
-              <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-2">
-                <button
-                  type="button"
-                  className="w-full sm:w-auto px-4 py-2 rounded-md border"
-                  onClick={closeEditModal}
+      {editingBook && typeof window !== "undefined" && createPortal(
+        <div className="fixed inset-0 z-[9999] flex flex-col items-center py-20 px-4 bg-slate-900/40 backdrop-blur-md transition-all animate-in fade-in duration-300">
+          <div className="relative w-full max-w-xl max-h-[calc(100vh-10rem)] overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl ring-1 ring-slate-200 animate-in slide-in-from-top-8 duration-300 scrollbar-hide">
+            <button 
+              onClick={closeEditModal}
+              className="absolute right-6 top-6 p-2 rounded-full hover:bg-slate-100 text-slate-400 transition-colors"
+            >
+              <X size={20} />
+            </button>
+
+            <div className="flex flex-col items-center mb-4 text-center">
+              <h2 className="text-xl font-bold text-[#1e2741]">Edit Book</h2>
+            </div>
+
+            <form onSubmit={handleEditSubmit} className="space-y-4">
+              <div className="space-y-1">
+                <label className="ml-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-500">Cover Images</label>
+                <div className="relative group aspect-[2/3] w-[180px] mx-auto overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
+                  <img 
+                    src={coverImageFiles.length > 0 ? URL.createObjectURL(coverImageFiles[0]) : (getBookPrimaryImage(editingBook) || "/placeholder-book.png")} 
+                    alt="Preview" 
+                    className="h-full w-full object-cover transition-opacity group-hover:opacity-40" 
+                  />
+                  <label className="absolute inset-0 flex items-center justify-center cursor-pointer opacity-0 transition group-hover:opacity-100">
+                    <div className="flex flex-col items-center gap-2 text-slate-900 text-center px-4">
+                      <ImageIcon size={24} />
+                      <span className="text-sm font-semibold">Select Images</span>
+                    </div>
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      multiple 
+                      className="hidden" 
+                      onChange={(e) => setCoverImageFiles(Array.from(e.target.files ?? []))}
+                    />
+                  </label>
+                </div>
+                {!!coverImageFiles.length && (
+                  <p className="text-[10px] text-center text-slate-500 mt-1">{coverImageFiles.length} new image(s) selected</p>
+                )}
+              </div>
+
+              <div className="space-y-3">
+                <div className="space-y-1">
+                  <label className="ml-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-500">Title</label>
+                  <input 
+                    value={title} 
+                    onChange={(e) => setTitle(e.target.value)}
+                    className="w-full h-11 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none transition focus:ring-2 focus:ring-primary focus:bg-white" 
+                    placeholder="Book title" 
+                    required 
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="ml-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-500">Description</label>
+                  <textarea 
+                    value={description} 
+                    onChange={(e) => setDescription(e.target.value)}
+                    className="w-full min-h-[140px] rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm outline-none transition focus:ring-2 focus:ring-primary focus:bg-white resize-none" 
+                    placeholder="Book description..." 
+                    required 
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="ml-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-500">Genre</label>
+                  <input 
+                    value={genre} 
+                    onChange={(e) => setGenre(e.target.value)}
+                    className="w-full h-11 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none transition focus:ring-2 focus:ring-primary focus:bg-white" 
+                    placeholder="Fiction, Mystery, etc." 
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2">
+                <button 
+                  type="button" 
+                  onClick={closeEditModal} 
+                  className="px-5 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-colors"
                   disabled={isSaving}
                 >
                   Cancel
                 </button>
-                <button
+                <button 
                   type="submit"
-                  className="w-full sm:w-auto px-4 py-2 rounded-md bg-primary text-white disabled:opacity-50"
-                  disabled={isSaving}
+                  disabled={isSaving} 
+                  className="px-7 py-2 rounded-xl text-sm bg-primary font-semibold text-white shadow-lg shadow-primary/20 hover:opacity-90 disabled:opacity-50 transition-all"
                 >
-                  {isSaving ? "Saving..." : "Save"}
+                  {isSaving ? "Saving..." : "Save Changes"}
                 </button>
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
