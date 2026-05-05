@@ -59,7 +59,6 @@ const UserDetails = ({ isOwnProfile = true, userOverride }: UserDetailsProps) =>
       }
     }
     if (typeof pic === "object") {
-      // @ts-expect-error profilePicture may come from API
       return pic.secure_url || pic.url || null;
     }
     return null;
