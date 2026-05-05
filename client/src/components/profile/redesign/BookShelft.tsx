@@ -57,7 +57,7 @@ const BookShelft = () => {
     }
   };
 
-  const handleDeleteBook = async (id: string, coverImages: string[]) => {
+  const handleDeleteBook = async (id: string) => {
     if (!window.confirm("Are you sure you want to delete this publication?") || !user?.id) return;
     try {
       await deleteBook(id);
@@ -141,7 +141,7 @@ const BookShelft = () => {
                 <button onClick={() => openEditModal(book)} className="h-8 w-8 flex items-center justify-center bg-white text-primary hover:bg-primary hover:text-white transition-all cursor-pointer border border-primary/10">
                   <Pencil size={14} />
                 </button>
-                <button onClick={() => handleDeleteBook(book.id, book.coverImages)} className="h-8 w-8 flex items-center justify-center bg-white text-red-600 hover:bg-red-500 hover:text-white transition-all cursor-pointer border border-primary/10">
+                <button onClick={() => handleDeleteBook(book.id)} className="h-8 w-8 flex items-center justify-center bg-white text-red-600 hover:bg-red-500 hover:text-white transition-all cursor-pointer border border-primary/10">
                   <Trash2 size={14} />
                 </button>
               </div>
