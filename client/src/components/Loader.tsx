@@ -57,7 +57,7 @@ export default function Loader({ fullScreen = false, progress = 0 }: LoaderProps
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] as any }}
           className="flex flex-col items-center gap-6"
         >
           <div className="w-20 h-20 border border-white/10 flex items-center justify-center bg-white/5 backdrop-blur-sm p-4">

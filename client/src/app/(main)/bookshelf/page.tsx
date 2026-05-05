@@ -293,7 +293,7 @@ export default function BookshelfPage() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.6, delay: index * 0.05, ease: [0.215, 0.61, 0.355, 1] }}
+                transition={{ duration: 0.6, delay: index * 0.05, ease: [0.215, 0.61, 0.355, 1] as any }}
               >
                 <Link href={`/bookshelf/${book.id}?from=bookshelf`} className="group block h-full border border-primary/10 hover:border-primary/30 transition-all duration-500 cursor-pointer bg-white">
                   {/* Image Container */}
