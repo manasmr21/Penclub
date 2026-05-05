@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams, useSearchParams, useRouter } from "next/navigation";
 import { useBookDetails } from "./useBookDetails";
 import { BookHeader } from "@/src/components/book/BookHeader";
 import { BookRating } from "@/src/components/book/BookRating";
@@ -13,6 +13,7 @@ export default function BookDetailsPage() {
   const from = useSearchParams().get("from");
   const backHref = from === "profile" ? "/profile" : "/bookshelf";
   const backLabel = from === "profile" ? "Back to profile" : "Back to bookshelf";
+  const router = useRouter();
 
   const {
     book, reviews, authorName, loading,
