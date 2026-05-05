@@ -67,16 +67,6 @@ export default function ProfileSettingsPage() {
   return (
     <div className="main-container px-3 sm:px-6 pt-20 sm:pt-24 pb-12">
       <div className="mx-auto max-w-6xl">
-        <div className="mb-5 sm:mb-6 flex flex-wrap items-center justify-between gap-3 text-primary">
-          <button
-            type="button"
-            onClick={() => router.push("/profile")}
-            className="rounded-full border border-border bg-card px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-foreground transition hover:bg-muted/60"
-          >
-            Back to Profile
-          </button>
-        </div>
-
         <div className="mb-5 sm:mb-6 flex items-center gap-2 text-primary">
           <Settings size={18} />
           <h1 className="text-2xl font-bold tracking-tight">Profile Settings</h1>

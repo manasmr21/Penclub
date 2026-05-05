@@ -151,7 +151,7 @@ const Profile = () => {
             <div className="pb-2 sm:pb-3">
               <button
                 onClick={() => router.push(activeTab === 'Bookshelf' ? '/add-book' : '/post-article')}
-                className="group flex w-full items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 text-[10px] font-bold uppercase tracking-[0.15em] text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-primary/90 shadow-[0_4px_12px_rgba(13,56,125,0.2)] hover:shadow-[0_6px_20px_rgba(13,56,125,0.3)] sm:w-auto sm:px-6 sm:text-[11px]"
+                className="group flex w-full items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 text-[10px] font-bold uppercase tracking-[0.15em] text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-primary/90 shadow-[0_4px_12px_rgba(13,56,125,0.2)] hover:shadow-[0_6px_20px_rgba(13,56,125,0.3)] sm:w-auto sm:px-6 sm:text-[11px] cursor-pointer"
               >
                 <Plus size={16} className="transition-transform group-hover:rotate-90" />
                 {activeTab === 'Bookshelf' ? 'Add Book' : 'Post Article'}

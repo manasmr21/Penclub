@@ -52,7 +52,7 @@ function ProfilePageContent() {
   if (!hydrated || !user) return <ProfileLoadingView />;
 
   return (
-    <div className="pt-16 min-h-screen bg-background">
+    <div className="pt-24 min-h-screen bg-background">
       <ProfileRedesign />
 
       {isEditModalOpen && (

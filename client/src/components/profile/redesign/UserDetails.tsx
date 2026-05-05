@@ -122,9 +122,10 @@ const UserDetails = () => {
 
         {/* Info */}
         <div className="flex flex-col flex-1 justify-center max-w-2xl text-center md:text-left mt-4 md:mt-2">
-          <h1 className="text-4xl md:text-[2.75rem] font-bold tracking-tight text-primary mb-4 leading-none">
+          <h1 className="text-4xl md:text-[2.5rem] font-bold tracking-tight text-primary leading-none">
             {displayName}
           </h1>
+          <p className="italic font-medium mb-3 text-gray-500">{user.username}</p>
           <p className="text-base md:text-[17px] text-on-surface-variant opacity-80 font-serif italic leading-relaxed mb-10 md:border-l-2 md:border-primary/20 md:pl-5 mx-auto md:mx-0 max-w-lg">
             {user?.bio || "No biography added yet."}
           </p>
@@ -170,11 +171,11 @@ const UserDetails = () => {
       </div>
 
       {/* Actions */}
-      <div className="flex w-full md:w-auto mt-6 md:mt-4 items-center justify-center md:justify-end shrink-0">
+      <div className="flex w-full md:w-auto mt-6 md:mt-4 items-center justify-center md:justify-end shrink-0 cursor-pointer">
         <button
           onClick={() => router.push("/profile/settings")}
-          className="group flex h-12 w-12 items-center justify-center rounded-full border border-primary/20 bg-white text-primary shadow-sm transition-all duration-300 hover:bg-primary/10"
-          aria-label="Open profile settings"
+          className="group flex h-12 w-12 items-center justify-center rounded-full border border-primary/20 bg-white text-primary shadow-sm transition-all duration-300 hover:bg-primary/10 cursor-pointer"
+          aria-label="Open profile settings "
         >
           <IoSettingsOutline className="text-[22px] transition-transform group-hover:rotate-45" />
         </button>

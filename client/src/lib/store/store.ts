@@ -86,6 +86,7 @@ export const useAppStore = create<AppStore>()(
             },
           };
         }),
+
       setLoading: (value) => set({ isLoading: value }),
       setError: (message) => set({ error: message }),
       clearAuth: () => set({ user: null }),
