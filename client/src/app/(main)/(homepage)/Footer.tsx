@@ -4,14 +4,14 @@ import { FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
 
 const Footer = () => {
   return (
-    <footer id="contact" className="bg-primary text-white">
+    <footer id="contact" className="bg-primary text-white border-t border-white/50">
       <div className="mx-auto w-full max-w-7xl px-4 py-5 sm:px-6 md:px-8">
         <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 md:justify-between">
           <div className="order-2 w-full text-center text-sm font-medium sm:w-auto md:order-1 md:text-left">
             &copy; {new Date().getFullYear()} Penclub
           </div>
 
-          <div className="order-1 w-full text-center text-base font-quicksand font-semibold sm:text-lg md:order-2 md:w-auto">
+          <div className="order-1 w-full text-center text-base font-rounded font-semibold sm:text-lg md:order-2 md:w-auto">
             Penned with love
           </div>
 

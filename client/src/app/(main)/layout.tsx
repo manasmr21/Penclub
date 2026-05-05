@@ -1,8 +1,15 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Inter, Rouge_Script, Chau_Philomene_One, Quicksand } from "next/font/google";
+import { Geist, Geist_Mono, Inter, Rouge_Script, Chau_Philomene_One, Quicksand, Noto_Serif } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/src/components/Navbar/Navbar";
 import Footer from "./(homepage)/Footer";
+
+const notoSerif = Noto_Serif({
+  variable: "--font-noto-serif",
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  weight: ["400", "700", "900"],
+});
 
 
 const geistSans = Geist({
@@ -47,20 +54,22 @@ export const metadata: Metadata = {
   },
 };
 
+import SplashScreenProvider from "@/src/components/providers/SplashScreenProvider";
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-
+    <SplashScreenProvider>
       <div
-        className={`${geistSans.variable} ${geistMono.variable} ${interFont.variable} ${rougeScript.variable} ${chauPhilomene.variable} ${quickSand.variable} min-h-screen flex flex-col antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${interFont.variable} ${rougeScript.variable} ${chauPhilomene.variable} ${quickSand.variable} ${notoSerif.variable} min-h-screen flex flex-col antialiased`}
       >
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />
       </div>
-
+    </SplashScreenProvider>
   );
 }

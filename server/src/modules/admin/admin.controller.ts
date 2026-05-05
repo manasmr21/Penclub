@@ -12,10 +12,10 @@ export class AdminController {
     ) { }
 
     //admin module different
-    @Post("admin")
-    async makeAdmin(@Body() dto: { email: string, password: string, confirmPassword: string }) {
-        return await this.adminService.createAdmin(dto);
-    }
+    // @Post("admin")
+    // async makeAdmin(@Body() dto: { email: string, password: string, confirmPassword: string }) {
+    //     return await this.adminService.createAdmin(dto);
+    // }
 
     @Post("login")
     async loginAdmin(@Body() dto: { email: string, password: string }, @Response({ passthrough: true }) res: any) {

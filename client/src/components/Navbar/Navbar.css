@@ -3,205 +3,27 @@
   display: none;
 }
 
-@media only screen and (max-width: 800px) {
+
+@media only screen and (max-width: 1050px) {
+  .menu-items ul li {
+    font-size: 13px;
+  }
+}
+
+
+@media only screen and (max-width: 1024px) {
   .contacts {
-    display: none;
+    display: flex;
   }
 
   .burger-menu {
-    display: block;
-    z-index: 1001;
-    cursor: pointer;
-  }
-
-
-  /* FULLSCREEN GLASS MENU */
-  .menu-items {
-    position: fixed;
-    inset: 0;
-    width: 100dvw;
-    height: 100dvh;
-    padding: 5.5rem 1.25rem 2rem;
-    backdrop-filter: blur(18px);
-    background: linear-gradient(
-      135deg,
-      rgba(13, 56, 125, 0.95),
-      rgba(13, 56, 125, 0.85)
-    );
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    transform: translateY(calc(-100% - 24px));
-    transition: transform 0.45s cubic-bezier(0.77, 0, 0.18, 1);
-    z-index: 1000;
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-  }
-
-  .menu-items[menu-open="true"] {
-    transform: translateY(0);
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-  }
-
-  /* MENU ITEMS */
-  .menu-items ul {
-    flex-direction: column;
-    gap: 10px;
-    width: min(90vw, 26rem);
-    font-size: clamp(1.1rem, 4.8vw, 1.45rem);
-    font-weight: 700;
-    text-align: center;
-    letter-spacing: 1px;
-    color: white;
-  }
-
-  .menu-items ul li {
-    position: relative;
-    cursor: pointer;
-    width: 100%;
-    border: 1px solid rgba(255, 255, 255, 0.35);
-    border-radius: 999px;
-    padding: 0;
-    transition: background-color 0.2s ease;
-  }
-
-  .menu-items ul li a {
-    display: block;
-    width: 100%;
-    padding: 10px 16px;
-  }
-
-  .menu-items ul li:hover {
-    transform: none;
-    opacity: 1;
-    background: rgba(255, 255, 255, 0.1);
-  }
-
-  .menu-items ul li.active {
-    background: rgba(255, 255, 255, 0.18);
-    border-color: white;
-  }
-
-  /* CONTACT BUTTON */
-  .responsive-contact {
-    display: block;
-    margin-top: 10px;
-    width: min(90vw, 26rem);
-  }
-
-  .responsive-contact button {
-    padding: 14px 34px;
-    border-radius: 999px;
-    border: 2px solid white;
-    background: transparent;
-    font-weight: 600;
-    font-size: 16px;
-    color: white;
-    transition: 0.3s ease;
-  }
-
-  .responsive-contact a {
-    display: inline-block;
-    padding: 14px 34px;
-    border-radius: 999px;
-    border: 2px solid white;
-    background: transparent;
-    font-weight: 600;
-    font-size: 16px;
-    color: white;
-    transition: 0.3s ease;
-  }
-
-  .mobile-auth-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    width: 100%;
-  }
-
-  .mobile-auth-actions a,
-  .mobile-auth-actions button {
-    width: 100%;
-    display: block;
-    padding: 12px 16px;
-    border-radius: 999px;
-    border: 2px solid white;
-    background: transparent;
-    font-weight: 600;
-    font-size: 16px;
-    color: white;
-    text-align: center;
-    transition: 0.2s ease;
-  }
-
-  .mobile-auth-actions button {
-    cursor: pointer;
-  }
-
-  .mobile-auth-actions a:hover,
-  .mobile-auth-actions button:hover {
-    background: white;
-    color: black;
-  }
-
-  .responsive-contact button:hover {
-    background: white;
-    color: black;
-  }
-
-  .responsive-contact a:hover {
-    background: white;
-    color: black;
-  }
-
-  /* CLOSE BUTTON */
-  .close-burger {
-    display: block;
-    position: absolute;
-    top: 16px;
-    right: 16px;
-    font-size: 30px;
-    color: white;
-    cursor: pointer;
-    transition: 0.3s ease;
-    z-index: 1002;
-  }
-
-  .close-burger:hover {
-    transform: rotate(90deg);
+    display: none;
   }
 }
-
-
-/* .menu-items ul li{
-  position: relative;
-}
-
-.menu-items ul li::after{
-  content: "";
-  position: absolute;
-  width: 0%;
-  height: 3px;
-  background-color: var(--primary);
-  border-radius: 15px;
-  left: 0;
-  bottom: 0px;
-  transition: width 0.1s ease-in-out;
-}
-
-.menu-items ul li:hover::after{
-  width: 100%;
-} */
 
 .menu-items ul li {
   border: 1px solid transparent;
-  padding: 8px 16px;
+  padding: 4px 12px;
   border-radius: 0;
   transition: all 0.2s ease-out;
   background: transparent;
@@ -214,7 +36,7 @@
 
 .menu-items ul li:hover,
 .menu-items ul li.active {
-  background: var(--color-primary, #001b45);
+  background: var(--primary);
 }
 
 .menu-items ul li:hover a,

@@ -104,12 +104,12 @@ const UserDetails = ({ isOwnProfile = true, userOverride }: UserDetailsProps) =>
 
   if (!user) {
     return (
-      <div className="flex flex-col md:flex-row gap-10 items-start mb-16 animate-pulse">
-        <div className="w-40 h-40 md:w-48 md:h-48 rounded-none bg-zinc-200" />
-        <div className="flex-1 space-y-5">
+      <div className="flex flex-col md:flex-row gap-10 items-center md:items-start mb-16 animate-pulse">
+        <div className="w-40 h-40 md:w-48 md:h-48 rounded-full bg-zinc-200" />
+        <div className="flex-1 flex flex-col items-center md:items-start space-y-5 w-full">
           <div className="h-10 bg-zinc-200 w-48 rounded-none" />
           <div className="h-4 bg-zinc-200 w-72 rounded-none" />
-          <div className="flex gap-8">
+          <div className="flex gap-8 justify-center md:justify-start">
             <div className="h-16 w-20 bg-zinc-200 rounded-none" />
             <div className="h-16 w-20 bg-zinc-200 rounded-none" />
           </div>
@@ -120,67 +120,69 @@ const UserDetails = ({ isOwnProfile = true, userOverride }: UserDetailsProps) =>
 
   return (
     <motion.header
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="flex flex-col md:flex-row gap-10 items-start mb-16 relative w-full"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="bg-[#0A192F] px-8 py-10 mb-10 text-white relative w-full"
     >
-      <div className="relative group shrink-0">
-        <div className="w-40 h-40 md:w-48 md:h-48 rounded-none overflow-hidden shadow-2xl rotate-1 group-hover:rotate-0 transition-transform duration-500 bg-black/5">
-          {hasProfilePicture ? (
-            <Image
-              src={picUrl!}
-              alt={displayName}
-              width={400}
-              height={400}
-              className="object-cover w-full h-full"
-              priority
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center bg-zinc-100 text-primary/40 font-serif font-bold text-6xl">
-              {fallbackInitials}
+      <div className="max-w-5xl mx-auto flex flex-col items-center">
+        {/* Top Content Row */}
+        <div className="w-full flex flex-col md:flex-row items-center md:items-start justify-start gap-10 md:gap-14 mb-10">
+          {/* Profile Picture (Left on Desktop) */}
+          <div className="relative shrink-0">
+            <div className="w-28 h-28 md:w-36 md:h-36 rounded-none border-2 border-white/20 p-1">
+              <div className="w-full h-full relative overflow-hidden bg-white/5">
+                {hasProfilePicture ? (
+                  <Image
+                    src={picUrl!}
+                    alt={displayName}
+                    fill
+                    className="object-cover"
+                    priority
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-white/20 font-serif font-bold text-5xl">
+                    {fallbackInitials}
+                  </div>
+                )}
+              </div>
             </div>
-          )}
-        </div>
-        {isAuthor && (
-          <div className="absolute -bottom-4 -right-4 w-12 h-12 bg-primary rounded-none flex items-center justify-center text-white shadow-lg">
-            <IoCheckmarkCircle className="text-2xl" />
+            {isOwnProfile && (
+              <Link href="/profile/settings" className="absolute -bottom-2 -right-2 w-8 h-8 bg-white text-[#0A192F] flex items-center justify-center shadow-lg cursor-pointer hover:bg-zinc-100 transition-colors">
+                <Edit3 size={14} />
+              </Link>
+            )}
           </div>
-        )}
-      </div>
 
-      <div className="flex-1 space-y-6 w-full">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-4xl md:text-5xl font-serif font-bold text-primary tracking-tight mb-2 capitalize">
-              {displayName}
-            </h1>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-sm font-sans tracking-widest text-primary/50 uppercase">
-                @{user?.username || displayName.toLowerCase().replace(/\s/g, "")}
-              </span>
+          {/* User Info (Right on Desktop) */}
+          <div className="flex-1 space-y-4 text-center md:text-left w-full">
+            <div className="space-y-3">
+              <h1 className="text-3xl md:text-5xl font-serif font-bold tracking-tight leading-tight">
+                {displayName}
+              </h1>
+              <p className="text-base md:text-lg font-serif italic text-white/70 max-w-2xl">
+                {displayBio}
+              </p>
             </div>
-            <p className="text-lg italic text-primary/70 max-w-xl leading-relaxed font-serif">
-              "{displayBio}"
-            </p>
+
+            <div className="flex flex-wrap justify-center md:justify-start gap-3 pt-2">
+              {["Essays", "Memoir", "Poetry", "Modernist Fiction"].map((tag) => (
+                <span key={tag} className="px-4 py-1.5 border border-white/20 text-[10px] font-sans font-bold uppercase tracking-widest text-white/80">
+                  {tag}
+                </span>
+              ))}
+            </div>
           </div>
-          
-          {isOwnProfile ? (
-            <Link href="/profile/settings" className="bg-primary text-white px-8 py-3 rounded-none font-sans font-semibold text-sm hover:opacity-90 transition-all active:scale-95 shadow-lg flex items-center justify-center gap-2 w-full max-w-[150px]">
-              <IoSettingsOutline size={16} /> Settings
-            </Link>
-          ) : (
-            <button onClick={handleShare} className="border border-primary text-primary hover:bg-primary hover:text-white px-8 py-3 rounded-none font-sans font-semibold text-sm transition-all active:scale-95 shadow-lg flex items-center justify-center gap-2 w-full max-w-[150px]">
-              <Share2 size={16} /> Share
-            </button>
-          )}
         </div>
 
-        <div className="flex flex-nowrap gap-4 sm:gap-8 pt-6 border-t border-primary/20 overflow-x-auto no-scrollbar">
-          {stats.map((stat) => (
-            <div key={stat.label} className="text-left shrink-0">
-              <span className="block text-xl md:text-2xl font-serif font-bold text-primary">{stat.value}</span>
-              <span className="text-[10px] md:text-xs font-sans uppercase tracking-widest text-primary/60">{stat.label}</span>
+        {/* Stats Grid */}
+        <div className="w-full max-w-3xl border border-white/10 p-6 grid grid-cols-2 md:grid-cols-4 gap-6 relative">
+          {stats.map((stat, idx) => (
+            <div key={stat.label} className="relative flex flex-col items-center">
+              <span className="text-2xl md:text-3xl font-serif font-bold mb-1">{stat.value}</span>
+              <span className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-white/40">{stat.label}</span>
+              {idx < stats.length - 1 && (
+                <div className="hidden md:block absolute -right-3 top-1/2 -translate-y-1/2 h-10 w-[1px] bg-white/10" />
+              )}
             </div>
           ))}
         </div>

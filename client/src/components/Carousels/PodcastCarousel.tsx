@@ -43,12 +43,21 @@ const PodcastCarousel = () => {
 
   // Disable scroll when modal open
   useEffect(() => {
+    if (!api) return;
+    
+    const autoplay = api.plugins()?.autoplay as any;
+    if (!autoplay) return;
+
     if (activeVideo) {
       document.body.style.overflow = "hidden";
-      api?.plugins()?.autoplay?.stop();
+      if (typeof autoplay.stop === "function") autoplay.stop();
     } else {
       document.body.style.overflow = "";
-      api?.plugins()?.autoplay?.play();
+      // Use reset() instead of play() as it's safer, and wrap in timeout
+      const timer = setTimeout(() => {
+        if (typeof autoplay.reset === "function") autoplay.reset();
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [activeVideo, api]);
 

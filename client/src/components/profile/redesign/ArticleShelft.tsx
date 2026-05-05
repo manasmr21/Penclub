@@ -1,24 +1,31 @@
 import { motion } from "motion/react";
 import React, { FormEvent, useState } from "react";
-import { Pencil, Trash2, X, PenTool, Heart, Clock, Calendar } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { createPortal } from "react-dom";
+import { Pencil, Trash2, X, Image as ImageIcon, PenTool, Heart, Clock, Calendar } from "lucide-react";
 import type { AuthorArticle } from "@/src/lib/profile-stats-api";
 import { deleteArticle, updateArticle } from "@/src/lib/articles-api";
 import { useAppStore } from "@/src/lib/store/store";
+import { useRouter } from "next/navigation";
 
 export default function ArticleShelf() {
   const router = useRouter();
-  const { 
+  const {
     user,
-    articles, 
-    loading, 
-    fetchArticles, 
-    fetchCounts 
+    articles,
+    loading,
+    fetchArticles,
+    fetchCounts
   } = useAppStore();
 
   const loadingArticles = loading.articles;
   const [editingArticle, setEditingArticle] = useState<AuthorArticle | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [preview, setPreview] = useState<string | null>(null);
+
+  const handleEditClick = (article: AuthorArticle) => {
+    setEditingArticle(article);
+    setPreview(null);
+  };
 
   if (loadingArticles) {
     return (
@@ -98,14 +105,14 @@ export default function ArticleShelf() {
 
   return (
     <div className="w-full">
-      <motion.div 
+      <motion.div
         variants={container}
         initial="hidden"
         animate="show"
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12"
       >
         {articles.map((article) => (
-          <motion.article 
+          <motion.article
             variants={item}
             key={article.id}
             className="group flex flex-col bg-white border border-primary/10 rounded-none transition-all duration-500 hover:shadow-xl hover:-translate-y-1"
@@ -116,7 +123,7 @@ export default function ArticleShelf() {
               ) : (
                 <div className="h-full w-full bg-zinc-100 flex items-center justify-center text-[10px] uppercase tracking-widest font-bold text-primary/30">Literary Piece</div>
               )}
-              
+
               {article.tags && article.tags.length > 0 && (
                 <div className="absolute top-4 left-4">
                   <span className="px-3 py-1 bg-white text-[10px] font-sans font-semibold tracking-widest text-primary border border-primary/10">
@@ -143,11 +150,11 @@ export default function ArticleShelf() {
                   <span>{new Date(article.createdAt).toLocaleDateString()}</span>
                 </div>
               </div>
-              
+
               <h3 className="text-xl font-bold text-primary font-serif leading-tight mb-3 line-clamp-2 cursor-pointer hover:text-primary/70 transition-colors">
                 {article.title}
               </h3>
-              
+
               <p className="text-sm text-primary/80 font-sans line-clamp-2 mb-4 leading-relaxed">
                 {article.content}
               </p>
@@ -172,18 +179,18 @@ export default function ArticleShelf() {
                 <X size={24} />
               </button>
             </div>
-            
+
             <form onSubmit={handleUpdate} className="p-10 space-y-8 overflow-y-auto max-h-[80vh]">
               <div className="space-y-3">
                 <label className="text-[10px] font-black uppercase tracking-widest text-primary/40 px-1">Title</label>
                 <input name="title" defaultValue={editingArticle.title} className="w-full h-14 bg-primary/[0.03] border border-primary/5 rounded-2xl px-6 text-sm font-bold text-primary outline-none focus:border-primary/20 transition-all" required />
               </div>
-              
+
               <div className="space-y-3">
                 <label className="text-[10px] font-black uppercase tracking-widest text-primary/40 px-1">Content Snippet</label>
                 <textarea name="content" defaultValue={editingArticle.content} className="w-full min-h-[160px] bg-primary/[0.03] border border-primary/5 rounded-[2rem] p-6 text-sm font-serif italic text-primary/70 outline-none focus:border-primary/20 transition-all resize-none" required />
               </div>
-              
+
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-3">
                   <label className="text-[10px] font-black uppercase tracking-widest text-primary/40 px-1">Tags</label>
