@@ -110,58 +110,58 @@ export class AdminService {
         return undefined;
     }
 
-    async createAdmin(dto: { email: string, password: string, confirmPassword: string }) {
-        try {
+    // async createAdmin(dto: { email: string, password: string, confirmPassword: string }) {
+    //     try {
 
-            const { email, password, confirmPassword } = dto;
+    //         const { email, password, confirmPassword } = dto;
 
-            if (password !== confirmPassword) throw new BadRequestException({
-                success: false,
-                message: "Confirm password does not match the password"
-            })
+    //         if (password !== confirmPassword) throw new BadRequestException({
+    //             success: false,
+    //             message: "Confirm password does not match the password"
+    //         })
 
-            if (!email || !password) throw new BadRequestException({
-                success: false,
-                message: "All fields are required"
-            })
+    //         if (!email || !password) throw new BadRequestException({
+    //             success: false,
+    //             message: "All fields are required"
+    //         })
 
-            const adminExist = await this.userRepository.findOne({
-                where: {
-                    role: "admin"
-                }
-            })
+    //         const adminExist = await this.userRepository.findOne({
+    //             where: {
+    //                 role: "admin"
+    //             }
+    //         })
 
-            if (adminExist) throw new BadRequestException({
-                success: false,
-                message: "Admin already exist cannot make another one"
-            })
+    //         if (adminExist) throw new BadRequestException({
+    //             success: false,
+    //             message: "Admin already exist cannot make another one"
+    //         })
 
-            const hashedPassword = await bcrypt.hash(password, 12);
+    //         const hashedPassword = await bcrypt.hash(password, 12);
 
-            const admin = this.userRepository.create({
-                email,
-                password: hashedPassword,
-                name: "Admin",
-                username: "admin",
-                role: "admin"
-            })
+    //         const admin = this.userRepository.create({
+    //             email,
+    //             password: hashedPassword,
+    //             name: "Admin",
+    //             username: "admin",
+    //             role: "admin"
+    //         })
 
-            await this.userRepository.save(admin);
+    //         await this.userRepository.save(admin);
 
-            return {
-                success: true,
-                message: "Admin created successfully",
-                admin: {
-                    username: admin.username,
-                    email: admin.email,
-                    role: admin.role
-                }
-            }
+    //         return {
+    //             success: true,
+    //             message: "Admin created successfully",
+    //             admin: {
+    //                 username: admin.username,
+    //                 email: admin.email,
+    //                 role: admin.role
+    //             }
+    //         }
 
-        } catch (error) {
-            throw this.handleServiceError(error);
-        }
-    }
+    //     } catch (error) {
+    //         throw this.handleServiceError(error);
+    //     }
+    // }
 
     async loginAdmin(dto: { email: string, password: string }, res: any) {
         try {
@@ -496,7 +496,7 @@ export class AdminService {
     async getSiteData() {
         try {
             const siteData = await this.siteRepository.findOne({ where: {} });
-            
+
             return {
                 success: true,
                 message: "Site data fetched successfully",

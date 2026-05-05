@@ -52,10 +52,10 @@ function ProfileSettings() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h3 className="text-lg font-semibold text-gray-900">Profile Information</h3>
-        <p className="text-sm text-gray-500 mt-1">Update your personal information</p>
+        <h3 className="text-xl font-bold text-primary tracking-tight">Profile Information</h3>
+        <p className="text-sm text-muted-foreground mt-1 font-serif italic">Update your personal and administrative information</p>
       </div>
 
       <div className="space-y-4">
@@ -132,11 +132,11 @@ function ProfileSettings() {
           </div>
         </div>
 
-        <div className="flex items-center gap-3 pt-4">
+        <div className="flex items-center gap-4 pt-6">
           <button
             onClick={handleSave}
             disabled={isSaving}
-            className="cursor-pointer flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+            className="cursor-pointer flex items-center gap-2 px-6 py-2.5 text-xs font-bold uppercase tracking-widest text-white bg-primary rounded-full hover:bg-primary/90 transition-all shadow-[0_4px_12px_rgba(13,56,125,0.2)] disabled:opacity-50"
           >
             {isSaving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             {isSaving ? "Saving..." : "Save Changes"}
@@ -213,7 +213,7 @@ function SecuritySettings() {
           />
         </div>
 
-        <button className="cursor-pointer px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+        <button className="cursor-pointer px-6 py-2.5 text-xs font-bold uppercase tracking-widest text-white bg-primary rounded-full hover:bg-primary/90 transition-all shadow-sm">
           Update Password
         </button>
       </div>
@@ -228,7 +228,7 @@ function SecuritySettings() {
           <button
             onClick={() => setTwoFactorEnabled(!twoFactorEnabled)}
             className={`cursor-pointer relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-              twoFactorEnabled ? "bg-blue-600" : "bg-gray-200"
+              twoFactorEnabled ? "bg-primary" : "bg-muted/20"
             }`}
           >
             <span
@@ -304,7 +304,7 @@ function NotificationsSettings() {
           <button
             onClick={() => toggleSetting("emailNotifications")}
             className={`cursor-pointer relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-              settings.emailNotifications ? "bg-blue-600" : "bg-gray-200"
+              settings.emailNotifications ? "bg-primary" : "bg-muted/20"
             }`}
           >
             <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
@@ -321,7 +321,7 @@ function NotificationsSettings() {
           <button
             onClick={() => toggleSetting("pushNotifications")}
             className={`cursor-pointer relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-              settings.pushNotifications ? "bg-blue-600" : "bg-gray-200"
+              settings.pushNotifications ? "bg-primary" : "bg-muted/20"
             }`}
           >
             <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
@@ -338,7 +338,7 @@ function NotificationsSettings() {
           <button
             onClick={() => toggleSetting("bookUpdates")}
             className={`cursor-pointer relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-              settings.bookUpdates ? "bg-blue-600" : "bg-gray-200"
+              settings.bookUpdates ? "bg-primary" : "bg-muted/20"
             }`}
           >
             <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
@@ -355,7 +355,7 @@ function NotificationsSettings() {
           <button
             onClick={() => toggleSetting("newFollowers")}
             className={`cursor-pointer relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-              settings.newFollowers ? "bg-blue-600" : "bg-gray-200"
+              settings.newFollowers ? "bg-primary" : "bg-muted/20"
             }`}
           >
             <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
@@ -397,7 +397,7 @@ function DangerZone() {
               />
               <button
                 disabled={confirmText !== "DELETE"}
-                className="cursor-pointer px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="cursor-pointer px-6 py-2.5 text-xs font-bold uppercase tracking-widest text-white bg-red-600 rounded-full hover:bg-red-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
               >
                 Delete Account
               </button>
@@ -421,31 +421,31 @@ export default function SettingsPage() {
   ];
 
   return (
-    <div className="p-6">
+    <div className="p-8 space-y-8 font-inter">
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-        <p className="text-gray-500 text-sm mt-1">Manage your account preferences</p>
+      <div>
+        <h1 className="text-3xl font-bold text-primary tracking-tight">Settings</h1>
+        <p className="text-muted-foreground text-sm mt-1 font-serif italic">Manage your account preferences and system configurations</p>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Sidebar Tabs */}
         <div className="lg:w-64 flex-shrink-0">
-          <div className="sticky top-6 space-y-1">
+          <div className="sticky top-8 space-y-2">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`cursor-pointer w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all ${
+                  className={`cursor-pointer w-full flex items-center gap-3 px-5 py-3.5 rounded-2xl transition-all ${
                     activeTab === tab.id
-                      ? "bg-blue-50 text-blue-700 font-medium"
-                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      ? "bg-primary text-white shadow-[0_4px_12px_rgba(13,56,125,0.2)] font-bold"
+                      : "text-muted-foreground hover:bg-primary/5 hover:text-primary"
                   }`}
                 >
                   <Icon className="w-4 h-4" />
-                  <span className="text-sm">{tab.label}</span>
+                  <span className="text-xs font-bold uppercase tracking-widest">{tab.label}</span>
                 </button>
               );
             })}
@@ -453,7 +453,7 @@ export default function SettingsPage() {
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 bg-white border border-gray-100 rounded-lg p-6">
+        <div className="flex-1 bg-white border border-border/40 rounded-3xl p-8 shadow-sm">
           {activeTab === "profile" && <ProfileSettings />}
           {activeTab === "security" && <SecuritySettings />}
           {activeTab === "notifications" && <NotificationsSettings />}

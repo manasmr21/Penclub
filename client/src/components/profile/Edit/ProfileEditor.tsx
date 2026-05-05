@@ -182,9 +182,9 @@ export default function ProfileEditor({ inModal = false, onClose }: ProfileEdito
         ? user.interests
         : typeof user.interests === 'string'
           ? (user.interests as string)
-              .split(',')
-              .map((interest: string) => interest.trim())
-              .filter(Boolean)
+            .split(',')
+            .map((interest: string) => interest.trim())
+            .filter(Boolean)
           : [];
 
       setSelected(parsed);
@@ -263,110 +263,108 @@ export default function ProfileEditor({ inModal = false, onClose }: ProfileEdito
   };
 
   return (
-  <div
-    className={`w-full rounded-2xl border border-[var(--border)] bg-white text-[var(--foreground)] shadow-sm ${
-      inModal
-        ? "mx-auto mt-4 sm:mt-10 max-w-2xl max-h-[92vh] overflow-y-auto"
-        : "mx-auto max-w-none"
-    }`}
-  >
-    <ProfileHeader onClose={handleClose} />
+    <div
+      className={`w-full rounded-2xl border border-[var(--border)] bg-white text-[var(--foreground)] shadow-sm ${inModal
+          ? "mx-auto mt-4 sm:mt-10 max-w-2xl max-h-[92vh] overflow-y-auto"
+          : "mx-auto max-w-none"
+        }`}
+    >
+      <ProfileHeader onClose={handleClose} />
 
-    <div className="space-y-3 p-3 sm:p-4">
-      <ProfilePictureUpdate
-        currentPicture={user?.profilePicture}
-        name={user?.name}
-        email={user?.email}
-        onFileSelect={setFile}
-      />
+      <div className="space-y-3 p-3 sm:p-4">
+        <ProfilePictureUpdate
+          currentPicture={user?.profilePicture}
+          name={user?.name}
+          email={user?.email}
+          onFileSelect={setFile}
+        />
 
-      {user?.isEmailVerified === false && (
-        <div className="flex justify-center pt-1">
-          <button
-            type="button"
-            onClick={handleVerifyNow}
-            disabled={verifyLoading}
-            className="h-10 rounded-full border border-[var(--primary)] px-5 text-sm font-semibold text-[var(--primary)] transition hover:opacity-85 disabled:opacity-60"
-          >
-            {verifyLoading ? "Sending OTP..." : "Verify Now"}
-          </button>
-        </div>
-      )}
-
-      <form className="space-y-2" onSubmit={handleSave}>
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-          <FormInput id="fullName" label="Full Name" value={name} onChange={(e) => setName(e.target.value)} />
-          <FormInput id="username" label="Username" value={username} onChange={(e) => setUsername(e.target.value)} prefix="@" />
-        </div>
-
-        <div className="space-y-1">
-          <label className="ml-1 block text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted-foreground)]">
-            Bio
-          </label>
-          <textarea
-            value={bio}
-            onChange={(e) => setBio(e.target.value)}
-            /* Changed bg-[var(--background)] to bg-gray-100 */
-            className="min-h-25 w-full resize-none rounded-xl border border-[var(--border)] bg-gray-100 p-3 text-sm outline-none transition focus:ring-2 focus:ring-[var(--primary)]"
-            rows={4}
-          />
-          <p className="text-right text-[10px] text-[var(--muted-foreground)]">{bio.length} / 300</p>
-        </div>
-
-        {selected.length > 0 && (
-          /* Changed bg-[var(--background)] to bg-gray-100 */
-          <div className="flex flex-wrap gap-1 rounded-xl border border-[var(--border)] bg-gray-100 p-2">
-            {selected.map((item) => (
-              <span
-                key={item}
-                /* Changed bg-[var(--card)] to bg-white for contrast */
-                className="cursor-pointer rounded-full border border-[var(--border)] bg-white px-3 py-1 text-xs transition hover:opacity-80"
-                onClick={() => toggleInterest(item)}
-              >
-                {item} x
-              </span>
-            ))}
+        {user?.isEmailVerified === false && (
+          <div className="flex justify-center pt-1">
+            <button
+              type="button"
+              onClick={handleVerifyNow}
+              disabled={verifyLoading}
+              className="h-10 rounded-full border border-[var(--primary)] px-5 text-sm font-semibold text-[var(--primary)] transition hover:opacity-85 disabled:opacity-60"
+            >
+              {verifyLoading ? "Sending OTP..." : "Verify Now"}
+            </button>
           </div>
         )}
 
-        <div className="flex flex-wrap gap-2">
-          {allInterests.map((item) => (
+        <form className="space-y-2" onSubmit={handleSave}>
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            <FormInput id="fullName" label="Full Name" value={name} onChange={(e) => setName(e.target.value)} />
+            <FormInput id="username" label="Username" value={username} onChange={(e) => setUsername(e.target.value)} prefix="@" />
+          </div>
+
+          <div className="space-y-1">
+            <label className="ml-1 block text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted-foreground)]">
+              Bio
+            </label>
+            <textarea
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+              /* Changed bg-[var(--background)] to bg-gray-100 */
+              className="min-h-25 w-full resize-none rounded-xl border border-[var(--border)] bg-gray-100 p-3 text-sm outline-none transition focus:ring-2 focus:ring-[var(--primary)]"
+              rows={4}
+            />
+            <p className="text-right text-[10px] text-[var(--muted-foreground)]">{bio.length} / 300</p>
+          </div>
+
+          {selected.length > 0 && (
+            /* Changed bg-[var(--background)] to bg-gray-100 */
+            <div className="flex flex-wrap gap-1 rounded-xl border border-[var(--border)] bg-gray-100 p-2">
+              {selected.map((item) => (
+                <span
+                  key={item}
+                  /* Changed bg-[var(--card)] to bg-white for contrast */
+                  className="cursor-pointer rounded-full border border-[var(--border)] bg-white px-3 py-1 text-xs transition hover:opacity-80"
+                  onClick={() => toggleInterest(item)}
+                >
+                  {item} x
+                </span>
+              ))}
+            </div>
+          )}
+
+          <div className="flex flex-wrap gap-2">
+            {allInterests.map((item) => (
+              <button
+                type="button"
+                key={item}
+                onClick={() => toggleInterest(item)}
+                className={`rounded-full border px-3 py-1 text-xs transition ${selected.includes(item)
+                    ? "border-[var(--primary)] bg-[var(--primary)] text-[var(--primary-foreground)]"
+                    : "border-[var(--border)] bg-gray-100 hover:bg-gray-200" /* Changed to gray-100 */
+                  }`}
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex flex-col-reverse sm:flex-row gap-2.5 pt-1">
             <button
               type="button"
-              key={item}
-              onClick={() => toggleInterest(item)}
-              className={`rounded-full border px-3 py-1 text-xs transition ${
-                selected.includes(item)
-                  ? "border-[var(--primary)] bg-[var(--primary)] text-[var(--primary-foreground)]"
-                  : "border-[var(--border)] bg-gray-100 hover:bg-gray-200" /* Changed to gray-100 */
-              }`}
+              onClick={handleClose}
+              disabled={loading}
+              /* Changed bg-[var(--card)] to bg-gray-100 */
+              className="h-11 w-full sm:flex-1 rounded-full border border-[var(--border)] bg-gray-100 text-sm font-medium transition hover:bg-gray-200 disabled:opacity-50"
             >
-              {item}
+              Cancel
             </button>
-          ))}
-        </div>
-
-        <div className="flex flex-col-reverse sm:flex-row gap-2.5 pt-1">
-          <button
-            type="button"
-            onClick={handleClose}
-            disabled={loading}
-            /* Changed bg-[var(--card)] to bg-gray-100 */
-            className="h-11 w-full sm:flex-1 rounded-full border border-[var(--border)] bg-gray-100 text-sm font-medium transition hover:bg-gray-200 disabled:opacity-50"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={loading || initialSyncLoading}
-            className="h-11 w-full sm:flex-1 rounded-full bg-[linear-gradient(90deg,var(--primary),var(--secondary))] text-sm font-semibold text-[var(--primary-foreground)] shadow-[0_12px_30px_rgba(10,56,125,0.2)] transition disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {loading ? "Saving..." : initialSyncLoading ? "Loading..." : "Save Changes"}
-          </button>
-        </div>
-      </form>
+            <button
+              type="submit"
+              disabled={loading || initialSyncLoading}
+              className="h-11 w-full sm:flex-1 rounded-full bg-[linear-gradient(90deg,var(--primary),var(--secondary))] text-sm font-semibold text-[var(--primary-foreground)] shadow-[0_12px_30px_rgba(10,56,125,0.2)] transition disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {loading ? "Saving..." : initialSyncLoading ? "Loading..." : "Save Changes"}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
-  </div>
-);
+  );
 
 }

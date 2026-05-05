@@ -28,32 +28,42 @@ const now = Date.now();
 function StatCard({ title, value, icon: Icon, trend, trendValue, color }) {
   const isPositive = trend === "up";
 
+  // Map incoming color to theme colors
+  const colorMap = {
+    blue: "primary",
+    purple: "secondary",
+    green: "green-500", // Keep semantic colors if theme doesn't provide replacements
+    orange: "orange-500",
+  };
+
+  const themeColor = colorMap[color] || color;
+
   return (
-    <div className="bg-white rounded-xl border border-gray-100 p-6 hover:border-gray-200 transition-all duration-200">
+    <div className="bg-white rounded-2xl border border-border/40 p-6 hover:shadow-md transition-all duration-300">
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-sm font-medium text-gray-500 mb-1">{title}</p>
-          <h3 className="text-2xl font-bold text-gray-900">{value}</h3>
+          <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">{title}</p>
+          <h3 className="text-3xl font-bold text-primary">{value}</h3>
 
           {trend && (
             <div className="flex items-center gap-1 mt-2">
               {isPositive ? (
-                <ArrowUpRight className="w-4 h-4 text-green-500" />
+                <ArrowUpRight className="w-4 h-4 text-green-600" />
               ) : (
-                <ArrowDownRight className="w-4 h-4 text-red-500" />
+                <ArrowDownRight className="w-4 h-4 text-red-600" />
               )}
               <span
-                className={`text-sm font-medium ${isPositive ? "text-green-600" : "text-red-600"}`}
+                className={`text-sm font-bold ${isPositive ? "text-green-600" : "text-red-600"}`}
               >
                 {trendValue}
               </span>
-              <span className="text-xs text-gray-500">vs last month</span>
+              <span className="text-[10px] uppercase tracking-wide text-muted-foreground">vs last month</span>
             </div>
           )}
         </div>
 
-        <div className={`p-3 rounded-xl bg-${color}-50`}>
-          <Icon className={`w-6 h-6 text-${color}-600`} />
+        <div className={`p-3 rounded-2xl bg-primary/5 text-primary`}>
+          <Icon className="w-6 h-6" />
         </div>
       </div>
     </div>
@@ -65,15 +75,15 @@ function RecentActivity({ activities }) {
   const getActivityIcon = (type) => {
     switch (type) {
       case "user":
-        return <Users className="w-4 h-4 text-blue-500" />;
+        return <Users className="w-4 h-4 text-primary" />;
       case "document":
-        return <FileText className="w-4 h-4 text-purple-500" />;
+        return <FileText className="w-4 h-4 text-secondary" />;
       case "comment":
-        return <MessageCircle className="w-4 h-4 text-green-500" />;
+        return <MessageCircle className="w-4 h-4 text-green-600" />;
       case "view":
         return <Eye className="w-4 h-4 text-orange-500" />;
       default:
-        return <Activity className="w-4 h-4 text-gray-500" />;
+        return <Activity className="w-4 h-4 text-muted-foreground" />;
     }
   };
 
@@ -95,42 +105,42 @@ function RecentActivity({ activities }) {
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100">
-      <div className="p-6 border-b border-gray-100">
+    <div className="bg-white rounded-2xl border border-border/40 overflow-hidden shadow-sm">
+      <div className="p-6 border-b border-border/40 bg-gray-50/50">
         <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-gray-900">Recent Activity</h3>
-          <button className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+          <h3 className="font-bold text-primary uppercase tracking-wider text-sm">Recent Activity</h3>
+          <button className="text-xs text-secondary hover:text-primary font-bold uppercase tracking-widest transition-colors">
             View All
           </button>
         </div>
       </div>
 
-      <div className="divide-y divide-gray-100">
+      <div className="divide-y divide-border/20">
         {activities.map((activity, index) => (
-          <div key={index} className="p-4 hover:bg-gray-50 transition-colors">
-            <div className="flex items-start gap-3">
-              <div className="p-2 bg-gray-50 rounded-lg">
+          <div key={index} className="p-4 hover:bg-background/50 transition-colors">
+            <div className="flex items-start gap-4">
+              <div className="p-2.5 bg-primary/5 rounded-xl text-primary">
                 {getActivityIcon(activity.type)}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900">
+                <p className="text-sm font-bold text-primary">
                   {activity.title}
                 </p>
-                <p className="text-xs text-gray-500 mt-0.5">
+                <p className="text-xs text-muted-foreground mt-0.5 font-serif italic">
                   {activity.description}
                 </p>
-                <p className="text-xs text-gray-400 mt-1">
+                <p className="text-[10px] text-muted-foreground/60 mt-1.5 font-medium uppercase tracking-tighter">
                   {getTimeAgo(activity.timestamp)}
                 </p>
               </div>
               {activity.status && (
                 <div
-                  className={`px-2 py-1 rounded-full text-xs font-medium ${
+                  className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter ${
                     activity.status === "completed"
-                      ? "bg-green-50 text-green-700"
+                      ? "bg-green-100 text-green-700"
                       : activity.status === "pending"
-                        ? "bg-yellow-50 text-yellow-700"
-                        : "bg-red-50 text-red-700"
+                        ? "bg-orange-100 text-orange-700"
+                        : "bg-red-100 text-red-700"
                   }`}
                 >
                   {activity.status}
@@ -149,25 +159,29 @@ function SimpleBarChart({ data, title }) {
   const maxValue = Math.max(...data.map((d) => d.value));
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="font-semibold text-gray-900">{title}</h3>
-        <button className="p-1 hover:bg-gray-100 rounded-lg transition-colors">
-          <MoreVertical className="w-4 h-4 text-gray-400" />
+    <div className="bg-white rounded-2xl border border-border/40 p-6 shadow-sm">
+      <div className="flex items-center justify-between mb-8">
+        <h3 className="font-bold text-primary uppercase tracking-wider text-sm">{title}</h3>
+        <button className="p-1.5 hover:bg-background rounded-full transition-colors">
+          <MoreVertical className="w-4 h-4 text-muted-foreground" />
         </button>
       </div>
 
-      <div className="flex items-end justify-between gap-2 h-48">
+      <div className="flex items-end justify-between gap-4 h-56">
         {data.map((item, index) => (
-          <div key={index} className="flex-1 flex flex-col items-center gap-2">
+          <div key={index} className="flex-1 flex flex-col items-center gap-3">
             <div
-              className="w-full bg-gradient-to-t from-blue-500 to-purple-500 rounded-lg transition-all duration-500 hover:opacity-80"
+              className="w-full bg-gradient-to-t from-primary to-secondary rounded-xl transition-all duration-700 hover:brightness-110 relative group"
               style={{
                 height: `${(item.value / maxValue) * 100}%`,
-                minHeight: "4px",
+                minHeight: "8px",
               }}
-            />
-            <span className="text-xs text-gray-500">{item.label}</span>
+            >
+              <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-primary text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                {item.value} units
+              </div>
+            </div>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{item.label}</span>
           </div>
         ))}
       </div>
@@ -178,40 +192,40 @@ function SimpleBarChart({ data, title }) {
 // Tasks Component
 function TasksList({ tasks, onToggleTask }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-100">
-      <div className="p-6 border-b border-gray-100">
+    <div className="bg-white rounded-2xl border border-border/40 overflow-hidden shadow-sm">
+      <div className="p-6 border-b border-border/40 bg-gray-50/50">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-semibold text-gray-900">Today's Tasks</h3>
-            <p className="text-xs text-gray-500 mt-1">
+            <h3 className="font-bold text-primary uppercase tracking-wider text-sm">Today&apos;s Tasks</h3>
+            <p className="text-[10px] text-muted-foreground mt-1 uppercase font-bold tracking-widest">
               {tasks.filter((t) => t.completed).length} of {tasks.length}{" "}
               completed
             </p>
           </div>
-          <button className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+          <button className="text-xs text-secondary hover:text-primary font-bold uppercase tracking-widest transition-colors">
             Add Task
           </button>
         </div>
       </div>
 
-      <div className="divide-y divide-gray-100">
+      <div className="divide-y divide-border/20">
         {tasks.map((task) => (
-          <div key={task.id} className="p-4 hover:bg-gray-50 transition-colors">
-            <div className="flex items-center gap-3">
+          <div key={task.id} className="p-4 hover:bg-background/50 transition-colors">
+            <div className="flex items-center gap-4">
               <input
                 type="checkbox"
                 checked={task.completed}
                 onChange={() => onToggleTask(task.id)}
-                className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                className="w-4 h-4 rounded border-primary/30 text-primary focus:ring-primary/40 cursor-pointer"
               />
               <div className="flex-1">
                 <p
-                  className={`text-sm font-medium ${task.completed ? "text-gray-400 line-through" : "text-gray-900"}`}
+                  className={`text-sm font-bold ${task.completed ? "text-muted-foreground/50 line-through" : "text-primary"}`}
                 >
                   {task.title}
                 </p>
                 {task.dueDate && (
-                  <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
+                  <p className="text-[10px] text-muted-foreground mt-0.5 flex items-center gap-1 font-medium uppercase tracking-tighter">
                     <Clock className="w-3 h-3" />
                     Due {task.dueDate}
                   </p>
@@ -219,12 +233,12 @@ function TasksList({ tasks, onToggleTask }) {
               </div>
               {task.priority && (
                 <div
-                  className={`px-2 py-1 rounded-full text-xs font-medium ${
+                  className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter ${
                     task.priority === "high"
-                      ? "bg-red-50 text-red-700"
+                      ? "bg-red-100 text-red-700"
                       : task.priority === "medium"
-                        ? "bg-yellow-50 text-yellow-700"
-                        : "bg-green-50 text-green-700"
+                        ? "bg-orange-100 text-orange-700"
+                        : "bg-green-100 text-green-700"
                   }`}
                 >
                   {task.priority}
@@ -245,21 +259,21 @@ function QuickStats({ stats }) {
       {stats.map((stat, index) => (
         <div
           key={index}
-          className="bg-white rounded-xl border border-gray-100 p-4"
+          className="bg-white rounded-2xl border border-border/40 p-5 shadow-sm group hover:border-primary/20 transition-all"
         >
-          <div className="flex items-center justify-between mb-2">
-            <stat.icon className="w-4 h-4 text-gray-400" />
+          <div className="flex items-center justify-between mb-3">
+            <stat.icon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100 transition-opacity" />
             <span
-              className={`text-xs font-medium ${
-                stat.change > 0 ? "text-green-600" : "text-red-600"
+              className={`text-[10px] font-bold uppercase tracking-tighter px-1.5 py-0.5 rounded ${
+                stat.change > 0 ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
               }`}
             >
               {stat.change > 0 ? "+" : ""}
               {stat.change}%
             </span>
           </div>
-          <p className="text-xl font-bold text-gray-900">{stat.value}</p>
-          <p className="text-xs text-gray-500 mt-1">{stat.label}</p>
+          <p className="text-2xl font-bold text-primary">{stat.value}</p>
+          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 mt-1">{stat.label}</p>
         </div>
       ))}
     </div>
@@ -369,22 +383,22 @@ export function Dashboard() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 font-inter">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Welcome back! Here's what's happening with your platform today.
+          <h1 className="text-3xl font-bold text-primary tracking-tight">Dashboard</h1>
+          <p className="text-sm text-muted-foreground mt-1 font-serif italic">
+            Welcome back! Here&apos;s what&apos;s happening with your platform today.
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+        <div className="flex items-center gap-4">
+          <button className="flex items-center gap-2 px-5 py-2.5 text-xs font-bold uppercase tracking-widest text-primary bg-white border border-primary/20 rounded-full hover:bg-primary/5 transition-all shadow-sm">
             <Download className="w-4 h-4" />
             Export
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg hover:opacity-90 transition-all">
+          <button className="flex items-center gap-2 px-6 py-2.5 text-xs font-bold uppercase tracking-widest text-white bg-primary rounded-full hover:bg-primary/90 transition-all shadow-[0_4px_12px_rgba(13,56,125,0.2)]">
             <RefreshCw className="w-4 h-4" />
             Refresh
           </button>
@@ -445,48 +459,60 @@ export function Dashboard() {
 
       {/* Additional Stats Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white">
-          <div className="flex items-center justify-between mb-4">
-            <TrendingUp className="w-8 h-8 opacity-80" />
-            <span className="text-3xl font-bold">+47%</span>
+        <div className="bg-primary rounded-2xl p-6 text-white shadow-[0_8px_30px_rgba(13,56,125,0.15)] relative overflow-hidden group">
+          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+            <TrendingUp className="w-24 h-24 -mr-8 -mt-8" />
           </div>
-          <h4 className="text-lg font-semibold mb-1">Growth Rate</h4>
-          <p className="text-blue-100 text-sm">Month over month growth</p>
-          <div className="mt-4 pt-4 border-t border-blue-400">
-            <button className="text-sm font-medium hover:underline flex items-center gap-1">
-              View Details
-              <ChevronRight className="w-4 h-4" />
-            </button>
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-4">
+              <TrendingUp className="w-8 h-8 text-secondary" />
+              <span className="text-3xl font-bold">+47%</span>
+            </div>
+            <h4 className="text-lg font-bold tracking-tight mb-1">Growth Rate</h4>
+            <p className="text-white/70 text-xs font-serif italic">Month over month growth</p>
+            <div className="mt-6 pt-4 border-t border-white/10">
+              <button className="text-xs font-bold uppercase tracking-widest hover:text-secondary transition-colors flex items-center gap-1">
+                View Details
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-6 text-white">
+        <div className="bg-white border border-border/40 rounded-2xl p-6 shadow-sm group hover:border-secondary/30 transition-all">
           <div className="flex items-center justify-between mb-4">
-            <Calendar className="w-8 h-8 opacity-80" />
-            <span className="text-3xl font-bold">12</span>
+            <div className="p-3 bg-secondary/10 rounded-xl text-secondary">
+              <Calendar className="w-6 h-6" />
+            </div>
+            <span className="text-3xl font-bold text-primary">12</span>
           </div>
-          <h4 className="text-lg font-semibold mb-1">Upcoming Events</h4>
-          <p className="text-purple-100 text-sm">Events scheduled this week</p>
-          <div className="mt-4 pt-4 border-t border-purple-400">
-            <button className="text-sm font-medium hover:underline flex items-center gap-1">
+          <h4 className="text-lg font-bold tracking-tight text-primary mb-1">Upcoming Events</h4>
+          <p className="text-muted-foreground text-xs font-serif italic">Events scheduled this week</p>
+          <div className="mt-6 pt-4 border-t border-border/20">
+            <button className="text-xs font-bold uppercase tracking-widest text-secondary hover:text-primary transition-colors flex items-center gap-1">
               View Calendar
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white">
-          <div className="flex items-center justify-between mb-4">
-            <MessageCircle className="w-8 h-8 opacity-80" />
-            <span className="text-3xl font-bold">24</span>
+        <div className="bg-secondary rounded-2xl p-6 text-white shadow-[0_8px_30px_rgba(19,135,215,0.15)] relative overflow-hidden group">
+          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+            <MessageCircle className="w-24 h-24 -mr-8 -mt-8" />
           </div>
-          <h4 className="text-lg font-semibold mb-1">New Messages</h4>
-          <p className="text-green-100 text-sm">Unread conversations</p>
-          <div className="mt-4 pt-4 border-t border-green-400">
-            <button className="text-sm font-medium hover:underline flex items-center gap-1">
-              View Messages
-              <ChevronRight className="w-4 h-4" />
-            </button>
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-4">
+              <MessageCircle className="w-8 h-8 text-primary" />
+              <span className="text-3xl font-bold">24</span>
+            </div>
+            <h4 className="text-lg font-bold tracking-tight mb-1">New Messages</h4>
+            <p className="text-white/70 text-xs font-serif italic">Unread conversations</p>
+            <div className="mt-6 pt-4 border-t border-white/10">
+              <button className="text-xs font-bold uppercase tracking-widest hover:text-primary transition-colors flex items-center gap-1">
+                View Messages
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
       </div>

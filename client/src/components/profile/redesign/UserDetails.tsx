@@ -1,17 +1,54 @@
+import { motion } from "motion/react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useCallback } from "react";
 import Image from "next/image";
-import profileBg from "@/public/images/Profile-bg.jpg";
-import { IoSettingsOutline } from "react-icons/io5";
-import { useEffect, useState } from "react";
+import { IoSettingsOutline, IoCheckmarkCircle } from "react-icons/io5";
+import { Share2, Edit3 } from "lucide-react";
 import { useAppStore } from "@/src/lib/store/store";
 
-const UserDetails = () => {
+interface User {
+  id: string;
+  name?: string;
+  username?: string;
+  role?: "author" | "user";
+  bio?: string;
+  createdAt?: string;
+  profilePicture?: string | { secure_url?: string; url?: string };
+  bookCount?: number;
+  articleCount?: number;
+  followersCount?: number;
+  followingCount?: number;
+}
+
+interface UserDetailsProps {
+  /** If true, shows edit controls (settings gear + Edit Profile button) */
+  isOwnProfile?: boolean;
+  /** Optional user override – if not provided, uses logged‑in user from store */
+  userOverride?: User;
+}
+
+const UserDetails = ({ isOwnProfile = true, userOverride }: UserDetailsProps) => {
   const router = useRouter();
-  const user = useAppStore((state) => state.user);
+  const storeUser = useAppStore((state) => state.user);
+  const user = userOverride ?? storeUser;
   const isAuthor = user?.role === "author";
-  const isReader = user?.role === "reader";
-  type PictureLike = string | { secure_url?: string; url?: string } | null | undefined;
-  const getProfileUrl = (pic: PictureLike) => {
+
+  const fetchCounts = useAppStore(useCallback((state) => state.fetchCounts, []));
+
+  useEffect(() => {
+    if (isAuthor && user?.id) {
+      let isMounted = true;
+      fetchCounts(user.id).catch((err) => {
+        if (isMounted) console.error("Failed to fetch counts:", err);
+      });
+      return () => {
+        isMounted = false;
+      };
+    }
+  }, [isAuthor, user?.id, fetchCounts]);
+
+  const getProfileUrl = useCallback((pic: User["profilePicture"]): string | null => {
     if (!pic) return null;
     if (typeof pic === "string") {
       try {
@@ -22,146 +59,133 @@ const UserDetails = () => {
       }
     }
     if (typeof pic === "object") {
+      // @ts-expect-error profilePicture may come from API
       return pic.secure_url || pic.url || null;
     }
     return null;
-  };
+  }, []);
 
   const picUrl = getProfileUrl(user?.profilePicture);
   const hasProfilePicture = typeof picUrl === "string" && picUrl.trim().length > 0;
-  const displayName = user?.name || user?.username || "Pen Club Member";
+  const displayName = user?.name || user?.username || "Author";
+  const bio = user?.bio;
 
-  const initials = displayName.trim().split(/\s+/).filter(Boolean).slice(0, 2);
-  const fallbackInitials =
-    initials.length > 1
-      ? `${initials[0].charAt(0)}${initials[1].charAt(0)}`.toUpperCase()
-      : initials[0]?.charAt(0).toUpperCase() || "PC";
+  const fallbackInitials = useMemo(() => {
+    const parts = displayName.trim().split(/\s+/).filter(Boolean).slice(0, 2);
+    if (parts.length === 0) return "A";
+    if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+    return `${parts[0].charAt(0)}${parts[1].charAt(0)}`.toUpperCase();
+  }, [displayName]);
 
-  const parsedInterests = Array.isArray(user?.interests)
-    ? user.interests
-    : typeof user?.interests === "string"
-      ? user.interests
-        // @ts-expect-error interests may be string from persisted API payload
-        .split(",")
-        .map((interest: string) => interest.trim())
-        .filter(Boolean)
-      : [];
-  const { 
-    fetchCounts 
-  } = useAppStore();
+  const memberSince = useMemo(() => {
+    if (!user?.createdAt) return "recently";
+    const year = new Date(user.createdAt).getFullYear();
+    return isNaN(year) ? "recently" : year.toString();
+  }, [user?.createdAt]);
 
-  const bookCount = user?.bookCount ?? 0;
-  const articleCount = user?.articleCount ?? 0;
-
-  useEffect(() => {
-    if (isAuthor && user?.id) {
-      void fetchCounts(user.id);
-    }
-  }, [isAuthor, user?.id, fetchCounts]);
+  const displayBio = bio || `Member since ${memberSince}`;
 
   const stats = [
-    ...(isReader ? [] : [{ label: "Books", value: bookCount }]),
-    ...(isAuthor ? [{ label: "Articles", value: articleCount }] : []),
-    ...(isAuthor ? [{ label: "Followers", value: user?.followersCount ?? 0 }] : []),
-    { label: "Following", value: user?.followingCount ?? 0 },
+    { label: "Books", value: user?.bookCount ?? 0 },
+    { label: "Articles", value: user?.articleCount ?? 0 },
+    ...(user?.followersCount !== undefined ? [{ label: "Followers", value: user.followersCount }] : []),
+    ...(user?.followingCount !== undefined ? [{ label: "Following", value: user.followingCount }] : []),
   ];
 
-  return (
-    <div className={`relative w-full max-w-5xl mx-auto px-6 border border-[var(--color-primary)] rounded-3xl shadow-lg overflow-hidden ${isReader ? "pt-8" : "py-12"}`}>
-      {/* Background Texture for this container */}
-      <div className="absolute inset-0 z-0 pointer-events-none opacity-[0.06] select-none">
-        <Image
-          src={profileBg}
-          alt=""
-          fill
-          className="object-cover"
-        />
-      </div>
+  const handleShare = async () => {
+    const url = `${window.location.origin}/profile/${user?.id || user?.username}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      alert("Profile link copied to clipboard!");
+    } catch (err) {
+      console.error("Failed to copy link:", err);
+    }
+  };
 
-      <div className={`relative z-10 ${isReader ? "rounded-3xl px-6 py-10" : ""}`}>
-        <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-12 w-full">
-          <div className="flex flex-col md:flex-row items-center md:items-start gap-10 w-full md:w-auto">
-            {/* Profile Image */}
-            <div
-              className="relative w-[160px] md:w-[200px] shrink-0 aspect-square overflow-hidden rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.08)] ring-4 ring-offset-4 ring-outline-variant/10"
-            >
-              {hasProfilePicture ? (
-                <Image
-                  src={picUrl || ""}
-                  alt="profile picture"
-                  width={300}
-                  height={300}
-                  className="object-cover w-full h-full"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-primary/10 text-primary font-bold text-5xl select-none">
-                  {fallbackInitials}
-                </div>
-              )}
-            </div>
-
-            {/* Info */}
-            <div className="flex flex-col flex-1 justify-center max-w-2xl text-center md:text-left mt-4 md:mt-2">
-              <h1 className="text-4xl md:text-[2.75rem] font-bold tracking-tight text-primary mb-4 leading-none">
-                {displayName}
-              </h1>
-              <p className="text-base md:text-[17px] text-on-surface-variant opacity-80 font-serif italic leading-relaxed mb-10 md:border-l-2 md:border-primary/20 md:pl-5 mx-auto md:mx-0 max-w-lg">
-                {user?.bio || "No biography added yet."}
-              </p>
-              <div className="mb-10 mx-auto md:mx-0 max-w-lg">
-                <p className="text-[11px] tracking-[0.2em] uppercase text-on-surface-variant/70 mb-3">
-                  Interests
-                </p>
-                {parsedInterests.length > 0 ? (
-                  <div className="flex flex-wrap gap-2.5 justify-center md:justify-start">
-                    {parsedInterests.map((interest: string) => (
-                      <span
-                        key={interest}
-                        className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium capitalize"
-                      >
-                        {interest}
-                      </span>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-sm text-on-surface-variant/70">
-                    No interests added yet.
-                  </p>
-                )}
-              </div>
-
-              {/* Stats */}
-              <div className="flex flex-wrap justify-center md:justify-start gap-8 md:gap-14">
-                {stats.map((stat, i) => (
-                  <div
-                    key={i}
-                    className="flex flex-col items-center md:items-start group cursor-default"
-                  >
-                    <span className="text-[2rem] leading-none font-bold text-primary group-hover:text-tertiary transition-colors duration-300">
-                      {stat.value}
-                    </span>
-                    <span className="text-[10px] tracking-[0.25em] uppercase font-medium text-on-surface-variant/70 mt-2">
-                      {stat.label}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div className="flex w-full md:w-auto mt-6 md:mt-4 items-center justify-center md:justify-end shrink-0">
-            <button
-              onClick={() => router.push("/profile/settings")}
-              className="group flex h-12 w-12 items-center justify-center rounded-full border border-primary/20 bg-white text-primary shadow-sm transition-all duration-300 hover:bg-primary/10"
-              aria-label="Open profile settings"
-            >
-              <IoSettingsOutline className="text-[22px] transition-transform group-hover:rotate-45" />
-            </button>
+  if (!user) {
+    return (
+      <div className="flex flex-col md:flex-row gap-10 items-start mb-16 animate-pulse">
+        <div className="w-40 h-40 md:w-48 md:h-48 rounded-none bg-zinc-200" />
+        <div className="flex-1 space-y-5">
+          <div className="h-10 bg-zinc-200 w-48 rounded-none" />
+          <div className="h-4 bg-zinc-200 w-72 rounded-none" />
+          <div className="flex gap-8">
+            <div className="h-16 w-20 bg-zinc-200 rounded-none" />
+            <div className="h-16 w-20 bg-zinc-200 rounded-none" />
           </div>
         </div>
       </div>
-    </div>
+    );
+  }
+
+  return (
+    <motion.header
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="flex flex-col md:flex-row gap-10 items-start mb-16 relative w-full"
+    >
+      <div className="relative group shrink-0">
+        <div className="w-40 h-40 md:w-48 md:h-48 rounded-none overflow-hidden shadow-2xl rotate-1 group-hover:rotate-0 transition-transform duration-500 bg-black/5">
+          {hasProfilePicture ? (
+            <Image
+              src={picUrl!}
+              alt={displayName}
+              width={400}
+              height={400}
+              className="object-cover w-full h-full"
+              priority
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-zinc-100 text-primary/40 font-serif font-bold text-6xl">
+              {fallbackInitials}
+            </div>
+          )}
+        </div>
+        {isAuthor && (
+          <div className="absolute -bottom-4 -right-4 w-12 h-12 bg-primary rounded-none flex items-center justify-center text-white shadow-lg">
+            <IoCheckmarkCircle className="text-2xl" />
+          </div>
+        )}
+      </div>
+
+      <div className="flex-1 space-y-6 w-full">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-4xl md:text-5xl font-serif font-bold text-primary tracking-tight mb-2 capitalize">
+              {displayName}
+            </h1>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-sm font-sans tracking-widest text-primary/50 uppercase">
+                @{user?.username || displayName.toLowerCase().replace(/\s/g, "")}
+              </span>
+            </div>
+            <p className="text-lg italic text-primary/70 max-w-xl leading-relaxed font-serif">
+              "{displayBio}"
+            </p>
+          </div>
+          
+          {isOwnProfile ? (
+            <Link href="/profile/settings" className="bg-primary text-white px-8 py-3 rounded-none font-sans font-semibold text-sm hover:opacity-90 transition-all active:scale-95 shadow-lg flex items-center justify-center gap-2 w-full max-w-[150px]">
+              <IoSettingsOutline size={16} /> Settings
+            </Link>
+          ) : (
+            <button onClick={handleShare} className="border border-primary text-primary hover:bg-primary hover:text-white px-8 py-3 rounded-none font-sans font-semibold text-sm transition-all active:scale-95 shadow-lg flex items-center justify-center gap-2 w-full max-w-[150px]">
+              <Share2 size={16} /> Share
+            </button>
+          )}
+        </div>
+
+        <div className="flex flex-nowrap gap-4 sm:gap-8 pt-6 border-t border-primary/20 overflow-x-auto no-scrollbar">
+          {stats.map((stat) => (
+            <div key={stat.label} className="text-left shrink-0">
+              <span className="block text-xl md:text-2xl font-serif font-bold text-primary">{stat.value}</span>
+              <span className="text-[10px] md:text-xs font-sans uppercase tracking-widest text-primary/60">{stat.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </motion.header>
   );
 };
 

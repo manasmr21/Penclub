@@ -1,16 +1,13 @@
 "use client";
 
+import { motion, AnimatePresence } from 'motion/react';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Plus } from 'lucide-react';
-import Image from 'next/image';
-import profileBg from "@/public/images/Profile-bg.jpg";
+import { Plus, Book, FileText } from 'lucide-react';
 import { useAppStore } from '@/src/lib/store/store';
 import UserDetails from './UserDetails';
 import BookShelft from './BookShelft';
 import ArticleShelft from './ArticleShelft';
-
-const TABS = ['Bookshelf', 'Articles'] as const;
 
 const Profile = () => {
   const router = useRouter();
@@ -25,7 +22,6 @@ const Profile = () => {
   } = useAppStore();
   const isAuthor = user?.role === "author";
 
-  // --- Effects ---
   useEffect(() => {
     if (isAuthor && user?.id) {
       void fetchBooks(user.id, 1);
@@ -44,73 +40,77 @@ const Profile = () => {
     }
   }, [isAuthor, user?.id, activeTab, articlesLoaded, fetchArticles]);
 
-  // --- Actions ---
   const isBooks = activeTab === 'Bookshelf';
 
   return (
-    <div className="relative min-h-screen bg-[#faf8e3]">
-      <div className="relative z-10 main-container">
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="relative min-h-screen"
+    >
+      <div className="max-w-5xl mx-auto px-4 pt-12 pb-20 space-y-12">
         <UserDetails />
 
-        {/* Show Author-specific Tabs and Content only if isAuthor is true */}
         {isAuthor && (
-          <div className="relative mt-12 shadow-sm rounded-3xl overflow-hidden min-h-[500px]">
-            {/* Background Texture for this container */}
-            <div className="absolute inset-0 z-0 pointer-events-none opacity-[0.06] select-none">
-              <Image
-                src={profileBg}
-                alt=""
-                fill
-                className="object-cover"
-              />
-            </div>
-
-            <div className="relative z-10">
-              {/* Tabs Navigation */}
-              <nav className="mb-6 border-b border-primary px-3 sm:px-6 pt-6">
-                <div className="mx-auto flex max-w-5xl flex-col gap-4 pb-2 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="flex gap-6 overflow-x-auto no-scrollbar sm:gap-10">
-                    {TABS.map((tab) => (
-                      <button
-                        key={tab}
-                        onClick={() => setActiveTab(tab)}
-                        className={`relative pb-3 border-b-2 text-xs uppercase tracking-widest transition-all sm:text-sm font-label
-                        ${activeTab === tab
-                            ? 'text-primary font-bold border-[var(--color-primary)]'
-                            : 'text-on-surface-variant border-transparent opacity-60 hover:opacity-100 hover:text-primary'
-                          }`}
-                      >
-                        {tab}
-                        {activeTab === tab && (
-                          <span className="absolute -top-1 -right-4 h-1.5 w-1.5 rounded-full bg-tertiary" />
-                        )}
-                      </button>
-                    ))}
-                  </div>
-
+          <div className="w-full">
+            {/* Tab Navigation with smooth indicator */}
+            <div className="flex flex-wrap items-center justify-between border-b border-primary/5 mb-12 gap-6">
+              <div className="flex gap-8 sm:gap-12">
+                {[
+                  { id: 'Bookshelf', label: 'Bookshelf' },
+                  { id: 'Articles', label: 'Articles' }
+                ].map((tab) => (
                   <button
-                    onClick={() => router.push(isBooks ? '/add-book' : '/post-article')}
-                    className="group flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-2.5 text-[11px] font-bold uppercase tracking-wider text-white shadow-md transition-all hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-lg"
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id as any)}
+                    className={`relative pb-4 text-xs font-black uppercase tracking-[0.2em] transition-all
+                    ${activeTab === tab.id
+                        ? 'text-primary'
+                        : 'text-primary/30 hover:text-primary/50'
+                      } cursor-pointer`}
                   >
-                    <Plus size={16} className="group-hover:rotate-90 transition-transform" />
-                    {isBooks ? 'Add Book' : 'Post Article'}
+                    {tab.label}
+                    {activeTab === tab.id && (
+                      <motion.span 
+                        layoutId="activeTabBorder"
+                        className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-none" 
+                      />
+                    )}
                   </button>
-                </div>
-              </nav>
+                ))}
+              </div>
 
-              {/* Content Area */}
-              <main className="min-h-[70vh]">
-                {isBooks ? (
-                  <BookShelft />
-                ) : (
-                  <ArticleShelft />
-                )}
-              </main>
+              <motion.button
+                onClick={() => router.push(isBooks ? '/add-book' : '/post-article')}
+                className="mb-4 flex items-center gap-2 bg-primary text-white px-8 py-3 rounded-none font-sans font-semibold text-sm hover:opacity-90 transition-all active:scale-95 shadow-lg cursor-pointer"
+              >
+                <Plus size={16} />
+                {isBooks ? 'Add Book' : 'Post Article'}
+              </motion.button>
             </div>
+
+            {/* Content Area */}
+            <main className="min-h-[50vh]">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeTab}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.4, ease: "easeInOut" }}
+                >
+                  {isBooks ? (
+                    <BookShelft />
+                  ) : (
+                    <ArticleShelft />
+                  )}
+                </motion.div>
+              </AnimatePresence>
+            </main>
           </div>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 };
 

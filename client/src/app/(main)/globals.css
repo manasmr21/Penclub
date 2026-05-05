@@ -125,9 +125,6 @@
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-white text-foreground;
-  }
 }
 
 @layer components {
@@ -149,11 +146,9 @@
   }
 }
 
-body{
-  background: var(--background);
-}
 
-.main-container{
+
+.main-container {
   width: 90%;
   max-width: 1920px;
   margin-left: auto;
@@ -197,6 +192,7 @@ body{
 
 /* Tablet */
 @media (max-width: 768px) {
+
   .publisher-heading span::after,
   .publisher-heading span::before {
     width: 80px;
@@ -205,6 +201,7 @@ body{
 
 /* Mobile */
 @media (max-width: 480px) {
+
   .publisher-heading span::after,
   .publisher-heading span::before {
     display: none;
@@ -218,7 +215,7 @@ body{
 }
 
 .testimonial-card:hover {
-  transform: perspective(1000px) rotateY(-50deg); 
+  transform: perspective(1000px) rotateY(-50deg);
 }
 
 .hero {
@@ -319,23 +316,25 @@ body{
 
 @layer components {
   .ink-gradient {
-      background: linear-gradient(135deg, #001b45, #0a3068);
+    background: linear-gradient(135deg, #001b45, #0a3068);
   }
+
   .ambient-shadow {
-      box-shadow: 0 10px 40px rgba(10, 48, 104, 0.06);
+    box-shadow: 0 10px 40px rgba(10, 48, 104, 0.06);
   }
+
   .glass-header {
-      background-color: rgba(251, 250, 238, 0.8);
-      backdrop-filter: blur(12px);
+    background-color: rgba(251, 250, 238, 0.8);
+    backdrop-filter: blur(12px);
   }
 
   .menu-items ul li.active {
-      background-color: var(--color-primary);
-      border: 1px solid var(--color-primary);
+    background-color: var(--color-primary);
+    border: 1px solid var(--color-primary);
   }
 
   .menu-items ul li.active a {
-      color: white;
+    color: white;
   }
 }
 
@@ -347,8 +346,8 @@ body{
   justify-content: center;
   align-items: center;
   z-index: 9999;
-  width:auto;
-  height:auto;
+  width: auto;
+  height: auto;
 }
 
 .loader-inline {

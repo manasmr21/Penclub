@@ -55,7 +55,7 @@ const Navbar = () => {
   }, []);
 
   const closeMenu = () => setMenuOpen(false);
-  const openProfileSettings = () => {
+  const openProfile = () => {
     closeMenu();
     router.push("/profile");
   };
@@ -99,13 +99,13 @@ const Navbar = () => {
 
   const profileChip = (
     <Link
-      href="/profile/settings"
+      href="/profile"
       className="flex items-center rounded-full border border-primary/15 bg-white/80 p-2 text-primary transition hover:border-primary"
       onClick={(e) => {
         e.preventDefault();
-        openProfileSettings();
+        openProfile();
       }}
-      aria-label="Profile settings"
+      aria-label="Profile"
     >
       <span className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-slate-100">
         {hasProfilePicture ? (
@@ -127,7 +127,10 @@ const Navbar = () => {
   return (
     <>
       <nav
-        className={`navbar fixed w-full top-0 z-[999] transition-all duration-300 ${showSolidNavbar ? "bg-background" : "bg-transparent"
+        className={`navbar fixed w-full top-0 z-[999] transition-all duration-500 
+          ${isHomePage && !scrolled 
+            ? "bg-background border-transparent" 
+            : "bg-white/60 dark:bg-black/60 backdrop-blur-lg border-b border-primary/50"
           }`}
       >
         <div className="main-container relative flex items-center justify-between py-2 font-inter">
@@ -193,7 +196,7 @@ const Navbar = () => {
             ) : (
               <Link
                 href="/sign-in"
-                className="cursor-pointer border border-transparent hover:bg-transparent hover:border-primary duration-300 hover:text-primary font-medium bg-primary py-2 w-[150px] text-center rounded-full text-white text-lg"
+                className="cursor-pointer border border-primary hover:bg-transparent hover:text-primary duration-300 font-medium bg-primary py-2 px-8 text-center rounded-none text-white text-sm tracking-widest uppercase"
               >
                 Sign in
               </Link>

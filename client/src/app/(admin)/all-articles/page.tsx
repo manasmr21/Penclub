@@ -143,12 +143,12 @@ function ArticleDetailsModal({ article, onClose }: { article: Blog | null; onClo
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="bg-white rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white border-b border-gray-100 p-6 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-gray-900">Article Details</h2>
-          <button onClick={onClose} className="cursor-pointer p-2 hover:bg-gray-100 rounded-lg">
-            <X className="w-5 h-5" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
+      <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-border/20">
+        <div className="sticky top-0 bg-white/80 backdrop-blur-md border-b border-border/10 p-6 flex items-center justify-between z-10">
+          <h2 className="text-xl font-bold text-primary tracking-tight">Article Details</h2>
+          <button onClick={onClose} className="cursor-pointer p-2 hover:bg-background rounded-full transition-all">
+            <X className="w-5 h-5 text-primary" />
           </button>
         </div>
 
@@ -164,11 +164,11 @@ function ArticleDetailsModal({ article, onClose }: { article: Blog | null; onClo
 
           {/* Title and Status */}
           <div>
-            <div className="flex items-center gap-2 mb-2">
-              <h3 className="text-2xl font-bold text-gray-900">{article.title}</h3>
-              <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full ${getStatusColor(article.status)}`}>
+            <div className="flex items-center gap-3 mb-2">
+              <h3 className="text-2xl font-bold text-primary tracking-tight">{article.title}</h3>
+              <span className={`inline-flex items-center gap-1 px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full ${getStatusColor(article.status)}`}>
                 {getStatusIcon(article.status)}
-                {article.status.charAt(0).toUpperCase() + article.status.slice(1)}
+                {article.status}
               </span>
             </div>
             
@@ -278,20 +278,20 @@ export default function ArticlesPage() {
 
   return (
     <>
-      <div className="p-6">
+      <div className="p-8 space-y-8 font-inter">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Articles</h1>
-            <p className="text-gray-500 text-sm mt-1">Manage blog articles and posts</p>
+            <h1 className="text-3xl font-bold text-primary tracking-tight">Articles</h1>
+            <p className="text-muted-foreground text-sm mt-1 font-serif italic">Manage blog articles and literary posts</p>
           </div>
           
-          <div className="flex items-center gap-3">
-            <button className="cursor-pointer flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50">
+          <div className="flex items-center gap-4">
+            <button className="cursor-pointer flex items-center gap-2 px-5 py-2.5 text-xs font-bold uppercase tracking-widest text-primary bg-white border border-primary/20 rounded-full hover:bg-primary/5 transition-all shadow-sm">
               <Download className="w-4 h-4" />
               Export
             </button>
-            <button className="cursor-pointer flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">
+            <button className="cursor-pointer flex items-center gap-2 px-6 py-2.5 text-xs font-bold uppercase tracking-widest text-white bg-primary rounded-full hover:bg-primary/90 transition-all shadow-[0_4px_12px_rgba(13,56,125,0.2)]">
               <Plus className="w-4 h-4" />
               New Article
             </button>
@@ -299,48 +299,48 @@ export default function ArticlesPage() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-          <div className="bg-white border border-gray-100 rounded-lg p-4">
-            <p className="text-sm text-gray-500">Total Articles</p>
-            <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+          <div className="bg-white border border-border/40 rounded-2xl p-6 shadow-sm">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Total Articles</p>
+            <p className="text-3xl font-bold text-primary">{stats.total}</p>
           </div>
-          <div className="bg-white border border-gray-100 rounded-lg p-4">
-            <p className="text-sm text-gray-500">Published</p>
-            <p className="text-2xl font-bold text-green-600">{stats.posted}</p>
+          <div className="bg-white border border-border/40 rounded-2xl p-6 shadow-sm">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Published</p>
+            <p className="text-3xl font-bold text-green-600">{stats.posted}</p>
           </div>
-          <div className="bg-white border border-gray-100 rounded-lg p-4">
-            <p className="text-sm text-gray-500">Pending</p>
-            <p className="text-2xl font-bold text-yellow-600">{stats.pending}</p>
+          <div className="bg-white border border-border/40 rounded-2xl p-6 shadow-sm">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Pending</p>
+            <p className="text-3xl font-bold text-orange-600">{stats.pending}</p>
           </div>
-          <div className="bg-white border border-gray-100 rounded-lg p-4">
-            <p className="text-sm text-gray-500">Drafts</p>
-            <p className="text-2xl font-bold text-gray-600">{stats.draft}</p>
+          <div className="bg-white border border-border/40 rounded-2xl p-6 shadow-sm">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Drafts</p>
+            <p className="text-3xl font-bold text-muted-foreground">{stats.draft}</p>
           </div>
-          <div className="bg-white border border-gray-100 rounded-lg p-4">
-            <p className="text-sm text-gray-500">Total Likes</p>
-            <p className="text-2xl font-bold text-red-600">{stats.totalLikes}</p>
+          <div className="bg-white border border-border/40 rounded-2xl p-6 shadow-sm">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Total Likes</p>
+            <p className="text-3xl font-bold text-red-600">{stats.totalLikes}</p>
           </div>
         </div>
 
         {/* Search and Filter */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+          <div className="relative max-w-md w-full">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-primary/40 pointer-events-none" />
             <input
               type="text"
-              placeholder="Search articles by title, content, tags, or author..."
+              placeholder="Search articles..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-400"
+              className="w-full pl-11 pr-4 py-3 bg-white border border-border/40 rounded-xl focus:outline-none focus:border-primary/40 transition-all text-sm"
             />
           </div>
 
-          <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-gray-400" />
+          <div className="flex items-center gap-3">
+            <Filter className="w-4 h-4 text-primary/40" />
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-400"
+              className="px-4 py-3 bg-white border border-border/40 rounded-xl focus:outline-none focus:border-primary/40 transition-all text-sm font-medium text-primary cursor-pointer"
             >
               <option value="all">All Status</option>
               <option value="posted">Published</option>
@@ -359,9 +359,9 @@ export default function ArticlesPage() {
             <p className="text-gray-500">Try adjusting your search or create a new article</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
             {filteredArticles.map((article) => (
-              <div key={article.id} className="bg-white border border-gray-100 rounded-lg overflow-hidden hover:border-gray-200 transition-all flex flex-col">
+              <div key={article.id} className="bg-white border border-border/40 rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col group">
                 {/* Article Image */}
                 {article.coverImage && (
                   <div className="relative h-48 overflow-hidden">
@@ -390,9 +390,9 @@ export default function ArticlesPage() {
                 )}
 
                 {/* Article Content */}
-                <div className="p-4 flex-1">
-                  <h3 className="font-semibold text-gray-900 line-clamp-2 mb-2">{article.title}</h3>
-                  <p className="text-sm text-gray-600 line-clamp-2 mb-3">{article.content}</p>
+                <div className="p-6 flex-1">
+                  <h3 className="text-lg font-bold text-primary line-clamp-2 mb-2 group-hover:text-secondary transition-colors">{article.title}</h3>
+                  <p className="text-sm text-muted-foreground line-clamp-2 mb-4 font-serif italic">{article.content}</p>
                   
                   {/* Tags */}
                   {article.tags.length > 0 && (
@@ -430,27 +430,27 @@ export default function ArticlesPage() {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="p-4 pt-0 mt-auto border-t border-gray-100">
-                  <div className="grid grid-cols-3 gap-2">
+                <div className="p-6 pt-0 mt-auto">
+                  <div className="grid grid-cols-3 gap-3">
                     <button
                       onClick={() => handleView(article)}
-                      className="cursor-pointer flex items-center justify-center gap-1 px-3 py-2 text-sm bg-gray-50 hover:bg-blue-50 text-gray-600 hover:text-blue-600 rounded-lg transition-colors"
+                      className="cursor-pointer flex items-center justify-center gap-1.5 px-3 py-2.5 text-[10px] font-bold uppercase tracking-widest bg-background hover:bg-primary hover:text-white text-primary rounded-xl transition-all"
                     >
-                      <Eye className="w-4 h-4" />
+                      <Eye className="w-3.5 h-3.5" />
                       <span>View</span>
                     </button>
                     <button
                       onClick={() => {}}
-                      className="cursor-pointer flex items-center justify-center gap-1 px-3 py-2 text-sm bg-gray-50 hover:bg-yellow-50 text-gray-600 hover:text-yellow-600 rounded-lg transition-colors"
+                      className="cursor-pointer flex items-center justify-center gap-1.5 px-3 py-2.5 text-[10px] font-bold uppercase tracking-widest bg-background hover:bg-orange-500 hover:text-white text-primary rounded-xl transition-all"
                     >
-                      <Edit className="w-4 h-4" />
+                      <Edit className="w-3.5 h-3.5" />
                       <span>Edit</span>
                     </button>
                     <button
                       onClick={() => handleDelete(article.id)}
-                      className="cursor-pointer flex items-center justify-center gap-1 px-3 py-2 text-sm bg-gray-50 hover:bg-red-50 text-gray-600 hover:text-red-600 rounded-lg transition-colors"
+                      className="cursor-pointer flex items-center justify-center gap-1.5 px-3 py-2.5 text-[10px] font-bold uppercase tracking-widest bg-background hover:bg-red-500 hover:text-white text-primary rounded-xl transition-all"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-3.5 h-3.5" />
                       <span>Delete</span>
                     </button>
                   </div>

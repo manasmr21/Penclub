@@ -180,87 +180,65 @@ export default function UsersPage() {
 
   return (
     <>
-      <div className="p-6">
+      <div className="p-8 space-y-8 font-inter">
         {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Users Management</h1>
-          <p className="text-gray-500 text-sm mt-1">Manage authors, readers, and administrators</p>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+          <div>
+            <h1 className="text-3xl font-bold text-primary tracking-tight">Users Management</h1>
+            <p className="text-muted-foreground text-sm mt-1 font-serif italic">Manage authors, readers, and administrators</p>
+          </div>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white border border-gray-100 rounded-lg p-4">
-            <p className="text-sm text-gray-500">Total Users</p>
-            <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="bg-white border border-border/40 rounded-2xl p-6 shadow-sm">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Total Users</p>
+            <p className="text-3xl font-bold text-primary">{stats.total}</p>
           </div>
-          <div className="bg-white border border-gray-100 rounded-lg p-4">
-            <p className="text-sm text-gray-500">Authors</p>
-            <p className="text-2xl font-bold text-purple-600">{stats.authors}</p>
+          <div className="bg-white border border-border/40 rounded-2xl p-6 shadow-sm">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Authors</p>
+            <p className="text-3xl font-bold text-secondary">{stats.authors}</p>
           </div>
-          <div className="bg-white border border-gray-100 rounded-lg p-4">
-            <p className="text-sm text-gray-500">Readers</p>
-            <p className="text-2xl font-bold text-green-600">{stats.readers}</p>
+          <div className="bg-white border border-border/40 rounded-2xl p-6 shadow-sm">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Readers</p>
+            <p className="text-3xl font-bold text-green-600">{stats.readers}</p>
           </div>
-          <div className="bg-white border border-gray-100 rounded-lg p-4">
-            <p className="text-sm text-gray-500">Admins</p>
-            <p className="text-2xl font-bold text-red-600">{stats.admins}</p>
+          <div className="bg-white border border-border/40 rounded-2xl p-6 shadow-sm">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Admins</p>
+            <p className="text-3xl font-bold text-red-600">{stats.admins}</p>
           </div>
         </div>
 
         {/* Tabs */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-          <div className="flex gap-2 border-b border-gray-200">
-            <button
-              onClick={() => setActiveTab("all")}
-              className={`cursor-pointer px-4 py-2 text-sm font-medium transition-colors ${
-                activeTab === "all" 
-                  ? "text-blue-600 border-b-2 border-blue-600" 
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              All Users
-            </button>
-            <button
-              onClick={() => setActiveTab("authors")}
-              className={`cursor-pointer px-4 py-2 text-sm font-medium transition-colors ${
-                activeTab === "authors" 
-                  ? "text-blue-600 border-b-2 border-blue-600" 
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              Authors
-            </button>
-            <button
-              onClick={() => setActiveTab("readers")}
-              className={`cursor-pointer px-4 py-2 text-sm font-medium transition-colors ${
-                activeTab === "readers" 
-                  ? "text-blue-600 border-b-2 border-blue-600" 
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              Readers
-            </button>
-            <button
-              onClick={() => setActiveTab("admins")}
-              className={`cursor-pointer px-4 py-2 text-sm font-medium transition-colors ${
-                activeTab === "admins" 
-                  ? "text-blue-600 border-b-2 border-blue-600" 
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              Admins
-            </button>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+          <div className="flex gap-6 border-b border-border/10">
+            {["all", "authors", "readers", "admins"].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`cursor-pointer px-2 py-4 text-[10px] font-bold uppercase tracking-widest transition-all relative ${
+                  activeTab === tab 
+                    ? "text-primary" 
+                    : "text-muted-foreground/60 hover:text-primary"
+                }`}
+              >
+                {tab === "all" ? "All Users" : tab}
+                {activeTab === tab && (
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />
+                )}
+              </button>
+            ))}
           </div>
 
           {/* Search */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+          <div className="relative max-w-xs w-full">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-primary/40 pointer-events-none" />
             <input
               type="text"
               placeholder="Search users..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-400 w-64"
+              className="w-full pl-11 pr-4 py-3 bg-white border border-border/40 rounded-xl focus:outline-none focus:border-primary/40 transition-all text-sm"
             />
           </div>
         </div>
@@ -271,11 +249,11 @@ export default function UsersPage() {
             <p className="text-gray-500">No users found</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
             {filteredUsers.map((user) => (
               <div
                 key={user.id}
-                className="bg-white border border-gray-100 rounded-lg p-4 hover:border-gray-200 transition-all"
+                className="bg-white border border-border/40 rounded-2xl p-6 hover:shadow-xl transition-all duration-300 group"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
@@ -292,12 +270,12 @@ export default function UsersPage() {
                     </div>
                     
                     <div>
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-semibold text-gray-900">{user.name}</h3>
-                        <span className={`text-xs px-2 py-0.5 rounded-full ${
-                          user.role === "author" ? "bg-purple-100 text-purple-700" :
+                      <div className="flex items-center gap-3">
+                        <h3 className="font-bold text-primary group-hover:text-secondary transition-colors">{user.name}</h3>
+                        <span className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest rounded-full ${
+                          user.role === "author" ? "bg-secondary/10 text-secondary" :
                           user.role === "admin" ? "bg-red-100 text-red-700" :
-                          "bg-blue-100 text-blue-700"
+                          "bg-primary/10 text-primary"
                         }`}>
                           {user.role}
                         </span>
@@ -310,19 +288,19 @@ export default function UsersPage() {
                     </div>
                   </div>
 
-                  <div className="flex gap-1">
+                  <div className="flex gap-2">
                     {/* Preview Button */}
                     <button
                       onClick={() => handlePreview(user)}
-                      className="cursor-pointer p-2 hover:bg-blue-50 rounded-lg transition-colors"
+                      className="cursor-pointer p-2.5 hover:bg-primary hover:text-white text-primary bg-background rounded-xl transition-all"
                       title="Preview user details"
                     >
-                      <Eye className="w-4 h-4 text-blue-500" />
+                      <Eye className="w-4 h-4" />
                     </button>
                     
                     <button
                       onClick={() => handleToggleStatus(user.id)}
-                      className="cursor-pointer p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                      className="cursor-pointer p-2.5 hover:bg-primary/5 text-primary bg-background rounded-xl transition-all"
                       title={user.isLoggedIn ? "Block user" : "Activate user"}
                     >
                       {user.isLoggedIn ? (
@@ -333,10 +311,10 @@ export default function UsersPage() {
                     </button>
                     <button
                       onClick={() => handleDelete(user.id)}
-                      className="cursor-pointer p-2 hover:bg-red-50 rounded-lg transition-colors"
+                      className="cursor-pointer p-2.5 hover:bg-red-500 hover:text-white text-primary bg-background rounded-xl transition-all"
                       title="Delete user"
                     >
-                      <Trash2 className="w-4 h-4 text-red-500" />
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
