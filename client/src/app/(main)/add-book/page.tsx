@@ -81,7 +81,7 @@ export default function AddBookPage() {
           <X size={16} />
         </button>
 
-        <h1 className="mb-8 text-center text-2xl font-serif font-bold text-[#0A192F]">Add New Book</h1>
+        <h1 className="mb-8 text-center text-2xl font-serif font-bold text-[#0D387D]">Add New Book</h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <Field label="Title">
@@ -149,7 +149,7 @@ export default function AddBookPage() {
           <button 
             type="submit" 
             disabled={isSubmitting} 
-            className="w-full h-12 rounded-none bg-[#0A192F] font-sans font-bold text-[10px] uppercase tracking-[0.2em] text-white active:scale-[0.98] disabled:opacity-50 mt-4 transition-all hover:opacity-90 cursor-pointer"
+            className="w-full h-12 rounded-none bg-[#0D387D] font-sans font-bold text-[10px] uppercase tracking-[0.2em] text-white active:scale-[0.98] disabled:opacity-50 mt-4 transition-all hover:opacity-90 cursor-pointer"
           >
             {isSubmitting ? "Processing..." : "Add to Bookshelf"}
           </button>

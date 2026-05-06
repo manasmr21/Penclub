@@ -52,7 +52,7 @@ export default function PostArticlePage() {
     <div className="mx-auto mt-28 mb-16 w-full max-w-xl px-4">
       <div className="relative border border-primary/10 bg-white p-6 sm:p-10 shadow-sm">
 
-        {/* Close button */}
+        
         <button
           onClick={() => router.back()}
           className="absolute right-5 top-5 h-8 w-8 flex items-center justify-center border border-primary/20 text-primary/40 hover:text-primary hover:border-primary transition-all cursor-pointer"
@@ -60,11 +60,11 @@ export default function PostArticlePage() {
           <X size={16} />
         </button>
 
-        <h1 className="mb-8 text-center text-2xl font-serif font-bold text-[#0A192F]">Post Article</h1>
+        <h1 className="mb-8 text-center text-2xl font-serif font-bold text-[#0D387D]">Post Article</h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
 
-          {/* Cover Image */}
+          
           <div className="space-y-2">
             <label className={labelClasses}>Cover Image</label>
             {preview ? (
@@ -112,7 +112,7 @@ export default function PostArticlePage() {
 
           <button
             disabled={loading}
-            className="h-12 w-full rounded-none bg-[#0A192F] font-sans font-bold text-[10px] uppercase tracking-[0.2em] text-white transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            className="h-12 w-full rounded-none bg-[#0D387D] font-sans font-bold text-[10px] uppercase tracking-[0.2em] text-white transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {loading ? "Publishing..." : "Publish Article"}
           </button>

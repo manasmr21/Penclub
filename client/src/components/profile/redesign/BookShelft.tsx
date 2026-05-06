@@ -206,7 +206,7 @@ const BookShelft = () => {
             <div className="sticky top-0 z-10 px-8 py-6 border-b border-primary/10 flex justify-between items-center bg-white">
               <div>
                 <p className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40 mb-1">Publication</p>
-                <h2 className="text-2xl font-serif font-bold text-[#0A192F]">Edit Book</h2>
+                <h2 className="text-2xl font-serif font-bold text-[#0D387D]">Edit Book</h2>
               </div>
               <button
                 onClick={closeEditModal}
@@ -304,7 +304,7 @@ const BookShelft = () => {
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="h-12 flex-[2] rounded-none bg-[#0A192F] text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-white transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+                  className="h-12 flex-[2] rounded-none bg-[#0D387D] text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-white transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
                 >
                   {isSaving ? "Saving..." : "Save Changes"}
                 </button>

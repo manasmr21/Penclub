@@ -190,7 +190,7 @@ export default function ArticleShelf() {
             <div className="px-8 py-6 border-b border-primary/10 flex justify-between items-center bg-white">
               <div>
                 <p className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40 mb-1">Article</p>
-                <h2 className="text-2xl font-serif font-bold text-[#0A192F]">Edit Article</h2>
+                <h2 className="text-2xl font-serif font-bold text-[#0D387D]">Edit Article</h2>
               </div>
               <button
                 onClick={() => setEditingArticle(null)}
@@ -285,7 +285,7 @@ export default function ArticleShelf() {
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="h-12 flex-[2] rounded-none bg-[#0A192F] text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-white transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+                  className="h-12 flex-[2] rounded-none bg-[#0D387D] text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-white transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
                 >
                   {isSaving ? "Saving..." : "Save Changes"}
                 </button>
