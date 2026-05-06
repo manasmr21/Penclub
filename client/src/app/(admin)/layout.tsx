@@ -1,4 +1,5 @@
 import "./dashboard.css";
+import "../(main)/globals.css";
 import DashboardShell from "./DashboardShell";
 
 export default function DashboardLayout({ children }) {

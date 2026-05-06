@@ -86,7 +86,7 @@ export default function ProfileSettingsPage() {
         <div className="mb-8 border-b-2 border-primary/20 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <span className="text-xs font-semibold uppercase tracking-[0.2em] text-secondary">
-              Atelier Settings
+              Pen Club Settings
             </span>
             <h1 className="text-3xl sm:text-4xl font-serif font-bold text-primary mt-1 tracking-tight">
               Account Dossier & Settings

@@ -14,14 +14,12 @@ import {
   User,
   Tag,
   Heart,
-  MoreVertical,
   CheckCircle,
   Clock,
-  AlertCircle,
   FileText,
-  Image as ImageIcon,
   RefreshCw
 } from "lucide-react";
+import { StatCard } from "@/src/components/cards";
 
 interface Blog {
   id: string;
@@ -120,34 +118,15 @@ const MOCK_ARTICLES: Blog[] = [
 function ArticleDetailsModal({ article, onClose }: { article: Blog | null; onClose: () => void }) {
   if (!article) return null;
 
-  const getStatusColor = (status: string) => {
-    switch(status) {
-      case "posted": return "text-green-700 bg-green-100";
-      case "pending": return "text-yellow-700 bg-yellow-100";
-      case "draft": return "text-gray-700 bg-gray-100";
-      case "edited": return "text-blue-700 bg-blue-100";
-      case "deleted": return "text-red-700 bg-red-100";
-      default: return "text-gray-700 bg-gray-100";
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch(status) {
-      case "posted": return <CheckCircle className="w-4 h-4" />;
-      case "pending": return <Clock className="w-4 h-4" />;
-      case "draft": return <FileText className="w-4 h-4" />;
-      case "edited": return <Edit className="w-4 h-4" />;
-      case "deleted": return <Trash2 className="w-4 h-4" />;
-      default: return null;
-    }
-  };
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
-      <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-border/20">
-        <div className="sticky top-0 bg-white/80 backdrop-blur-md border-b border-border/10 p-6 flex items-center justify-between z-10">
-          <h2 className="text-xl font-bold text-primary tracking-tight">Article Details</h2>
-          <button onClick={onClose} className="cursor-pointer p-2 hover:bg-background rounded-full transition-all">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+      <div className="bg-card rounded-none max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-primary/30 font-inter">
+        <div className="sticky top-0 bg-white border-b border-primary/20 p-6 flex items-center justify-between z-10">
+          <h2 className="text-lg font-serif font-bold text-primary uppercase tracking-widest">Article Details</h2>
+          <button 
+            onClick={onClose} 
+            className="cursor-pointer p-2 hover:bg-primary/5 border border-transparent hover:border-primary/10 rounded-none transition-all"
+          >
             <X className="w-5 h-5 text-primary" />
           </button>
         </div>
@@ -158,46 +137,50 @@ function ArticleDetailsModal({ article, onClose }: { article: Blog | null; onClo
             <img
               src={article.coverImage}
               alt={article.title}
-              className="w-full h-64 object-cover rounded-lg"
+              className="w-full h-64 object-cover rounded-none border border-primary/25 shadow-sm"
             />
           )}
 
           {/* Title and Status */}
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <h3 className="text-2xl font-bold text-primary tracking-tight">{article.title}</h3>
-              <span className={`inline-flex items-center gap-1 px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full ${getStatusColor(article.status)}`}>
-                {getStatusIcon(article.status)}
+          <div className="border-b border-primary/10 pb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+              <h3 className="text-2xl font-serif font-bold text-primary tracking-tight leading-tight">{article.title}</h3>
+              <span className={`px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest border self-start ${
+                article.status === "posted" ? "border-green-600/30 text-green-600 bg-green-500/5" :
+                article.status === "pending" ? "border-orange-600/30 text-orange-600 bg-orange-500/5" :
+                article.status === "edited" ? "border-secondary/30 text-secondary bg-secondary/5" :
+                "border-primary/30 text-primary bg-primary/5"
+              }`}>
                 {article.status}
               </span>
             </div>
             
-            <div className="flex items-center gap-4 text-sm text-gray-500">
-              <div className="flex items-center gap-1">
-                <User className="w-4 h-4" />
+            <div className="flex flex-wrap items-center gap-6 text-xs text-primary/60">
+              <div className="flex items-center gap-1.5 font-serif italic">
+                <User className="w-4 h-4 text-primary/40" />
                 <span>{article.user?.name || "Unknown"}</span>
               </div>
-              <div className="flex items-center gap-1">
-                <Calendar className="w-4 h-4" />
+              <div className="flex items-center gap-1.5 font-serif italic">
+                <Calendar className="w-4 h-4 text-primary/40" />
                 <span>{new Date(article.createdAt).toLocaleDateString()}</span>
               </div>
-              <div className="flex items-center gap-1">
-                <Heart className="w-4 h-4" />
-                <span>{article.likesCount} likes</span>
+              <div className="flex items-center gap-1.5">
+                <Heart className="w-4 h-4 text-red-500 fill-red-500/10" />
+                <span className="text-[10px] font-bold uppercase tracking-wider text-primary/50">{article.likesCount} likes</span>
               </div>
             </div>
           </div>
 
           {/* Tags */}
           {article.tags.length > 0 && (
-            <div>
-              <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+            <div className="space-y-2">
+              <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary/50 flex items-center gap-2">
                 <Tag className="w-4 h-4" />
                 Tags
               </h4>
               <div className="flex flex-wrap gap-2">
                 {article.tags.map((tag, idx) => (
-                  <span key={idx} className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded-full">
+                  <span key={idx} className="px-3 py-1 text-xs border border-primary/20 bg-primary/5 text-primary rounded-none font-medium">
                     #{tag}
                   </span>
                 ))}
@@ -206,10 +189,10 @@ function ArticleDetailsModal({ article, onClose }: { article: Blog | null; onClo
           )}
 
           {/* Content */}
-          <div>
-            <h4 className="font-semibold text-gray-900 mb-2">Content</h4>
-            <div className="prose max-w-none">
-              <p className="text-gray-600 leading-relaxed">{article.content}</p>
+          <div className="space-y-3">
+            <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary/50">Content</h4>
+            <div className="bg-primary/[0.01] rounded-none p-5 border border-primary/15 leading-relaxed text-sm font-serif italic text-primary/80">
+              <p className="whitespace-pre-line leading-relaxed">"{article.content}"</p>
             </div>
           </div>
         </div>
@@ -265,33 +248,34 @@ export default function ArticlesPage() {
     totalLikes: articles.reduce((sum, a) => sum + a.likesCount, 0)
   };
 
-  const getStatusColor = (status: string) => {
+  const getCardStatusBorder = (status: string) => {
     switch(status) {
-      case "posted": return "text-green-700 bg-green-100";
-      case "pending": return "text-yellow-700 bg-yellow-100";
-      case "draft": return "text-gray-700 bg-gray-100";
-      case "edited": return "text-blue-700 bg-blue-100";
-      case "deleted": return "text-red-700 bg-red-100";
-      default: return "text-gray-700 bg-gray-100";
+      case "posted": return "border-l-4 border-l-green-500/70";
+      case "pending": return "border-l-4 border-l-orange-500/70";
+      case "draft": return "border-l-4 border-l-gold-500/70";
+      default: return "";
     }
   };
 
   return (
     <>
-      <div className="p-8 space-y-8 font-inter">
+      <div className="pt-2 px-8 pb-8 space-y-8 font-inter">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b border-primary/20 pb-6">
           <div>
-            <h1 className="text-3xl font-bold text-primary tracking-tight">Articles</h1>
-            <p className="text-muted-foreground text-sm mt-1 font-serif italic">Manage blog articles and literary posts</p>
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-secondary">
+              Editorial Ledger
+            </span>
+            <h1 className="text-3xl font-serif font-bold text-primary mt-1 tracking-tight">Articles</h1>
+            <p className="text-xs text-muted-foreground mt-1.5 font-serif italic">Manage blog articles and literary posts</p>
           </div>
           
           <div className="flex items-center gap-4">
-            <button className="cursor-pointer flex items-center gap-2 px-5 py-2.5 text-xs font-bold uppercase tracking-widest text-primary bg-white border border-primary/20 rounded-full hover:bg-primary/5 transition-all shadow-sm">
+            <button className="cursor-pointer flex items-center gap-2 px-5 py-2.5 text-xs font-bold uppercase tracking-widest text-primary bg-white border border-primary/20 rounded-none hover:bg-primary/5 transition-all">
               <Download className="w-4 h-4" />
               Export
             </button>
-            <button className="cursor-pointer flex items-center gap-2 px-6 py-2.5 text-xs font-bold uppercase tracking-widest text-white bg-primary rounded-full hover:bg-primary/90 transition-all shadow-[0_4px_12px_rgba(13,56,125,0.2)]">
+            <button className="cursor-pointer flex items-center gap-2 px-6 py-2.5 text-xs font-bold uppercase tracking-widest text-white bg-primary border border-primary rounded-none hover:opacity-90 transition-all">
               <Plus className="w-4 h-4" />
               New Article
             </button>
@@ -300,26 +284,36 @@ export default function ArticlesPage() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-          <div className="bg-white border border-border/40 rounded-2xl p-6 shadow-sm">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Total Articles</p>
-            <p className="text-3xl font-bold text-primary">{stats.total}</p>
-          </div>
-          <div className="bg-white border border-border/40 rounded-2xl p-6 shadow-sm">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Published</p>
-            <p className="text-3xl font-bold text-green-600">{stats.posted}</p>
-          </div>
-          <div className="bg-white border border-border/40 rounded-2xl p-6 shadow-sm">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Pending</p>
-            <p className="text-3xl font-bold text-orange-600">{stats.pending}</p>
-          </div>
-          <div className="bg-white border border-border/40 rounded-2xl p-6 shadow-sm">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Drafts</p>
-            <p className="text-3xl font-bold text-muted-foreground">{stats.draft}</p>
-          </div>
-          <div className="bg-white border border-border/40 rounded-2xl p-6 shadow-sm">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Total Likes</p>
-            <p className="text-3xl font-bold text-red-600">{stats.totalLikes}</p>
-          </div>
+          <StatCard
+            title="Total Articles"
+            value={stats.total.toString()}
+            icon={FileText}
+            theme="blue"
+          />
+          <StatCard
+            title="Published"
+            value={stats.posted.toString()}
+            icon={CheckCircle}
+            theme="green"
+          />
+          <StatCard
+            title="Pending"
+            value={stats.pending.toString()}
+            icon={Clock}
+            theme="ocean"
+          />
+          <StatCard
+            title="Drafts"
+            value={stats.draft.toString()}
+            icon={FileText}
+            theme="gold"
+          />
+          <StatCard
+            title="Total Likes"
+            value={stats.totalLikes.toString()}
+            icon={Heart}
+            theme="coral"
+          />
         </div>
 
         {/* Search and Filter */}
@@ -331,7 +325,7 @@ export default function ArticlesPage() {
               placeholder="Search articles..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-11 pr-4 py-3 bg-white border border-border/40 rounded-xl focus:outline-none focus:border-primary/40 transition-all text-sm"
+              className="w-full pl-11 pr-4 py-3 bg-white border border-primary/20 rounded-none focus:outline-none focus:border-primary transition-all text-sm font-serif italic"
             />
           </div>
 
@@ -340,7 +334,7 @@ export default function ArticlesPage() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-4 py-3 bg-white border border-border/40 rounded-xl focus:outline-none focus:border-primary/40 transition-all text-sm font-medium text-primary cursor-pointer"
+              className="px-4 py-3 bg-white border border-primary/20 rounded-none focus:outline-none focus:border-primary transition-all text-xs font-bold uppercase tracking-wider text-primary cursor-pointer"
             >
               <option value="all">All Status</option>
               <option value="posted">Published</option>
@@ -353,25 +347,29 @@ export default function ArticlesPage() {
 
         {/* Articles Grid */}
         {filteredArticles.length === 0 ? (
-          <div className="text-center py-12">
-            <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-1">No articles found</h3>
-            <p className="text-gray-500">Try adjusting your search or create a new article</p>
+          <div className="text-center py-12 border border-dashed border-primary/20 bg-primary/[0.01]">
+            <FileText className="w-16 h-16 text-primary/30 mx-auto mb-4" />
+            <h3 className="text-lg font-serif font-bold text-primary uppercase tracking-widest">No articles found</h3>
+            <p className="text-xs text-muted-foreground font-serif italic mt-1">Try adjusting your search or create a new article</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
             {filteredArticles.map((article) => (
-              <div key={article.id} className="bg-white border border-border/40 rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col group">
+              <div key={article.id} className={`bg-card border border-primary/15 rounded-none overflow-hidden hover:border-primary/40 hover:bg-primary/[0.01] transition-all duration-300 flex flex-col group ${getCardStatusBorder(article.status)}`}>
                 {/* Article Image */}
                 {article.coverImage && (
                   <div className="relative h-48 overflow-hidden">
                     <img
                       src={article.coverImage}
                       alt={article.title}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover rounded-none group-hover:scale-105 transition-transform"
                     />
                     <div className="absolute top-3 right-3">
-                      <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full ${getStatusColor(article.status)}`}>
+                      <span className={`px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider border ${
+                        article.status === "posted" ? "border-green-600/30 text-green-600 bg-white" :
+                        article.status === "pending" ? "border-orange-600/30 text-orange-600 bg-white" :
+                        "border-primary/20 text-primary bg-white"
+                      }`}>
                         {article.status}
                       </span>
                     </div>
@@ -379,10 +377,14 @@ export default function ArticlesPage() {
                 )}
 
                 {!article.coverImage && (
-                  <div className="relative h-32 bg-gradient-to-r from-gray-50 to-gray-100 flex items-center justify-center">
-                    <FileText className="w-12 h-12 text-gray-300" />
+                  <div className="relative h-32 bg-primary/5 border-b border-primary/10 flex items-center justify-center">
+                    <FileText className="w-12 h-12 text-primary/30 animate-pulse" />
                     <div className="absolute top-3 right-3">
-                      <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full ${getStatusColor(article.status)}`}>
+                      <span className={`px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider border ${
+                        article.status === "posted" ? "border-green-600/30 text-green-600 bg-white" :
+                        article.status === "pending" ? "border-orange-600/30 text-orange-600 bg-white" :
+                        "border-primary/20 text-primary bg-white"
+                      }`}>
                         {article.status}
                       </span>
                     </div>
@@ -390,65 +392,65 @@ export default function ArticlesPage() {
                 )}
 
                 {/* Article Content */}
-                <div className="p-6 flex-1">
-                  <h3 className="text-lg font-bold text-primary line-clamp-2 mb-2 group-hover:text-secondary transition-colors">{article.title}</h3>
-                  <p className="text-sm text-muted-foreground line-clamp-2 mb-4 font-serif italic">{article.content}</p>
-                  
-                  {/* Tags */}
-                  {article.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mb-3">
-                      {article.tags.slice(0, 3).map((tag, idx) => (
-                        <span key={idx} className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full">
-                          #{tag}
-                        </span>
-                      ))}
-                      {article.tags.length > 3 && (
-                        <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full">
-                          +{article.tags.length - 3}
-                        </span>
-                      )}
-                    </div>
-                  )}
+                <div className="p-6 flex-1 flex flex-col justify-between">
+                  <div>
+                    <h3 className="text-lg font-serif font-bold text-primary group-hover:text-secondary transition-colors line-clamp-2 leading-tight">{article.title}</h3>
+                    <p className="text-xs text-muted-foreground line-clamp-2 mt-2 font-serif italic leading-relaxed">"{article.content}"</p>
+                    
+                    {/* Tags */}
+                    {article.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 mt-4">
+                        {article.tags.slice(0, 3).map((tag, idx) => (
+                          <span key={idx} className="text-[10px] font-medium px-2 py-0.5 border border-primary/10 bg-primary/5 text-primary rounded-none">
+                            #{tag}
+                          </span>
+                        ))}
+                        {article.tags.length > 3 && (
+                          <span className="text-[10px] font-medium px-2 py-0.5 border border-primary/10 bg-primary/5 text-primary rounded-none">
+                            +{article.tags.length - 3}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
 
                   {/* Meta Info */}
-                  <div className="flex items-center justify-between text-xs text-gray-500">
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-1">
-                        <User className="w-3 h-3" />
-                        <span>{article.user?.name || "Unknown"}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Calendar className="w-3 h-3" />
-                        <span>{new Date(article.createdAt).toLocaleDateString()}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Heart className="w-3 h-3" />
-                        <span>{article.likesCount}</span>
-                      </div>
+                  <div className="flex flex-wrap items-center gap-4 text-[10px] text-primary/60 border-t border-primary/5 pt-4 mt-6">
+                    <div className="flex items-center gap-1 font-serif italic">
+                      <User className="w-3.5 h-3.5 text-primary/40" />
+                      <span>{article.user?.name || "Unknown"}</span>
+                    </div>
+                    <div className="flex items-center gap-1 font-serif italic">
+                      <Calendar className="w-3.5 h-3.5 text-primary/40" />
+                      <span>{new Date(article.createdAt).toLocaleDateString()}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500/10" />
+                      <span className="font-bold uppercase tracking-wider text-[9px]">{article.likesCount}</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Action Buttons */}
-                <div className="p-6 pt-0 mt-auto">
-                  <div className="grid grid-cols-3 gap-3">
+                <div className="px-6 pb-6 pt-0 mt-auto">
+                  <div className="grid grid-cols-3 gap-2.5">
                     <button
                       onClick={() => handleView(article)}
-                      className="cursor-pointer flex items-center justify-center gap-1.5 px-3 py-2.5 text-[10px] font-bold uppercase tracking-widest bg-background hover:bg-primary hover:text-white text-primary rounded-xl transition-all"
+                      className="cursor-pointer flex items-center justify-center gap-1.5 py-2.5 text-[9px] font-bold uppercase tracking-widest hover:bg-primary hover:text-white text-primary border border-primary/20 rounded-none transition-all"
                     >
                       <Eye className="w-3.5 h-3.5" />
                       <span>View</span>
                     </button>
                     <button
                       onClick={() => {}}
-                      className="cursor-pointer flex items-center justify-center gap-1.5 px-3 py-2.5 text-[10px] font-bold uppercase tracking-widest bg-background hover:bg-orange-500 hover:text-white text-primary rounded-xl transition-all"
+                      className="cursor-pointer flex items-center justify-center gap-1.5 py-2.5 text-[9px] font-bold uppercase tracking-widest hover:bg-primary hover:text-white text-primary border border-primary/20 rounded-none transition-all"
                     >
                       <Edit className="w-3.5 h-3.5" />
                       <span>Edit</span>
                     </button>
                     <button
                       onClick={() => handleDelete(article.id)}
-                      className="cursor-pointer flex items-center justify-center gap-1.5 px-3 py-2.5 text-[10px] font-bold uppercase tracking-widest bg-background hover:bg-red-500 hover:text-white text-primary rounded-xl transition-all"
+                      className="cursor-pointer flex items-center justify-center gap-1.5 py-2.5 text-[9px] font-bold uppercase tracking-widest hover:bg-red-600 hover:text-white hover:border-red-600 text-primary border border-primary/20 rounded-none transition-all"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                       <span>Delete</span>

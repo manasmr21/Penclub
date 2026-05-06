@@ -287,7 +287,7 @@ const Navbar = () => {
                     <Link
                       href="/sign-in"
                       onClick={closeMenu}
-                      className="w-full bg-white text-primary py-4 text-center font-sans font-black text-xs uppercase tracking-widest"
+                      className="block w-full min-w-[150px] bg-white text-primary py-4 text-center font-sans font-black text-xs uppercase tracking-widest"
                     >
                       Sign In
                     </Link>

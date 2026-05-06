@@ -26,7 +26,7 @@ export default function ForgotPasswordPage() {
     <div className="mx-auto mt-32 w-full max-w-md border border-primary/20 bg-card p-8 rounded-none shadow-[0_4px_25px_rgba(13,56,125,0.02)]">
       <div className="border-b border-primary/15 pb-4 mb-6">
         <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-secondary text-center block">
-          Security Atelier
+          Security
         </span>
         <h1 className="text-center text-3xl font-serif font-bold text-primary tracking-tight mt-1">Forgot Password</h1>
         <p className="mt-2 text-center text-xs text-muted-foreground tracking-wide leading-relaxed">

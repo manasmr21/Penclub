@@ -77,13 +77,25 @@ const BookShelft = () => {
 
   if (loadingBooks) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-        {[...Array(8)].map((_, i) => (
-          <div key={i} className="animate-pulse space-y-4">
-            <div className="aspect-[3/4.5] bg-primary/5 rounded-[1.5rem]" />
-            <div className="space-y-2 px-2">
-              <div className="h-5 w-3/4 bg-primary/5 rounded-lg" />
-              <div className="h-3 w-1/2 bg-primary/5 rounded-lg" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="animate-pulse bg-white border border-primary/10 rounded-none flex flex-col h-full">
+            {/* Cover Aspect Skeleton */}
+            <div className="aspect-[4/2.5] bg-primary/5 rounded-none border-b border-primary/5" />
+            {/* Content Area Skeleton */}
+            <div className="p-6 flex-1 flex flex-col space-y-4">
+              <div className="space-y-2">
+                <div className="h-6 w-3/4 bg-primary/10 rounded-none" />
+                <div className="h-4 w-1/3 bg-primary/5 rounded-none" />
+              </div>
+              <div className="space-y-2">
+                <div className="h-3 w-full bg-primary/5 rounded-none" />
+                <div className="h-3 w-5/6 bg-primary/5 rounded-none" />
+              </div>
+              <div className="pt-4 border-t border-primary/5 mt-auto flex justify-between items-center">
+                <div className="h-3 w-20 bg-primary/5 rounded-none" />
+                <div className="h-3 w-16 bg-primary/10 rounded-none" />
+              </div>
             </div>
           </div>
         ))}

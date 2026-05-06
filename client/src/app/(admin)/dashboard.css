@@ -2,6 +2,25 @@
 /* @import "tw-animate-css"; */
 @import "shadcn/tailwind.css";
 
+:root {
+  --stat-blue-from: #0F4C9C;
+  --stat-blue-to: #051C3D;
+  --stat-purple-from: #6D28D9;
+  --stat-purple-to: #2E1065;
+  --stat-green-from: #047857;
+  --stat-green-to: #064E3B;
+  --stat-gold-from: #B45309;
+  --stat-gold-to: #451A03;
+  --stat-coral-from: #E11D48;
+  --stat-coral-to: #4C0519;
+  --stat-ocean-from: #0369A1;
+  --stat-ocean-to: #0C4A6E;
+  --stat-red-from: #BE123C;
+  --stat-red-to: #4C0519;
+  --stat-gray-from: #4B5563;
+  --stat-gray-to: #111827;
+}
+
 
 /* Custom animations */
 @keyframes fadeIn {

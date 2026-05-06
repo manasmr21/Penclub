@@ -127,7 +127,7 @@ const UserDetails = ({ isOwnProfile = true, userOverride }: UserDetailsProps) =>
         <Link 
           href="/profile/settings" 
           className="absolute top-6 right-6 p-2 bg-white/5 border border-white/10 text-white hover:bg-white/10 hover:border-white/20 transition-all cursor-pointer"
-          title="Atelier Settings"
+          title="Pen Club Settings"
         >
           <IoSettingsOutline size={18} />
         </Link>

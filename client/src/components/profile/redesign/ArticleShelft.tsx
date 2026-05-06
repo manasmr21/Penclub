@@ -29,13 +29,26 @@ export default function ArticleShelf() {
 
   if (loadingArticles) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="animate-pulse space-y-6">
-            <div className="aspect-[16/10] bg-primary/5 rounded-[2rem]" />
-            <div className="space-y-3 px-2">
-              <div className="h-6 w-3/4 bg-primary/5 rounded-lg" />
-              <div className="h-4 w-full bg-primary/5 rounded-lg" />
+          <div key={i} className="animate-pulse bg-white border border-primary/10 rounded-none flex flex-col h-full">
+            {/* Cover Aspect Skeleton */}
+            <div className="aspect-[4/2.5] bg-primary/5 rounded-none border-b border-primary/5" />
+            {/* Content Area Skeleton */}
+            <div className="p-6 flex-1 flex flex-col space-y-4">
+              <div className="h-3 w-24 bg-primary/5 rounded-none mb-1" />
+              <div className="space-y-2">
+                <div className="h-6 w-5/6 bg-primary/10 rounded-none" />
+                <div className="h-4 w-full bg-primary/5 rounded-none" />
+              </div>
+              <div className="space-y-2">
+                <div className="h-3 w-full bg-primary/5 rounded-none" />
+                <div className="h-3 w-2/3 bg-primary/5 rounded-none" />
+              </div>
+              <div className="pt-4 border-t border-primary/5 mt-auto flex justify-between items-center">
+                <div className="h-3 w-12 bg-primary/5 rounded-none" />
+                <div className="h-3 w-20 bg-primary/10 rounded-none" />
+              </div>
             </div>
           </div>
         ))}
