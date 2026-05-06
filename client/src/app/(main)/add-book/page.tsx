@@ -72,16 +72,16 @@ export default function AddBookPage() {
 
   return (
     // max-w-[30rem] sets the width exactly as requested
-    <main className="mx-auto mt-32 mb-12 max-w-[30rem] px-4">
-      <div className="relative rounded-2xl border border-[var(--border)] bg-[var(--card)] p-6 sm:p-8 shadow-sm">
+    <main className="mx-auto mt-32 mb-12 max-w-xl px-4">
+      <div className="relative border border-primary/10 bg-white p-6 sm:p-10 shadow-sm">
         <button 
           onClick={() => router.back()} 
-          className="absolute right-4 top-4 p-2 rounded-full hover:bg-[var(--muted)] text-[var(--muted-foreground)] transition-colors"
+          className="absolute right-5 top-5 h-8 w-8 flex items-center justify-center border border-primary/20 text-primary/40 hover:text-primary hover:border-primary transition-all cursor-pointer"
         >
-          <X size={20} />
+          <X size={16} />
         </button>
 
-        <h1 className="mb-8 text-center text-2xl font-bold tracking-tight">Add New Book</h1>
+        <h1 className="mb-8 text-center text-2xl font-serif font-bold text-[#0D387D]">Add New Book</h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <Field label="Title">
@@ -106,7 +106,7 @@ export default function AddBookPage() {
               required 
               rows={6} 
               placeholder="What's the story about?"
-              className={`${inputStyle} py-3 resize-none`} 
+              className={`${inputStyle} h-auto py-3 resize-none`} 
               value={formData.description} 
               onChange={e => setFormData({...formData, description: e.target.value})} 
             />
@@ -123,22 +123,22 @@ export default function AddBookPage() {
                 className="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0"
                 onChange={e => setFiles(prev => [...prev, ...Array.from(e.target.files ?? [])])}
               />
-              <div className={`${inputStyle} flex items-center justify-center border-dashed bg-transparent py-4 text-[var(--muted-foreground)] group-hover:border-[var(--primary)] group-hover:text-[var(--primary)]`}>
-                <ImageIcon className="mr-2" size={18} />
-                <span className="text-xs font-semibold">Upload cover images</span>
+              <div className="h-14 flex items-center justify-center border border-dashed border-primary/20 bg-zinc-50 text-primary/40 group-hover:border-primary group-hover:text-primary transition-all">
+                <ImageIcon className="mr-2" size={16} />
+                <span className="text-[10px] font-sans font-bold uppercase tracking-widest">Upload Cover Images</span>
               </div>
             </div>
 
             {previews.length > 0 && (
-              <div className="mt-6 flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+              <div className="mt-4 flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                 {previews.map((url, i) => (
-                  <div key={url} className="relative h-24 w-16 flex-shrink-0 rounded-lg border border-[var(--border)] bg-cover bg-center shadow-md" style={{ backgroundImage: `url(${url})` }}>
+                  <div key={url} className="relative h-28 w-20 flex-shrink-0 border border-primary/10 bg-cover bg-center" style={{ backgroundImage: `url(${url})` }}>
                     <button 
                       type="button"
                       onClick={() => removeFile(i)}
-                      className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white shadow-md hover:bg-red-600 transition-colors"
+                      className="absolute -right-2 -top-2 h-6 w-6 flex items-center justify-center bg-[#0A192F] text-white hover:bg-red-500 transition-colors"
                     >
-                      <X size={14} strokeWidth={3} />
+                      <X size={12} strokeWidth={3} />
                     </button>
                   </div>
                 ))}
@@ -149,7 +149,7 @@ export default function AddBookPage() {
           <button 
             type="submit" 
             disabled={isSubmitting} 
-            className="w-full h-12 rounded-xl bg-[var(--primary)] font-bold text-[var(--primary-foreground)] active:scale-[0.98] disabled:opacity-50 mt-2 transition-all hover:opacity-90"
+            className="w-full h-12 rounded-none bg-[#0D387D] font-sans font-bold text-[10px] uppercase tracking-[0.2em] text-white active:scale-[0.98] disabled:opacity-50 mt-4 transition-all hover:opacity-90 cursor-pointer"
           >
             {isSubmitting ? "Processing..." : "Add to Bookshelf"}
           </button>
@@ -159,12 +159,12 @@ export default function AddBookPage() {
   );
 }
 
-const inputStyle = "w-full rounded-xl border border-[var(--border)] bg-[#f3f4f6] px-4 h-11 text-sm outline-none focus:ring-2 focus:ring-[var(--primary)] transition-all placeholder:text-gray-400";
+const inputStyle = "h-12 w-full rounded-none border border-primary/20 bg-zinc-50 px-4 text-sm font-sans text-[#0A192F] outline-none transition-all focus:border-primary focus:bg-white placeholder:text-primary/20";
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="space-y-1.5">
-      <label className="ml-1 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-foreground)]">{label}</label>
+    <div className="space-y-2">
+      <label className="block text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40">{label}</label>
       {children}
     </div>
   );

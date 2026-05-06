@@ -1,11 +1,11 @@
 import { loginUser, registerUser, verifyUserOtp, updateUserProfile, deleteUserProfile, forgotPassword, resetPassword } from "./auth-api";
-import { useAppStore } from "./store/store"; 
+import { useAppStore } from "./store/store";
 import { type AuthUser } from "./store/store";
 import { api, extractErrorMessage } from "./http-client";
 export { api };
 
 function storeVariables() {
-  const {books} = useAppStore();
+  const { books } = useAppStore();
 }
 
 export type RegisterPayload = {
@@ -26,7 +26,6 @@ export type LoginPayload = {
 export type UpdateUserProfilePayload = {
   name?: string;
   interests?: string[];
-  bio?: string;
   profilePicture?: string;
   profilePictureId?: string;
   profilePictureFile?: File;
@@ -110,10 +109,6 @@ export async function updateProfile(
 
     if (payload.name !== undefined) {
       formData.append("name", payload.name);
-    }
-
-    if (payload.bio !== undefined) {
-      formData.append("bio", payload.bio);
     }
 
     if (payload.interests?.length) {

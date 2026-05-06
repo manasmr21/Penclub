@@ -1,22 +1,24 @@
 import {
-  Entity, PrimaryGeneratedColumn, Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
   ManyToOne,
-  DeleteDateColumn
-} from "typeorm";
-import { User } from "../../users/entities/user.entity";
+  DeleteDateColumn,
+} from 'typeorm';
+import { User } from '../../users/entities/user.entity';
 
-@Entity("blogs")
+@Entity('blogs')
 export class Blog {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
   title: string;
 
-  @Column("text")
+  @Column('text')
   content: string;
 
-  @Column("text", { array: true, default: [] })
+  @Column('text', { array: true, default: [] })
   tags: string[];
 
   @Column({ nullable: true })
@@ -25,24 +27,24 @@ export class Blog {
   @Column({ nullable: true })
   coverImageId: string;
 
-  @Column({ type: "uuid" })
-  userId: string
+  @Column({ type: 'uuid' })
+  userId: string;
 
   @ManyToOne(() => User, (user) => user.blogs, {
-    onDelete: "CASCADE",
-    onUpdate: "RESTRICT"
+    onDelete: 'CASCADE',
+    onUpdate: 'RESTRICT',
   })
   user: User;
 
   @Column({
-    enum: ["posted", "pending", "draft", "deleted", "edited"],
+    enum: ['posted', 'pending', 'draft', 'deleted', 'edited'],
   })
-  status: string
+  status: string;
 
   @Column({ default: 0 })
   likesCount: number;
 
-  @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
   @DeleteDateColumn()

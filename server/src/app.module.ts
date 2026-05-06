@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ConfigModule } from "@nestjs/config";
-import { TypeOrmModule } from "@nestjs/typeorm";
+import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import dataSource from './config/typeorm.config';
 import { CloudinaryModule } from './utils/cloudinary/cloudinary.module';
 import { BlogModule } from './modules/blog/blog.module';
@@ -18,7 +18,7 @@ import { ReadlistModule } from './modules/readlist/readlist.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: ["server/.env", ".env"]
+      envFilePath: ['server/.env', '.env'],
     }),
     TypeOrmModule.forRoot(dataSource.options),
     CloudinaryModule,
@@ -29,9 +29,9 @@ import { ReadlistModule } from './modules/readlist/readlist.module';
     ReviewModule,
     AdminModule,
     LikesModule,
-    ReadlistModule
+    ReadlistModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

@@ -184,40 +184,109 @@ export default function ArticleShelf() {
       </motion.div>
 
       {editingArticle && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-primary/20 backdrop-blur-md p-4">
-          <div className="w-full max-w-2xl bg-white rounded-[3rem] shadow-2xl border border-white overflow-hidden">
-            <div className="px-10 py-8 border-b border-primary/5 flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-primary font-serif">Edit Article</h2>
-              <button onClick={() => setEditingArticle(null)} className="p-2 rounded-full hover:bg-primary/5 text-primary/40 cursor-pointer transition-colors">
-                <X size={24} />
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#0A192F]/60 backdrop-blur-sm p-4">
+          <div className="w-full max-w-xl bg-white shadow-2xl border border-primary/10 overflow-hidden">
+            {/* Modal Header */}
+            <div className="px-8 py-6 border-b border-primary/10 flex justify-between items-center bg-white">
+              <div>
+                <p className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40 mb-1">Article</p>
+                <h2 className="text-2xl font-serif font-bold text-[#0D387D]">Edit Article</h2>
+              </div>
+              <button
+                onClick={() => setEditingArticle(null)}
+                className="h-9 w-9 flex items-center justify-center border border-primary/20 text-primary/40 hover:text-primary hover:border-primary transition-all cursor-pointer"
+              >
+                <X size={16} />
               </button>
             </div>
 
-            <form onSubmit={handleUpdate} className="p-10 space-y-8 overflow-y-auto max-h-[80vh]">
-              <div className="space-y-3">
-                <label className="text-[10px] font-black uppercase tracking-widest text-primary/40 px-1">Title</label>
-                <input name="title" defaultValue={editingArticle.title} className="w-full h-14 bg-primary/[0.03] border border-primary/5 rounded-2xl px-6 text-sm font-bold text-primary outline-none focus:border-primary/20 transition-all" required />
+            <form onSubmit={handleUpdate} className="p-8 space-y-6 overflow-y-auto max-h-[75vh] scrollbar-hide">
+              {/* Title */}
+              <div className="space-y-2">
+                <label className="block text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40">
+                  Title
+                </label>
+                <input
+                  name="title"
+                  defaultValue={editingArticle.title}
+                  className="h-12 w-full rounded-none border border-primary/20 bg-zinc-50 px-4 text-sm font-sans text-[#0A192F] outline-none transition-all focus:border-primary focus:bg-white"
+                  required
+                />
               </div>
 
-              <div className="space-y-3">
-                <label className="text-[10px] font-black uppercase tracking-widest text-primary/40 px-1">Content Snippet</label>
-                <textarea name="content" defaultValue={editingArticle.content} className="w-full min-h-[160px] bg-primary/[0.03] border border-primary/5 rounded-[2rem] p-6 text-sm font-serif italic text-primary/70 outline-none focus:border-primary/20 transition-all resize-none" required />
+              {/* Content */}
+              <div className="space-y-2">
+                <label className="block text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40">
+                  Content Snippet
+                </label>
+                <textarea
+                  name="content"
+                  defaultValue={editingArticle.content}
+                  className="min-h-[160px] w-full resize-none rounded-none border border-primary/20 bg-zinc-50 p-4 text-sm font-serif italic text-[#0A192F]/70 outline-none transition-all focus:border-primary focus:bg-white"
+                  rows={6}
+                  required
+                />
               </div>
 
-              <div className="grid grid-cols-2 gap-6">
-                <div className="space-y-3">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-primary/40 px-1">Tags</label>
-                  <input name="tags" defaultValue={editingArticle.tags?.join(", ")} className="w-full h-14 bg-primary/[0.03] border border-primary/5 rounded-2xl px-6 text-sm font-bold text-primary outline-none focus:border-primary/20 transition-all" />
+              {/* Tags & Image */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40">
+                    Tags
+                    <span className="ml-2 font-normal normal-case tracking-normal text-primary/30">(comma separated)</span>
+                  </label>
+                  <input
+                    name="tags"
+                    defaultValue={editingArticle.tags?.join(", ")}
+                    placeholder="Poetry, Essay, Fiction"
+                    className="h-12 w-full rounded-none border border-primary/20 bg-zinc-50 px-4 text-sm font-sans text-[#0A192F] outline-none transition-all focus:border-primary focus:bg-white placeholder:text-primary/20"
+                  />
                 </div>
-                <div className="space-y-3">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-primary/40 px-1">Banner Image</label>
-                  <input name="image" type="file" accept="image/*" className="w-full h-14 bg-primary/[0.03] border border-primary/5 rounded-2xl px-6 py-4 text-[10px] font-bold text-primary/30" />
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40">
+                    Banner Image
+                  </label>
+                  <div className="relative h-12 border border-primary/20 bg-zinc-50 flex items-center overflow-hidden">
+                    <span className="absolute left-4 text-primary/30 pointer-events-none">
+                      <ImageIcon size={14} />
+                    </span>
+                    <input
+                      name="image"
+                      type="file"
+                      accept="image/*"
+                      className="h-full w-full pl-10 pr-4 text-[10px] font-sans font-bold text-primary/40 bg-transparent outline-none file:hidden cursor-pointer"
+                    />
+                    <span className="absolute right-4 text-[10px] font-sans font-bold uppercase tracking-widest text-primary/30 pointer-events-none">
+                      Choose
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              <div className="flex gap-4 pt-6">
-                <button type="button" onClick={() => setEditingArticle(null)} className="h-14 flex-1 rounded-2xl border-2 border-primary/5 text-xs font-black uppercase tracking-widest text-primary/40 hover:bg-primary/5 transition-all cursor-pointer">Cancel</button>
-                <button disabled={isSaving} className="h-14 flex-[2] rounded-2xl bg-primary text-white text-xs font-black uppercase tracking-widest shadow-xl shadow-primary/20 transition-all hover:bg-primary/90 disabled:opacity-50 cursor-pointer">
+              {/* Image Preview */}
+              {preview && (
+                <div className="space-y-2">
+                  <p className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40">Preview</p>
+                  <div className="aspect-[16/6] overflow-hidden border border-primary/10">
+                    <img src={preview} alt="Banner preview" className="h-full w-full object-cover" />
+                  </div>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex flex-col-reverse sm:flex-row gap-4 pt-2 border-t border-primary/10">
+                <button
+                  type="button"
+                  onClick={() => setEditingArticle(null)}
+                  className="h-12 flex-1 rounded-none border border-primary/20 bg-transparent text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/60 transition-all hover:border-primary/40 hover:text-primary cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSaving}
+                  className="h-12 flex-[2] rounded-none bg-[#0D387D] text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-white transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+                >
                   {isSaving ? "Saving..." : "Save Changes"}
                 </button>
               </div>

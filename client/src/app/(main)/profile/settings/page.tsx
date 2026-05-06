@@ -20,6 +20,7 @@ export default function ProfileSettingsPage() {
   const hydrated = useAppStore((s) => s.hydrated);
   const clearAuth = useAppStore((s) => s.clearAuth);
   const setError = useAppStore((s) => s.setError);
+
   const [activeSection, setActiveSection] = useState<SettingsSection>("details");
   const [logoutLoading, setLogoutLoading] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
@@ -32,13 +33,23 @@ export default function ProfileSettingsPage() {
 
   const parsedInterests = useMemo(() => {
     if (!user) return [];
-    if (Array.isArray(user.interests)) return user.interests;
-    if (typeof user.interests === "string") {
-      //@ts-expect-error
-      return user.interests.split(",").map((interest) => interest.trim()).filter(Boolean);
+
+    const interests = (user as any).interests;
+
+    if (Array.isArray(interests)) return interests.filter(Boolean);
+    if (typeof interests === "string") {
+      return interests
+        .split(",")
+        .map((interest: string) => interest.trim())
+        .filter(Boolean);
     }
+
     return [];
   }, [user]);
+
+
+
+
 
   const handleLogout = async () => {
     setError(null);
@@ -62,7 +73,9 @@ export default function ProfileSettingsPage() {
     setResetLoading(true);
     try {
       await forgotPassword(user.email);
-      alert(`A secure password reset link has been dispatched to ${user.email}. Please verify your inbox.`);
+      alert(
+        `A secure password reset link has been dispatched to ${user.email}. Please verify your inbox.`
+      );
     } catch (error) {
       const message = extractErrorMessage(error, "Failed to dispatch reset link.");
       alert(message);
@@ -80,165 +93,140 @@ export default function ProfileSettingsPage() {
   }
 
   return (
-    <div className="main-container px-3 sm:px-6 pt-24 sm:pt-28 pb-16">
-      <div className="mx-auto max-w-6xl">
-        {/* EDITORIAL HEADER */}
-        <div className="mb-8 border-b-2 border-primary/20 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
-          <div>
-            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-secondary">
-              Pen Club Settings
-            </span>
-            <h1 className="text-3xl sm:text-4xl font-serif font-bold text-primary mt-1 tracking-tight">
-              Account Dossier & Settings
-            </h1>
-          </div>
-          <div className="text-sm font-medium text-muted-foreground font-serif italic">
-            Refining your digital voice
-          </div>
+    <div className="relative min-h-screen bg-white">
+      <div className="max-w-5xl mx-auto px-4 pt-24 pb-20">
+        <div className="mb-10 sm:mb-12 flex flex-col gap-2">
+          <h1 className="text-4xl md:text-5xl font-serif font-bold tracking-tight leading-tight text-[#0d387d]">
+            Profile Settings
+          </h1>
+          <p className="text-sm md:text-base font-serif italic text-[#0d387d]/70">
+            Manage your details and preferences
+          </p>
+
         </div>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-12">
-          {/* SIDEBAR NAVIGATION */}
-          <aside className="md:col-span-4 lg:col-span-3 md:sticky md:top-28 md:self-start">
-            <div className="border border-primary/20 bg-card p-4 rounded-none shadow-[0_4px_20px_rgba(13,56,125,0.02)]">
-              <h3 className="text-xs font-bold uppercase tracking-[0.15em] text-primary/40 mb-3 px-2">Navigation</h3>
-              <div className="flex flex-col gap-1">
-                <button
-                  type="button"
-                  onClick={() => setActiveSection("details")}
-                  className={`flex w-full items-center gap-3 px-3 py-2.5 text-left text-sm font-semibold transition duration-200 rounded-none border-l-2 ${
-                    activeSection === "details"
-                      ? "border-primary bg-primary/5 text-primary"
-                      : "border-transparent text-muted-foreground hover:text-primary hover:bg-primary/5"
-                  }`}
-                >
-                  <Settings size={15} />
-                  Profile Details
-                </button>
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-12 items-start">
+          <aside className="md:col-span-4 lg:col-span-3 md:sticky md:top-32">
+            <div className="flex flex-col border-l border-primary/10">
+              <button
+                type="button"
+                onClick={() => setActiveSection("details")}
+                className={`flex w-full items-center gap-3 px-6 py-4 text-left text-[10px] font-sans font-bold uppercase tracking-[0.2em] transition-all border-l-2 -ml-[1px] ${
+                  activeSection === "details"
+                    ? "border-[#0d387d] bg-[#0d387d]/5 text-[#0d387d]"
+                    : "border-transparent text-primary/40 hover:text-[#0d387d]/90 hover:bg-primary/5"
+                }`}
 
-                <button
-                  type="button"
-                  onClick={() => setActiveSection("edit")}
-                  className={`flex w-full items-center gap-3 px-3 py-2.5 text-left text-sm font-semibold transition duration-200 rounded-none border-l-2 ${
-                    activeSection === "edit"
-                      ? "border-primary bg-primary/5 text-primary"
-                      : "border-transparent text-muted-foreground hover:text-primary hover:bg-primary/5"
-                  }`}
-                >
-                  <UserCog size={15} />
-                  Edit Profile
-                </button>
+              >
+                <Settings size={14} />
+                Profile Details
+              </button>
 
-                <button
-                  type="button"
-                  onClick={() => setActiveSection("password")}
-                  className={`flex w-full items-center gap-3 px-3 py-2.5 text-left text-sm font-semibold transition duration-200 rounded-none border-l-2 ${
-                    activeSection === "password"
-                      ? "border-primary bg-primary/5 text-primary"
-                      : "border-transparent text-muted-foreground hover:text-primary hover:bg-primary/5"
-                  }`}
-                >
-                  <KeyRound size={15} />
-                  Reset Password
-                </button>
+              <button
+                type="button"
+                onClick={() => setActiveSection("edit")}
+                className={`flex w-full items-center gap-3 px-6 py-4 text-left text-[10px] font-sans font-bold uppercase tracking-[0.2em] transition-all border-l-2 -ml-[1px] ${
+                  activeSection === "edit"
+                    ? "border-[#0d387d] bg-[#0d387d]/5 text-[#0d387d]"
+                    : "border-transparent text-primary/40 hover:text-[#0d387d]/90 hover:bg-primary/5"
+                }`}
 
-                <div className="my-2 border-t border-primary/10" />
+              >
+                <UserCog size={14} />
+                Edit Profile
+              </button>
 
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  disabled={logoutLoading}
-                  className="flex w-full items-center gap-3 px-3 py-2.5 text-left text-sm font-semibold text-red-600 transition duration-200 rounded-none border-l-2 border-transparent hover:bg-red-50/50 disabled:opacity-60"
-                >
-                  <LogOut size={15} />
-                  {logoutLoading ? "Logging out..." : "Logout"}
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => setActiveSection("password")}
+                className={`flex w-full items-center gap-3 px-6 py-4 text-left text-[10px] font-sans font-bold uppercase tracking-[0.2em] transition-all border-l-2 -ml-[1px] ${
+                  activeSection === "password"
+                    ? "border-primary bg-primary/5 text-primary"
+                    : "border-transparent text-primary/40 hover:text-primary/70 hover:bg-primary/5"
+                }`}
+              >
+                <KeyRound size={14} />
+                Reset Password
+              </button>
+
+              <button
+                type="button"
+                onClick={handleLogout}
+                disabled={logoutLoading}
+                className="flex w-full items-center gap-3 px-6 py-4 text-left text-[10px] font-sans font-bold uppercase tracking-[0.2em] transition-all border-l-2 -ml-[1px] border-transparent text-red-600/60 hover:text-red-600 hover:bg-red-50 disabled:opacity-60"
+              >
+                <LogOut size={14} />
+                {logoutLoading ? "Logging out..." : "Logout"}
+              </button>
             </div>
           </aside>
 
-          {/* MAIN SETTINGS CONTENT */}
-          <section className="md:col-span-8 lg:col-span-9">
-            {activeSection === "password" ? (
-              <div className="border border-primary/20 bg-card p-6 md:p-8 rounded-none shadow-[0_4px_20px_rgba(13,56,125,0.02)]">
-                <div className="border-b border-primary/15 pb-4 mb-6">
-                  <h2 className="text-2xl font-serif font-bold text-primary tracking-tight">Reset Password</h2>
-                  <p className="text-xs text-muted-foreground mt-1 tracking-wide">Request a secure password reset link to your registered email address</p>
-                </div>
+          <section className="md:col-span-8 lg:col-span-9 w-full max-w-3xl">
+            {activeSection === "edit" ? (
+              <ProfileEditor inModal={false} onClose={() => setActiveSection("details")} />
+            ) : activeSection === "password" ? (
+              <div className="border border-primary/10 bg-white p-8 rounded-none relative">
+                <h2 className="text-2xl font-serif font-bold text-[#0A192F] mb-6">Reset Password</h2>
 
                 <div className="max-w-md space-y-6">
-                  <div className="border-b border-primary/10 pb-4">
-                    <p className="text-[10px] uppercase tracking-[0.2em] font-semibold text-primary/50">Your Registered Email</p>
-                    <p className="mt-1.5 text-base font-medium text-primary">{user.email}</p>
+                  <div className="border border-primary/10 bg-zinc-50/50 p-4 rounded-none">
+                    <p className="text-[10px] uppercase font-sans font-bold tracking-[0.2em] text-primary/40">
+                      Your Registered Email
+                    </p>
+                    <p className="mt-2 text-base font-sans font-medium text-[#0A192F]">{user.email}</p>
                   </div>
 
                   <button
                     type="button"
                     onClick={handleSendResetLink}
                     disabled={resetLoading}
-                    className="cursor-pointer bg-primary text-white text-xs uppercase tracking-widest font-bold rounded-none px-6 py-3.5 border border-primary hover:bg-transparent hover:text-primary transition duration-200 disabled:opacity-50"
+                    className="w-full cursor-pointer bg-primary text-white text-xs uppercase tracking-widest font-bold rounded-none px-6 py-3.5 border border-primary hover:bg-transparent hover:text-primary transition duration-200 disabled:opacity-50"
                   >
                     {resetLoading ? "Dispatching..." : "Send Password Reset Link"}
                   </button>
                 </div>
               </div>
-            ) : activeSection === "edit" ? (
-              <div className="border border-primary/20 bg-card p-4 sm:p-6 rounded-none shadow-[0_4px_20px_rgba(13,56,125,0.02)]">
-                <ProfileEditor inModal={false} onClose={() => setActiveSection("details")} />
-              </div>
             ) : (
-              <div className="border border-primary/20 bg-card p-6 md:p-8 rounded-none shadow-[0_4px_20px_rgba(13,56,125,0.02)]">
-                <div className="border-b border-primary/15 pb-4 mb-6">
-                  <h2 className="text-2xl font-serif font-bold text-primary tracking-tight">Atelier Dossier</h2>
-                  <p className="text-xs text-muted-foreground mt-1 tracking-wide">Current account details & system metadata</p>
-                </div>
+              <div className="border border-primary/10 bg-white p-8 rounded-none relative">
+                <h2 className="text-2xl font-serif font-bold text-[#0A192F] mb-6">User Details</h2>
 
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                  <div className="border-b border-primary/10 pb-4">
-                    <p className="text-[10px] uppercase tracking-[0.2em] font-semibold text-primary/50">Full Name</p>
-                    <p className="mt-1 text-base font-serif font-medium text-primary">{fieldValue(user.name)}</p>
+                  <div className="border border-primary/10 bg-zinc-50/50 p-4 rounded-none">
+                    <p className="text-[10px] uppercase font-sans font-bold tracking-[0.2em] text-primary/40">Name</p>
+                    <p className="mt-2 text-sm font-sans font-medium text-[#0A192F]">{fieldValue(user.name)}</p>
                   </div>
-                  <div className="border-b border-primary/10 pb-4">
-                    <p className="text-[10px] uppercase tracking-[0.2em] font-semibold text-primary/50">Username</p>
-                    <p className="mt-1 text-base font-mono text-primary/90">@{fieldValue(user.username)}</p>
+                  <div className="border border-primary/10 bg-zinc-50/50 p-4 rounded-none">
+                    <p className="text-[10px] uppercase font-sans font-bold tracking-[0.2em] text-primary/40">Username</p>
+                    <p className="mt-2 text-sm font-sans font-medium text-[#0A192F]">@{fieldValue(user.username)}</p>
                   </div>
-                  <div className="border-b border-primary/10 pb-4">
-                    <p className="text-[10px] uppercase tracking-[0.2em] font-semibold text-primary/50">Email Address</p>
-                    <p className="mt-1 text-base text-primary/90 break-all">{fieldValue(user.email)}</p>
+                  <div className="border border-primary/10 bg-zinc-50/50 p-4 rounded-none">
+                    <p className="text-[10px] uppercase font-sans font-bold tracking-[0.2em] text-primary/40">Email</p>
+                    <p className="mt-2 text-sm font-sans font-medium text-[#0A192F] break-all">{fieldValue(user.email)}</p>
                   </div>
-                  <div className="border-b border-primary/10 pb-4">
-                    <p className="text-[10px] uppercase tracking-[0.2em] font-semibold text-primary/50">System Role</p>
-                    <p className="mt-1 text-base font-serif capitalize text-primary">{fieldValue(user.role)}</p>
+                  <div className="border border-primary/10 bg-zinc-50/50 p-4 rounded-none">
+                    <p className="text-[10px] uppercase font-sans font-bold tracking-[0.2em] text-primary/40">Role</p>
+                    <p className="mt-2 text-sm font-sans font-medium capitalize text-[#0A192F]">{fieldValue(user.role)}</p>
                   </div>
-                  <div className="border-b border-primary/10 pb-4">
-                    <p className="text-[10px] uppercase tracking-[0.2em] font-semibold text-primary/50">Verification Status</p>
-                    <div className="mt-1.5 flex items-center">
-                      {user.isEmailVerified ? (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-none bg-emerald-50 text-emerald-800 text-[10px] font-bold uppercase tracking-wider border border-emerald-200">
-                          Verified
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-none bg-amber-50 text-amber-800 text-[10px] font-bold uppercase tracking-wider border border-amber-200">
-                          Pending
-                        </span>
-                      )}
-                    </div>
+                  <div className="border border-primary/10 bg-zinc-50/50 p-4 rounded-none sm:col-span-2">
+                    <p className="text-[10px] uppercase font-sans font-bold tracking-[0.2em] text-primary/40">Email Verified</p>
+                    <p className="mt-2 text-sm font-sans font-medium text-[#0A192F]">{user.isEmailVerified ? "Yes" : "No"}</p>
                   </div>
                 </div>
 
-                <div className="mt-8 border-b border-primary/10 pb-6">
-                  <p className="text-[10px] uppercase tracking-[0.2em] font-semibold text-primary/50 mb-2">Biography</p>
-                  <p className="text-base font-serif text-primary/90 leading-relaxed italic">
-                    "{fieldValue(user.bio)}"
-                  </p>
+                <div className="mt-6 border border-primary/10 bg-zinc-50/50 p-6 rounded-none">
+                  <p className="text-[10px] uppercase font-sans font-bold tracking-[0.2em] text-primary/40 mb-3">Bio</p>
+                  <p className="text-sm font-sans text-primary/80 leading-relaxed">{fieldValue(user.bio)}</p>
                 </div>
 
-                <div className="mt-8">
-                  <p className="text-[10px] uppercase tracking-[0.2em] font-semibold text-primary/50 mb-3">Interests & Topics</p>
+                <div className="mt-6 border border-primary/10 bg-zinc-50/50 p-6 rounded-none">
+                  <p className="text-[10px] uppercase font-sans font-bold tracking-[0.2em] text-primary/40 mb-4">Interests</p>
                   {parsedInterests.length > 0 ? (
                     <div className="flex flex-wrap gap-2">
                       {parsedInterests.map((interest) => (
-                        <span key={interest} className="rounded-none border border-primary/20 bg-primary/5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-primary hover:bg-primary/10 transition duration-150">
+                        <span
+                          key={interest}
+                          className="px-4 py-1.5 border border-primary/10 text-[10px] font-sans font-bold uppercase tracking-[0.1em] text-primary/80 bg-white"
+                        >
                           {interest}
                         </span>
                       ))}
@@ -255,3 +243,4 @@ export default function ProfileSettingsPage() {
     </div>
   );
 }
+

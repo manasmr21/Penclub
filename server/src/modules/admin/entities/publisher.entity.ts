@@ -5,33 +5,33 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
-  Index
-} from "typeorm";
+  Index,
+} from 'typeorm';
 
-@Entity("publishers")
+@Entity('publishers')
 export class Publisher {
   @Index()
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
-  name: string
+  name: string;
 
   @Index()
   @Column({ unique: true })
-  publisherId: string
+  publisherId: string;
 
   @Column({ unique: true })
-  email: string
+  email: string;
 
   @Column()
-  number: string
+  number: string;
 
   @Column()
-  logo: string
+  logo: string;
 
   @Column()
-  logoId: string
+  logoId: string;
 
   @CreateDateColumn()
   createdAt: Date;

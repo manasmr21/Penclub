@@ -1,55 +1,55 @@
 import {
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-    ManyToOne,
-    CreateDateColumn,
-    UpdateDateColumn,
-    Index,
-    JoinColumn,
-    Unique,
-    DeleteDateColumn
-} from "typeorm";
-import { User } from "../../users/entities/user.entity";
-import { Book } from "../../books/entities/books.entity";
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  CreateDateColumn,
+  UpdateDateColumn,
+  Index,
+  JoinColumn,
+  Unique,
+  DeleteDateColumn,
+} from 'typeorm';
+import { User } from '../../users/entities/user.entity';
+import { Book } from '../../books/entities/books.entity';
 
-@Entity("reviews")
-@Unique(["userId", "bookId"])
+@Entity('reviews')
+@Unique(['userId', 'bookId'])
 export class Review {
-    @PrimaryGeneratedColumn("uuid")
-    id: string;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-    @Column("int", { width: 1 })
-    rating: number;
+  @Column('int', { width: 1 })
+  rating: number;
 
-    @Column("text", { nullable: true })
-    content?: string;
+  @Column('text', { nullable: true })
+  content?: string;
 
-    @Index()
-    @Column({ type: "uuid" })
-    bookId: string
+  @Index()
+  @Column({ type: 'uuid' })
+  bookId: string;
 
-    @Index()
-    @Column({ type: "uuid" })
-    userId: string
+  @Index()
+  @Column({ type: 'uuid' })
+  userId: string;
 
-    @ManyToOne(() => Book, { onDelete: "CASCADE" })
-    @JoinColumn({ name: "review_of_book" })
-    book: Book;
+  @ManyToOne(() => Book, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'review_of_book' })
+  book: Book;
 
-    @ManyToOne(() => User, (user) => user.review, { onDelete: "CASCADE" })
-    @JoinColumn({ name: "userId" })
-    user: User;
+  @ManyToOne(() => User, (user) => user.review, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'userId' })
+  user: User;
 
-    @Column({default: false})
-    edited: boolean;
+  @Column({ default: false })
+  edited: boolean;
 
-    @CreateDateColumn()
-    createdAt: Date;
+  @CreateDateColumn()
+  createdAt: Date;
 
-    @UpdateDateColumn()
-    updatedAt: Date;
+  @UpdateDateColumn()
+  updatedAt: Date;
 
-    @DeleteDateColumn()
-    deletedAt: Date;
+  @DeleteDateColumn()
+  deletedAt: Date;
 }

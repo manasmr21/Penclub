@@ -21,7 +21,11 @@ interface FormInputProps {
 
 const ProfileHeader = ({ onClose }: { onClose?: () => void }) => (
   <header className="flex items-center justify-between border-b border-primary/10 bg-transparent pb-4 mb-6">
-    <button type="button" onClick={onClose} className="text-xs uppercase tracking-widest font-bold text-primary hover:opacity-80 transition duration-150">
+    <button
+      type="button"
+      onClick={onClose}
+      className="text-xs uppercase tracking-widest font-bold text-primary hover:opacity-80 transition duration-150"
+    >
       &larr; Back
     </button>
     <h1 className="text-xl font-serif font-bold text-primary tracking-tight">Edit Profile</h1>
@@ -80,7 +84,6 @@ const ProfilePictureUpdate = ({
             <span className="select-none">{getInitials()}</span>
           )}
         </div>
-
         <input type="file" ref={fileInputRef} hidden accept="image/*" onChange={handleFileChange} />
 
         <button
@@ -93,9 +96,9 @@ const ProfilePictureUpdate = ({
         </button>
       </div>
 
-      <button 
-        type="button" 
-        onClick={() => fileInputRef.current?.click()} 
+      <button
+        type="button"
+        onClick={() => fileInputRef.current?.click()}
         className="text-[10px] uppercase tracking-widest font-bold text-secondary hover:text-primary transition duration-150"
       >
         Change Photo
@@ -127,6 +130,7 @@ export default function ProfileEditor({ inModal = false, onClose }: ProfileEdito
   const user = useAppStore((s) => s.user);
   const updateUser = useAppStore((s) => s.updateUser);
   const setError = useAppStore((s) => s.setError);
+
   type UserPatch = Parameters<typeof updateUser>[0];
   type ProfileResponse = { user?: UserPatch; message?: string };
 
@@ -206,12 +210,13 @@ export default function ProfileEditor({ inModal = false, onClose }: ProfileEdito
 
     setLoading(true);
     setError(null);
+
     try {
       const payload: UpdateUserProfilePayload = {
         name,
-        bio,
         interests: selected,
       };
+
 
       if (file) {
         payload.profilePictureFile = file;
@@ -256,7 +261,9 @@ export default function ProfileEditor({ inModal = false, onClose }: ProfileEdito
     setError(null);
     try {
       const response = await resendUserOtp(user.role, user.email);
-      const expiresAt = response?.otpExpiresAt ? `&expiresAt=${encodeURIComponent(response.otpExpiresAt)}` : "";
+      const expiresAt = response?.otpExpiresAt
+        ? `&expiresAt=${encodeURIComponent(response.otpExpiresAt)}`
+        : "";
       router.push(`/verify-otp?email=${encodeURIComponent(user.email)}${expiresAt}`);
     } catch (error) {
       const message = extractErrorMessage(error, "Unable to send verification OTP.");
@@ -270,9 +277,9 @@ export default function ProfileEditor({ inModal = false, onClose }: ProfileEdito
   return (
     <div
       className={`w-full bg-transparent text-primary ${inModal
-          ? "mx-auto mt-4 sm:mt-10 max-w-2xl max-h-[92vh] overflow-y-auto border border-primary/20 bg-card p-6"
-          : "mx-auto max-w-none"
-        }`}
+        ? "mx-auto mt-4 sm:mt-10 max-w-2xl max-h-[92vh] overflow-y-auto border border-primary/20 bg-card p-6"
+        : "mx-auto max-w-none"
+      }`}
     >
       {inModal && <ProfileHeader onClose={handleClose} />}
 
@@ -321,7 +328,7 @@ export default function ProfileEditor({ inModal = false, onClose }: ProfileEdito
             <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-primary/50">
               Atelier Interests & Topics
             </label>
-            
+
             {selected.length > 0 && (
               <div className="flex flex-wrap gap-2 border border-primary/10 bg-primary/5 p-3 rounded-none">
                 {selected.map((item) => (
@@ -344,8 +351,8 @@ export default function ProfileEditor({ inModal = false, onClose }: ProfileEdito
                   key={item}
                   onClick={() => toggleInterest(item)}
                   className={`border px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition rounded-none ${selected.includes(item)
-                      ? "border-primary bg-primary text-white"
-                      : "border-primary/20 bg-transparent text-primary/60 hover:bg-primary/5 hover:text-primary hover:border-primary/40"
+                    ? "border-primary bg-primary text-white"
+                    : "border-primary/20 bg-transparent text-primary/60 hover:bg-primary/5 hover:text-primary hover:border-primary/40"
                     }`}
                 >
                   {item}
@@ -376,3 +383,4 @@ export default function ProfileEditor({ inModal = false, onClose }: ProfileEdito
     </div>
   );
 }
+

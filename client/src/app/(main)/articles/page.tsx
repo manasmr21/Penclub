@@ -85,7 +85,6 @@ export default function ArticlesPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Compact Hero Section - Matching Bookshelf */}
       <section className="pt-16 md:pt-28 md:pb-8">
         <div className="main-container">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">

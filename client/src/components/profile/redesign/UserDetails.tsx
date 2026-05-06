@@ -13,6 +13,7 @@ interface User {
   username?: string;
   role?: "author" | "user";
   bio?: string;
+  interests?: string[] | string;
   createdAt?: string;
   profilePicture?: string | { secure_url?: string; url?: string };
   bookCount?: number;
@@ -168,13 +169,20 @@ const UserDetails = ({ isOwnProfile = true, userOverride }: UserDetailsProps) =>
               </p>
             </div>
 
-            <div className="flex flex-wrap justify-center md:justify-start gap-3 pt-2">
-              {["Essays", "Memoir", "Poetry", "Modernist Fiction"].map((tag) => (
-                <span key={tag} className="px-4 py-1.5 border border-white/20 text-[10px] font-sans font-bold uppercase tracking-widest text-white/80">
-                  {tag}
-                </span>
-              ))}
-            </div>
+            {user?.interests && user.interests.length > 0 && (
+              <div className="flex flex-wrap justify-center md:justify-start gap-3 pt-2">
+                {(Array.isArray(user.interests) 
+                  ? user.interests 
+                  : typeof user.interests === 'string' 
+                    ? (user.interests as string).split(',').map(i => i.trim()).filter(Boolean)
+                    : []
+                ).map((tag) => (
+                  <span key={tag} className="px-4 py-1.5 border border-white/20 text-[10px] font-sans font-bold uppercase tracking-widest text-white/80">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 

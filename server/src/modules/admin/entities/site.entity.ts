@@ -4,24 +4,24 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  DeleteDateColumn
-} from "typeorm";
+  DeleteDateColumn,
+} from 'typeorm';
 
-@Entity("site_settings")
+@Entity('site_settings')
 export class Site {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: "simple-array", nullable: true })
+  @Column({ type: 'simple-array', nullable: true })
   navbar?: string[];
 
-  @Column({ type: "simple-array", nullable: true })
+  @Column({ type: 'simple-array', nullable: true })
   roles?: string[];
 
-  @Column({ type: "simple-array", nullable: true })
+  @Column({ type: 'simple-array', nullable: true })
   rolepermissions?: string[];
 
-  @Column({ type: "simple-array", nullable: true })
+  @Column({ type: 'simple-array', nullable: true })
   genre?: string[];
 
   @Column({ nullable: true })

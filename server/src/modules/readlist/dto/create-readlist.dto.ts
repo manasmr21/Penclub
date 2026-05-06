@@ -1,9 +1,9 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateReadlistDto {
-    @ApiProperty({ example: "Fantasy Reads" })
-    name: string;
+  @ApiProperty({ example: 'Fantasy Reads' })
+  name: string;
 
-    @ApiProperty({ example: false, required: false })
-    isPublic?: boolean;
+  @ApiProperty({ example: false, required: false })
+  isPublic?: boolean;
 }

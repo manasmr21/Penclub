@@ -1,6 +1,6 @@
-import { Book } from "../../books/entities/books.entity";
-import { Blog } from "../../blog/entities/blogs.entity";
-import { Comment } from "../../comments/entities/comment.entity";
+import { Book } from '../../books/entities/books.entity';
+import { Blog } from '../../blog/entities/blogs.entity';
+import { Comment } from '../../comments/entities/comment.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -11,13 +11,13 @@ import {
   ManyToMany,
   JoinTable,
   Index,
-  DeleteDateColumn
-} from "typeorm";
-import { Review } from "../../reviews/entities/review.entity";
+  DeleteDateColumn,
+} from 'typeorm';
+import { Review } from '../../reviews/entities/review.entity';
 
-@Entity("users")
+@Entity('users')
 export class User {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({ length: 50 })
@@ -35,38 +35,38 @@ export class User {
   password: string;
 
   @Column({
-    default: "reader",
-    enum: ["reader", "author", "admin"],
-    enumName: "user_roles_enum"
+    default: 'reader',
+    enum: ['reader', 'author', 'admin'],
+    enumName: 'user_roles_enum',
   })
   role: string;
 
   @OneToMany(() => Blog, (blog) => blog.user)
   blogs: Blog[];
 
-  @Column({ nullable: true, type: "varchar", length: 150 })
+  @Column({ nullable: true, type: 'varchar', length: 150 })
   bio?: string;
 
   @OneToMany(() => Book, (book) => book.author)
   books: Book[];
 
-  @Column("text", { array: true, default: [] })
+  @Column('text', { array: true, default: [] })
   booksId: string[];
 
-  @Column("text", { array: true, default: [] })
+  @Column('text', { array: true, default: [] })
   blogsId: string[];
 
   @ManyToMany(() => User, (user) => user.followers)
   @JoinTable({
-    name: "user_following",
+    name: 'user_following',
     joinColumn: {
-      name: "follower_id",
-      referencedColumnName: "id"
+      name: 'follower_id',
+      referencedColumnName: 'id',
     },
     inverseJoinColumn: {
-      name: "following_id",
-      referencedColumnName: "id"
-    }
+      name: 'following_id',
+      referencedColumnName: 'id',
+    },
   })
   following: User[];
 
@@ -79,16 +79,16 @@ export class User {
   @Column({ default: 0 })
   followingCount: number;
 
-  @Column({ type: "text", nullable: true })
+  @Column({ type: 'text', nullable: true })
   otpHash?: string | null;
 
-  @Column({ type: "timestamptz", nullable: true })
+  @Column({ type: 'timestamptz', nullable: true })
   otpExpiresAt?: Date | null;
 
   @Column({ default: false })
   isEmailVerified: boolean;
 
-  @Column({ type: "simple-array", nullable: true })
+  @Column({ type: 'simple-array', nullable: true })
   interests?: string[];
 
   @Column({ nullable: true })
@@ -97,7 +97,7 @@ export class User {
   @Column({ nullable: true })
   profilePictureId?: string;
 
-  @Column({ type: "simple-array", nullable: true })
+  @Column({ type: 'simple-array', nullable: true })
   socialLinks?: string[];
 
   @OneToMany(() => Comment, (comment) => comment.user)
@@ -106,10 +106,10 @@ export class User {
   @OneToMany(() => Review, (review) => review.user)
   review: Review[];
 
-  @Column({ type: "text", nullable: true })
+  @Column({ type: 'text', nullable: true })
   resetToken?: string | null;
 
-  @Column({type: "timestamptz", nullable: true})
+  @Column({ type: 'timestamptz', nullable: true })
   resetTokenExpiresAt?: Date | null;
 
   @Column({ default: false })
