@@ -9,7 +9,7 @@ import {
   CarouselPrevious,
 } from "@/src/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
-import { book,book2,book3, book4, book5, book6 } from "@/public/images";
+import { book, book2, book3, book4, book5, book6 } from "@/public/images";
 import Image from "next/image";
 
 const cards = [
@@ -40,6 +40,10 @@ export default function HeroCarousel() {
 
     api.on("select", onSelect);
     onSelect();
+
+    return () => {
+      api.off("select", onSelect);
+    };
   }, [api]);
 
   return (
@@ -54,8 +58,9 @@ export default function HeroCarousel() {
         opts={{
           align: "start",
           containScroll: "trimSnaps",
+          loop: true,
         }}
-        className="w-full  mx-auto"
+        className="w-full mx-auto"
       >
         <CarouselContent className="px-2">
           {cards.map((card, index) => (
@@ -69,10 +74,9 @@ export default function HeroCarousel() {
                   h-[220px] sm:h-[260px] md:h-[300px] lg:h-[350px] 
                   transition-all duration-500
                   origin-bottom
-                  ${
-                    index === selectedIndex
-                      ? "lg:scale-100 lg:z-10"
-                      : "lg:scale-90"
+                  ${index === selectedIndex
+                    ? "lg:scale-100 lg:z-10"
+                    : "lg:scale-90"
                   }
                 `}
               >
@@ -89,8 +93,15 @@ export default function HeroCarousel() {
           ))}
         </CarouselContent>
 
-        <CarouselPrevious className="absolute right-full top-[77%] bg-[#e8aa05] text-white p-5" />
-        <CarouselNext className="absolute left-full top-[77%] bg-[#e8aa05] text-white p-5" />
+        {/* Desktop Buttons */}
+        <CarouselPrevious className="hidden md:inline-flex absolute right-full top-[77%] bg-[#e8aa05] text-white p-5" />
+        <CarouselNext className="hidden md:inline-flex absolute left-full top-[77%] bg-[#e8aa05] text-white p-5" />
+
+        {/* Centered Mobile Buttons */}
+        <div className="flex md:hidden justify-center gap-6 mt-4">
+          <CarouselPrevious className="static translate-y-0 bg-[#e8aa05] text-white p-5" />
+          <CarouselNext className="static translate-y-0 bg-[#e8aa05] text-white p-5" />
+        </div>
       </Carousel>
     </div>
   );

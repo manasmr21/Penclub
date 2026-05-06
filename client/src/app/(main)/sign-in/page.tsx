@@ -25,7 +25,7 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="mt-32">
+    <div className="mt-32 pb-24 px-4">
       <AuthForm type="login" />
     </div>
   );

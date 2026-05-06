@@ -12,8 +12,10 @@ import {
   Building2,
   Calendar,
   X,
-  Download
+  Download,
+  CheckCircle
 } from "lucide-react";
+import { StatCard } from "@/src/components/cards";
 
 interface Publisher {
   id: string;
@@ -36,7 +38,7 @@ const MOCK_PUBLISHERS: Publisher[] = [
     publisherId: "PRH001",
     email: "contact@penguinrandomhouse.com",
     number: "+1 (212) 123-4567",
-    logo: "https://ui-avatars.com/api/?name=PRH&background=6366f1&color=fff",
+    logo: "https://ui-avatars.com/api/?name=PRH&background=0D387D&color=fff",
     logoId: "logo_prh_001",
     createdAt: new Date("2024-01-15"),
     updatedAt: new Date("2024-03-20"),
@@ -48,7 +50,7 @@ const MOCK_PUBLISHERS: Publisher[] = [
     publisherId: "HC002",
     email: "info@harpercollins.com",
     number: "+1 (212) 207-7000",
-    logo: "https://ui-avatars.com/api/?name=HC&background=8b5cf6&color=fff",
+    logo: "https://ui-avatars.com/api/?name=HC&background=4D127A&color=fff",
     logoId: "logo_hc_002",
     createdAt: new Date("2024-02-01"),
     updatedAt: new Date("2024-03-18"),
@@ -60,7 +62,7 @@ const MOCK_PUBLISHERS: Publisher[] = [
     publisherId: "SS003",
     email: "publishers@simonandschuster.com",
     number: "+1 (212) 698-7000",
-    logo: "https://ui-avatars.com/api/?name=SS&background=ec4899&color=fff",
+    logo: "https://ui-avatars.com/api/?name=SS&background=065F46&color=fff",
     logoId: "logo_ss_003",
     createdAt: new Date("2024-01-20"),
     updatedAt: new Date("2024-03-15"),
@@ -72,7 +74,7 @@ const MOCK_PUBLISHERS: Publisher[] = [
     publisherId: "HL004",
     email: "contact@hachette.com",
     number: "+33 (1) 43-92-30-00",
-    logo: "https://ui-avatars.com/api/?name=HL&background=10b981&color=fff",
+    logo: "https://ui-avatars.com/api/?name=HL&background=854D0E&color=fff",
     logoId: "logo_hl_004",
     createdAt: new Date("2024-02-10"),
     updatedAt: new Date("2024-03-12"),
@@ -84,7 +86,7 @@ const MOCK_PUBLISHERS: Publisher[] = [
     publisherId: "MP005",
     email: "info@macmillan.com",
     number: "+1 (646) 307-5151",
-    logo: "https://ui-avatars.com/api/?name=MP&background=f59e0b&color=fff",
+    logo: "https://ui-avatars.com/api/?name=MP&background=0D387D&color=fff",
     logoId: "logo_mp_005",
     createdAt: new Date("2024-01-25"),
     updatedAt: new Date("2024-03-10"),
@@ -97,6 +99,7 @@ function PublisherDetailsModal({ publisher, onClose }: { publisher: Publisher | 
   if (!publisher) return null;
 
   return (
+<<<<<<< HEAD
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-[#0A192F]/60 backdrop-blur-sm">
       <div className="bg-white w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-2xl border border-primary/10">
         {/* Header */}
@@ -108,6 +111,15 @@ function PublisherDetailsModal({ publisher, onClose }: { publisher: Publisher | 
           <button
             onClick={onClose}
             className="h-9 w-9 flex items-center justify-center border border-primary/20 text-primary/40 hover:text-primary hover:border-primary transition-all cursor-pointer"
+=======
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+      <div className="bg-card rounded-none max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-primary/30 font-inter">
+        <div className="sticky top-0 bg-white border-b border-primary/20 p-6 flex items-center justify-between z-10">
+          <h2 className="text-lg font-serif font-bold text-primary uppercase tracking-widest">Publisher Details</h2>
+          <button 
+            onClick={onClose} 
+            className="cursor-pointer p-2 hover:bg-primary/5 border border-transparent hover:border-primary/10 rounded-none transition-all"
+>>>>>>> c925529b424592087f1d1eb7f565490ef3cd21cb
           >
             <X className="w-4 h-4" />
           </button>
@@ -115,6 +127,7 @@ function PublisherDetailsModal({ publisher, onClose }: { publisher: Publisher | 
 
         <div className="p-8 space-y-8">
           {/* Logo and Name */}
+<<<<<<< HEAD
           <div className="flex items-center gap-6">
             <img
               src={publisher.logo}
@@ -124,11 +137,23 @@ function PublisherDetailsModal({ publisher, onClose }: { publisher: Publisher | 
             <div>
               <h3 className="text-2xl font-serif font-bold text-[#0A192F]">{publisher.name}</h3>
               <p className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40 mt-1">ID: {publisher.publisherId}</p>
+=======
+          <div className="flex items-center gap-5 border-b border-primary/10 pb-6">
+            <img
+              src={publisher.logo}
+              alt={publisher.name}
+              className="w-20 h-20 rounded-none border border-primary/20 object-cover shadow-sm"
+            />
+            <div>
+              <h3 className="text-2xl font-serif font-bold text-primary tracking-tight">{publisher.name}</h3>
+              <p className="text-xs text-primary/45 font-mono uppercase tracking-widest mt-1">Publisher ID: {publisher.publisherId}</p>
+>>>>>>> c925529b424592087f1d1eb7f565490ef3cd21cb
             </div>
           </div>
 
           {/* Contact Information */}
           <div className="space-y-3">
+<<<<<<< HEAD
             <p className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40 flex items-center gap-2">
               <Mail className="w-3 h-3" /> Contact Information
             </p>
@@ -140,12 +165,45 @@ function PublisherDetailsModal({ publisher, onClose }: { publisher: Publisher | 
               <div className="flex items-center gap-3 text-sm">
                 <Phone className="w-4 h-4 text-primary/30 shrink-0" />
                 <span className="font-sans text-[#0A192F]">{publisher.number}</span>
+=======
+            <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary/50 flex items-center gap-2">
+              <Mail className="w-4 h-4" />
+              Contact Information
+            </h4>
+            <div className="bg-primary/[0.01] rounded-none p-4 border border-primary/15 space-y-3">
+              <div className="flex items-center gap-3 text-sm">
+                <Mail className="w-4 h-4 text-primary/40" />
+                <span className="text-primary font-serif italic">{publisher.email}</span>
+              </div>
+              <div className="flex items-center gap-3 text-sm">
+                <Phone className="w-4 h-4 text-primary/40" />
+                <span className="text-primary font-serif italic">{publisher.number}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Additional Information */}
+          <div className="space-y-3">
+            <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary/50 flex items-center gap-2">
+              <Building2 className="w-4 h-4" />
+              Administrative Registry
+            </h4>
+            <div className="bg-primary/[0.01] rounded-none p-4 border border-primary/15 space-y-3">
+              <div className="flex justify-between items-center text-sm border-b border-primary/5 pb-2">
+                <span className="text-primary/40 font-bold uppercase tracking-wider text-[9px]">Internal SKU</span>
+                <span className="text-primary font-mono">{publisher.publisherId}</span>
+              </div>
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-primary/40 font-bold uppercase tracking-wider text-[9px]">Logo ID Reference</span>
+                <span className="text-primary font-mono">{publisher.logoId}</span>
+>>>>>>> c925529b424592087f1d1eb7f565490ef3cd21cb
               </div>
             </div>
           </div>
 
           {/* Timeline */}
           <div className="space-y-3">
+<<<<<<< HEAD
             <p className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40 flex items-center gap-2">
               <Calendar className="w-3 h-3" /> Timeline
             </p>
@@ -158,6 +216,24 @@ function PublisherDetailsModal({ publisher, onClose }: { publisher: Publisher | 
               <div className="flex justify-between text-sm">
                 <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-primary/40">Last Updated</span>
                 <span className="font-sans text-[#0A192F]">{new Date(publisher.updatedAt).toLocaleDateString()}</span>
+=======
+            <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary/50 flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
+              Registry Timeline
+            </h4>
+            <div className="bg-primary/[0.01] rounded-none p-4 border border-primary/15 space-y-3">
+              <div className="flex justify-between items-center text-sm border-b border-primary/5 pb-2">
+                <span className="text-primary/40 font-bold uppercase tracking-wider text-[9px]">Date Created</span>
+                <span className="text-primary font-serif italic">
+                  {new Date(publisher.createdAt).toLocaleDateString()}
+                </span>
+              </div>
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-primary/40 font-bold uppercase tracking-wider text-[9px]">Last Profile Edit</span>
+                <span className="text-primary font-serif italic">
+                  {new Date(publisher.updatedAt).toLocaleDateString()}
+                </span>
+>>>>>>> c925529b424592087f1d1eb7f565490ef3cd21cb
               </div>
             </div>
           </div>
@@ -186,6 +262,7 @@ function PublisherFormModal({ publisher, onClose, onSave }: {
   };
 
   return (
+<<<<<<< HEAD
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-[#0A192F]/60 backdrop-blur-sm">
       <div className="bg-white w-full max-w-xl shadow-2xl border border-primary/10 overflow-hidden">
         {/* Header */}
@@ -199,15 +276,32 @@ function PublisherFormModal({ publisher, onClose, onSave }: {
           <button
             onClick={onClose}
             className="h-9 w-9 flex items-center justify-center border border-primary/20 text-primary/40 hover:text-primary hover:border-primary transition-all cursor-pointer"
+=======
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+      <div className="bg-card rounded-none max-w-md w-full shadow-2xl border border-primary/30 overflow-hidden font-inter">
+        <div className="bg-white border-b border-primary/20 p-6 flex items-center justify-between">
+          <h2 className="text-lg font-serif font-bold text-primary uppercase tracking-widest">
+            {publisher ? "Edit Publisher" : "Add New Publisher"}
+          </h2>
+          <button 
+            onClick={onClose} 
+            className="cursor-pointer p-2 hover:bg-primary/5 border border-transparent hover:border-primary/10 rounded-none transition-all"
+>>>>>>> c925529b424592087f1d1eb7f565490ef3cd21cb
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
+<<<<<<< HEAD
         <form onSubmit={handleSubmit} className="p-8 space-y-6">
           {/* Name */}
           <div className="space-y-2">
             <label className="block text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40">
+=======
+        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+          <div>
+            <label className="block text-[10px] font-bold uppercase tracking-wider text-primary/60 mb-2">
+>>>>>>> c925529b424592087f1d1eb7f565490ef3cd21cb
               Publisher Name
             </label>
             <input
@@ -215,6 +309,7 @@ function PublisherFormModal({ publisher, onClose, onSave }: {
               required
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+<<<<<<< HEAD
               placeholder="e.g. Penguin Random House"
               className="h-12 w-full rounded-none border border-primary/20 bg-zinc-50 px-4 text-sm font-sans text-[#0A192F] outline-none transition-all focus:border-primary focus:bg-white placeholder:text-primary/20"
             />
@@ -223,6 +318,14 @@ function PublisherFormModal({ publisher, onClose, onSave }: {
           {/* Email */}
           <div className="space-y-2">
             <label className="block text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40">
+=======
+              className="w-full px-4 py-3 bg-white border border-primary/20 rounded-none focus:outline-none focus:border-primary text-sm font-serif italic"
+            />
+          </div>
+
+          <div>
+            <label className="block text-[10px] font-bold uppercase tracking-wider text-primary/60 mb-2">
+>>>>>>> c925529b424592087f1d1eb7f565490ef3cd21cb
               Email
             </label>
             <input
@@ -230,6 +333,7 @@ function PublisherFormModal({ publisher, onClose, onSave }: {
               required
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+<<<<<<< HEAD
               placeholder="contact@publisher.com"
               className="h-12 w-full rounded-none border border-primary/20 bg-zinc-50 px-4 text-sm font-sans text-[#0A192F] outline-none transition-all focus:border-primary focus:bg-white placeholder:text-primary/20"
             />
@@ -238,6 +342,14 @@ function PublisherFormModal({ publisher, onClose, onSave }: {
           {/* Phone */}
           <div className="space-y-2">
             <label className="block text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40">
+=======
+              className="w-full px-4 py-3 bg-white border border-primary/20 rounded-none focus:outline-none focus:border-primary text-sm font-serif italic"
+            />
+          </div>
+
+          <div>
+            <label className="block text-[10px] font-bold uppercase tracking-wider text-primary/60 mb-2">
+>>>>>>> c925529b424592087f1d1eb7f565490ef3cd21cb
               Phone Number
             </label>
             <input
@@ -245,6 +357,7 @@ function PublisherFormModal({ publisher, onClose, onSave }: {
               required
               value={formData.number}
               onChange={(e) => setFormData({ ...formData, number: e.target.value })}
+<<<<<<< HEAD
               placeholder="+1 (212) 000-0000"
               className="h-12 w-full rounded-none border border-primary/20 bg-zinc-50 px-4 text-sm font-sans text-[#0A192F] outline-none transition-all focus:border-primary focus:bg-white placeholder:text-primary/20"
             />
@@ -253,6 +366,14 @@ function PublisherFormModal({ publisher, onClose, onSave }: {
           {/* Publisher ID */}
           <div className="space-y-2">
             <label className="block text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40">
+=======
+              className="w-full px-4 py-3 bg-white border border-primary/20 rounded-none focus:outline-none focus:border-primary text-sm font-serif italic"
+            />
+          </div>
+
+          <div>
+            <label className="block text-[10px] font-bold uppercase tracking-wider text-primary/60 mb-2">
+>>>>>>> c925529b424592087f1d1eb7f565490ef3cd21cb
               Publisher ID
               {publisher && <span className="ml-2 font-normal normal-case tracking-normal text-primary/30">(read-only)</span>}
             </label>
@@ -261,6 +382,10 @@ function PublisherFormModal({ publisher, onClose, onSave }: {
               required
               value={formData.publisherId}
               onChange={(e) => setFormData({ ...formData, publisherId: e.target.value })}
+<<<<<<< HEAD
+=======
+              className="w-full px-4 py-3 bg-primary/5 border border-primary/20 rounded-none text-sm font-mono select-none outline-none"
+>>>>>>> c925529b424592087f1d1eb7f565490ef3cd21cb
               readOnly={!!publisher}
               className={`h-12 w-full rounded-none border border-primary/20 px-4 text-sm font-sans text-[#0A192F] outline-none transition-all focus:border-primary ${
                 publisher ? "bg-zinc-100 cursor-not-allowed text-primary/40" : "bg-zinc-50 focus:bg-white"
@@ -268,18 +393,30 @@ function PublisherFormModal({ publisher, onClose, onSave }: {
             />
           </div>
 
+<<<<<<< HEAD
           {/* Actions */}
           <div className="flex flex-col-reverse sm:flex-row gap-4 pt-2 border-t border-primary/10">
             <button
               type="button"
               onClick={onClose}
               className="h-12 flex-1 rounded-none border border-primary/20 bg-transparent text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/60 transition-all hover:border-primary/40 hover:text-primary cursor-pointer"
+=======
+          <div className="flex gap-4 pt-4 border-t border-primary/10">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 px-5 py-3 text-xs font-bold uppercase tracking-widest text-primary bg-white border border-primary/20 rounded-none hover:bg-primary/5 transition-all cursor-pointer"
+>>>>>>> c925529b424592087f1d1eb7f565490ef3cd21cb
             >
               Cancel
             </button>
             <button
               type="submit"
+<<<<<<< HEAD
               className="h-12 flex-[2] rounded-none bg-[#0A192F] text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-white transition-all hover:opacity-90 active:scale-95 cursor-pointer"
+=======
+              className="flex-1 px-5 py-3 text-xs font-bold uppercase tracking-widest text-white bg-primary border border-primary rounded-none hover:opacity-90 transition-all cursor-pointer"
+>>>>>>> c925529b424592087f1d1eb7f565490ef3cd21cb
             >
               {publisher ? "Update Publisher" : "Create Publisher"}
             </button>
@@ -348,7 +485,7 @@ export default function PublishersPage() {
       const newPublisher: Publisher = {
         id: Date.now().toString(),
         ...data,
-        logo: `https://ui-avatars.com/api/?name=${data.name.substring(0, 2).toUpperCase()}&background=6366f1&color=fff`,
+        logo: `https://ui-avatars.com/api/?name=${data.name.substring(0, 2).toUpperCase()}&background=0D387D&color=fff`,
         logoId: `logo_${data.publisherId.toLowerCase()}`,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -366,22 +503,25 @@ export default function PublishersPage() {
 
   return (
     <>
-      <div className="p-8 space-y-8 font-inter">
+      <div className="pt-2 px-8 pb-8 space-y-8 font-inter">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b border-primary/20 pb-6">
           <div>
-            <h1 className="text-3xl font-bold text-primary tracking-tight">Publishers</h1>
-            <p className="text-muted-foreground text-sm mt-1 font-serif italic">Manage book publishers and literary houses</p>
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-secondary">
+              Literary Registry
+            </span>
+            <h1 className="text-3xl font-serif font-bold text-primary mt-1 tracking-tight">Publishers</h1>
+            <p className="text-xs text-muted-foreground mt-1.5 font-serif italic">Manage book publishers and literary houses</p>
           </div>
           
           <div className="flex items-center gap-4">
-            <button className="cursor-pointer flex items-center gap-2 px-5 py-2.5 text-xs font-bold uppercase tracking-widest text-primary bg-white border border-primary/20 rounded-full hover:bg-primary/5 transition-all shadow-sm">
+            <button className="cursor-pointer flex items-center gap-2 px-5 py-2.5 text-xs font-bold uppercase tracking-widest text-primary bg-white border border-primary/20 rounded-none hover:bg-primary/5 transition-all">
               <Download className="w-4 h-4" />
               Export
             </button>
             <button 
               onClick={handleAdd}
-              className="cursor-pointer flex items-center gap-2 px-6 py-2.5 text-xs font-bold uppercase tracking-widest text-white bg-primary rounded-full hover:bg-primary/90 transition-all shadow-[0_4px_12px_rgba(13,56,125,0.2)]"
+              className="cursor-pointer flex items-center gap-2 px-6 py-2.5 text-xs font-bold uppercase tracking-widest text-white bg-primary border border-primary rounded-none hover:opacity-90 transition-all"
             >
               <Plus className="w-4 h-4" />
               Add Publisher
@@ -391,18 +531,22 @@ export default function PublishersPage() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-white border border-border/40 rounded-2xl p-6 shadow-sm">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Total Publishers</p>
-            <p className="text-3xl font-bold text-primary">{stats.total}</p>
-          </div>
-          <div className="bg-white border border-border/40 rounded-2xl p-6 shadow-sm">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Active Publishers</p>
-            <p className="text-3xl font-bold text-green-600">{stats.active}</p>
-          </div>
+          <StatCard
+            title="Total Publishers"
+            value={stats.total.toString()}
+            icon={Building2}
+            theme="blue"
+          />
+          <StatCard
+            title="Active Publishers"
+            value={stats.active.toString()}
+            icon={CheckCircle}
+            theme="ocean"
+          />
         </div>
 
         {/* Search */}
-        <div className="mb-8">
+        <div className="mb-8 border-b border-primary/10 pb-4">
           <div className="relative max-w-md w-full">
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-primary/40 pointer-events-none" />
             <input
@@ -410,60 +554,57 @@ export default function PublishersPage() {
               placeholder="Search publishers..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-11 pr-4 py-3 bg-white border border-border/40 rounded-xl focus:outline-none focus:border-primary/40 transition-all text-sm"
+              className="w-full pl-11 pr-4 py-3 bg-white border border-primary/20 rounded-none focus:outline-none focus:border-primary transition-all text-sm font-serif italic"
             />
           </div>
         </div>
 
         {/* Publishers Grid */}
         {filteredPublishers.length === 0 ? (
-          <div className="text-center py-12">
-            <Building2 className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-1">No publishers found</h3>
-            <p className="text-gray-500">Try adjusting your search or add a new publisher</p>
+          <div className="text-center py-12 border border-dashed border-primary/20 bg-primary/[0.01]">
+            <Building2 className="w-16 h-16 text-primary/30 mx-auto mb-4" />
+            <h3 className="text-lg font-serif font-bold text-primary uppercase tracking-widest">No publishers found</h3>
+            <p className="text-xs text-muted-foreground font-serif italic mt-1">Try adjusting your search filters or add a new publisher</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredPublishers.map((publisher) => (
               <div
                 key={publisher.id}
-                className="bg-white border border-border/40 rounded-2xl p-6 hover:shadow-xl transition-all duration-300 group"
+                className="bg-card border border-primary/15 rounded-none p-6 hover:border-primary/40 hover:bg-primary/[0.01] transition-all duration-300 group flex flex-col justify-between"
               >
-                <div className="flex items-start gap-5">
+                <div className="flex items-start gap-4">
                   <img
                     src={publisher.logo}
                     alt={publisher.name}
-                    className="w-16 h-16 rounded-xl object-cover shadow-sm group-hover:scale-105 transition-transform"
+                    className="w-16 h-16 rounded-none border border-primary/20 object-cover shadow-sm group-hover:scale-105 transition-transform flex-shrink-0"
                   />
-                  <div className="flex-1">
-                    <h3 className="font-bold text-primary group-hover:text-secondary transition-colors">{publisher.name}</h3>
-                    <p className="text-[10px] text-muted-foreground font-mono mt-1 uppercase tracking-widest">{publisher.publisherId}</p>
-                    <p className="text-sm text-muted-foreground mt-2 font-serif italic">{publisher.email}</p>
-                    <p className="text-[10px] font-bold text-muted-foreground/60 mt-1 uppercase tracking-tighter">{publisher.number}</p>
+                  <div className="min-w-0">
+                    <h3 className="font-bold text-primary group-hover:text-secondary transition-colors text-sm truncate">{publisher.name}</h3>
+                    <p className="text-[9px] text-muted-foreground font-mono mt-1 uppercase tracking-widest">{publisher.publisherId}</p>
+                    <p className="text-xs text-muted-foreground mt-2 font-serif italic truncate">{publisher.email}</p>
+                    <p className="text-[10px] font-bold text-primary/45 mt-1 uppercase tracking-widest">{publisher.number}</p>
                   </div>
                 </div>
 
-                <div className="flex gap-3 mt-6 pt-6 border-t border-border/10">
+                <div className="flex gap-2.5 mt-6 pt-4 border-t border-primary/10 justify-end">
                   <button
                     onClick={() => handleView(publisher)}
-                    className="cursor-pointer flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 text-[10px] font-bold uppercase tracking-widest bg-background hover:bg-primary hover:text-white text-primary rounded-xl transition-all"
+                    className="cursor-pointer p-2.5 hover:bg-primary hover:text-white text-primary border border-primary/20 rounded-none transition-all"
                   >
-                    <Eye className="w-3.5 h-3.5" />
-                    View
+                    <Eye className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => handleEdit(publisher)}
-                    className="cursor-pointer flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 text-[10px] font-bold uppercase tracking-widest bg-background hover:bg-orange-500 hover:text-white text-primary rounded-xl transition-all"
+                    className="cursor-pointer p-2.5 hover:bg-primary hover:text-white text-primary border border-primary/20 rounded-none transition-all"
                   >
-                    <Edit className="w-3.5 h-3.5" />
-                    Edit
+                    <Edit className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => handleDelete(publisher.id)}
-                    className="cursor-pointer flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 text-[10px] font-bold uppercase tracking-widest bg-background hover:bg-red-500 hover:text-white text-primary rounded-xl transition-all"
+                    className="cursor-pointer p-2.5 hover:bg-red-600 hover:text-white hover:border-red-600 text-primary border border-primary/20 rounded-none transition-all"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
-                    Delete
+                    <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
               </div>

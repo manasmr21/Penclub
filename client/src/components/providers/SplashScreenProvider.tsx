@@ -9,22 +9,21 @@ export default function SplashScreenProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [showSplash, setShowSplash] = useState(true);
+  const [showSplash, setShowSplash] = useState(false);
   const [progress, setProgress] = useState(0);
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
-    
+
     const hasVisited = sessionStorage.getItem("penclub_session_initialized");
 
-    if (hasVisited) {
-      setShowSplash(false);
-    } else {
+    if (!hasVisited) {
+      setShowSplash(true);
       const startDelay = 600; // Delay before counter starts
       const duration = 2000; // Duration of the counter itself
       const holdTime = 800; // Time to stay at 100%
-      
+
       const interval = 20;
       const steps = duration / interval;
       const increment = 100 / steps;

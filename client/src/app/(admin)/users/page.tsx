@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Search, Trash2, UserCheck, UserX, Eye } from "lucide-react";
+import { Search, Trash2, UserCheck, UserX, Eye, Users, Shield, BookOpen } from "lucide-react";
 import { UserDetailsModal } from "./UserDetailsModal";
+import { StatCard } from "@/src/components/cards";
 
 interface User {
   id: string;
@@ -180,52 +181,60 @@ export default function UsersPage() {
 
   return (
     <>
-      <div className="p-8 space-y-8 font-inter">
+      <div className="pt-2 px-8 pb-8 space-y-8 font-inter">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b border-primary/20 pb-6">
           <div>
-            <h1 className="text-3xl font-bold text-primary tracking-tight">Users Management</h1>
-            <p className="text-muted-foreground text-sm mt-1 font-serif italic">Manage authors, readers, and administrators</p>
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-secondary">
+              Members Directory
+            </span>
+            <h1 className="text-3xl font-serif font-bold text-primary mt-1 tracking-tight">Users Management</h1>
+            <p className="text-xs text-muted-foreground mt-1.5 font-serif italic">Manage authors, readers, and administrators</p>
           </div>
         </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-white border border-border/40 rounded-2xl p-6 shadow-sm">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Total Users</p>
-            <p className="text-3xl font-bold text-primary">{stats.total}</p>
-          </div>
-          <div className="bg-white border border-border/40 rounded-2xl p-6 shadow-sm">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Authors</p>
-            <p className="text-3xl font-bold text-secondary">{stats.authors}</p>
-          </div>
-          <div className="bg-white border border-border/40 rounded-2xl p-6 shadow-sm">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Readers</p>
-            <p className="text-3xl font-bold text-green-600">{stats.readers}</p>
-          </div>
-          <div className="bg-white border border-border/40 rounded-2xl p-6 shadow-sm">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Admins</p>
-            <p className="text-3xl font-bold text-red-600">{stats.admins}</p>
-          </div>
+          <StatCard
+            title="Total Users"
+            value={stats.total.toString()}
+            icon={Users}
+            theme="blue"
+          />
+          <StatCard
+            title="Authors"
+            value={stats.authors.toString()}
+            icon={BookOpen}
+            theme="purple"
+          />
+          <StatCard
+            title="Readers"
+            value={stats.readers.toString()}
+            icon={Users}
+            theme="ocean"
+          />
+          <StatCard
+            title="Admins"
+            value={stats.admins.toString()}
+            icon={Shield}
+            theme="coral"
+          />
         </div>
 
-        {/* Tabs */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
-          <div className="flex gap-6 border-b border-border/10">
+        {/* Filters and Search */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 border-b border-primary/10 pb-4">
+          <div className="flex flex-wrap gap-4">
             {["all", "authors", "readers", "admins"].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`cursor-pointer px-2 py-4 text-[10px] font-bold uppercase tracking-widest transition-all relative ${
+                className={`cursor-pointer px-4 py-2 text-[10px] font-bold uppercase tracking-widest border transition-all ${
                   activeTab === tab 
-                    ? "text-primary" 
-                    : "text-muted-foreground/60 hover:text-primary"
+                    ? "bg-primary text-white border-primary" 
+                    : "border-primary/15 text-primary/60 hover:bg-primary/5 hover:text-primary"
                 }`}
               >
                 {tab === "all" ? "All Users" : tab}
-                {activeTab === tab && (
-                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />
-                )}
               </button>
             ))}
           </div>
@@ -238,85 +247,85 @@ export default function UsersPage() {
               placeholder="Search users..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-11 pr-4 py-3 bg-white border border-border/40 rounded-xl focus:outline-none focus:border-primary/40 transition-all text-sm"
+              className="w-full pl-11 pr-4 py-3 bg-white border border-primary/20 rounded-none focus:outline-none focus:border-primary transition-all text-sm font-serif italic"
             />
           </div>
         </div>
 
         {/* Users Grid */}
         {filteredUsers.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-500">No users found</p>
+          <div className="text-center py-12 border border-dashed border-primary/20 bg-primary/[0.01]">
+            <p className="text-sm font-serif italic text-primary/50">No users found match your filters</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredUsers.map((user) => (
               <div
                 key={user.id}
-                className="bg-white border border-border/40 rounded-2xl p-6 hover:shadow-xl transition-all duration-300 group"
+                className="bg-card border border-primary/15 rounded-none p-6 hover:border-primary/40 hover:bg-primary/[0.01] transition-all duration-300 group flex flex-col justify-between"
               >
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    {/* Avatar */}
-                    <div className="relative">
-                      <img
-                        src={user.profilePicture || `https://ui-avatars.com/api/?name=${user.name}&background=6366f1&color=fff`}
-                        alt={user.name}
-                        className="w-12 h-12 rounded-full object-cover"
-                      />
-                      {user.isLoggedIn && (
-                        <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full ring-2 ring-white"></div>
-                      )}
-                    </div>
-                    
-                    <div>
-                      <div className="flex items-center gap-3">
-                        <h3 className="font-bold text-primary group-hover:text-secondary transition-colors">{user.name}</h3>
-                        <span className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest rounded-full ${
-                          user.role === "author" ? "bg-secondary/10 text-secondary" :
-                          user.role === "admin" ? "bg-red-100 text-red-700" :
-                          "bg-primary/10 text-primary"
-                        }`}>
-                          {user.role}
-                        </span>
-                      </div>
-                      <p className="text-sm text-gray-500">{user.email}</p>
-                      <p className="text-xs text-gray-400">@{user.username}</p>
-                      {user.bio && (
-                        <p className="text-xs text-gray-600 mt-1 line-clamp-1">{user.bio}</p>
-                      )}
-                    </div>
+                <div className="flex items-start gap-4">
+                  {/* Avatar */}
+                  <div className="relative flex-shrink-0">
+                    <img
+                      src={user.profilePicture || `https://ui-avatars.com/api/?name=${user.name}&background=0D387D&color=fff`}
+                      alt={user.name}
+                      className="w-14 h-14 rounded-none border border-primary/20 object-cover"
+                    />
+                    {user.isLoggedIn && (
+                      <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 border border-white"></div>
+                    )}
                   </div>
+                  
+                  <div className="min-w-0">
+                    <div className="flex items-center flex-wrap gap-2">
+                      <h3 className="font-bold text-primary group-hover:text-secondary transition-colors text-sm truncate">{user.name}</h3>
+                      <span className={`px-2 py-0.5 text-[8px] font-bold uppercase tracking-widest border ${
+                        user.role === "author" ? "border-secondary/30 text-secondary bg-secondary/5" :
+                        user.role === "admin" ? "border-red-600/30 text-red-600 bg-red-500/5" :
+                        "border-primary/30 text-primary bg-primary/5"
+                      }`}>
+                        {user.role}
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground truncate font-serif italic">{user.email}</p>
+                    <p className="text-[10px] text-primary/45 font-bold uppercase tracking-wider mt-0.5">@{user.username}</p>
+                    {user.bio && (
+                      <p className="text-xs text-primary/70 font-serif italic mt-2 line-clamp-2 leading-relaxed border-l-2 border-primary/10 pl-2">
+                        "{user.bio}"
+                      </p>
+                    )}
+                  </div>
+                </div>
 
-                  <div className="flex gap-2">
-                    {/* Preview Button */}
-                    <button
-                      onClick={() => handlePreview(user)}
-                      className="cursor-pointer p-2.5 hover:bg-primary hover:text-white text-primary bg-background rounded-xl transition-all"
-                      title="Preview user details"
-                    >
-                      <Eye className="w-4 h-4" />
-                    </button>
-                    
-                    <button
-                      onClick={() => handleToggleStatus(user.id)}
-                      className="cursor-pointer p-2.5 hover:bg-primary/5 text-primary bg-background rounded-xl transition-all"
-                      title={user.isLoggedIn ? "Block user" : "Activate user"}
-                    >
-                      {user.isLoggedIn ? (
-                        <UserX className="w-4 h-4 text-red-500" />
-                      ) : (
-                        <UserCheck className="w-4 h-4 text-green-500" />
-                      )}
-                    </button>
-                    <button
-                      onClick={() => handleDelete(user.id)}
-                      className="cursor-pointer p-2.5 hover:bg-red-500 hover:text-white text-primary bg-background rounded-xl transition-all"
-                      title="Delete user"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
+                <div className="flex gap-2.5 mt-6 pt-4 border-t border-primary/10 justify-end">
+                  {/* Preview Button */}
+                  <button
+                    onClick={() => handlePreview(user)}
+                    className="cursor-pointer p-2 hover:bg-primary hover:text-white text-primary border border-primary/20 rounded-none transition-all"
+                    title="Preview user details"
+                  >
+                    <Eye className="w-4 h-4" />
+                  </button>
+                  
+                  <button
+                    onClick={() => handleToggleStatus(user.id)}
+                    className="cursor-pointer p-2 hover:bg-primary hover:text-white text-primary border border-primary/20 rounded-none transition-all"
+                    title={user.isLoggedIn ? "Block user" : "Activate user"}
+                  >
+                    {user.isLoggedIn ? (
+                      <UserX className="w-4 h-4 text-red-600" />
+                    ) : (
+                      <UserCheck className="w-4 h-4 text-green-600" />
+                    )}
+                  </button>
+                  <button
+                    onClick={() => handleDelete(user.id)}
+                    className="cursor-pointer p-2 hover:bg-red-600 hover:text-white hover:border-red-600 text-primary border border-primary/20 rounded-none transition-all"
+                    title="Delete user"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
             ))}

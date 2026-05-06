@@ -48,7 +48,7 @@ export default function Loader({ fullScreen = false, progress = 0 }: LoaderProps
       {/* Background Typographic Texture */}
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none select-none overflow-hidden flex items-center justify-center">
         <span className="text-[40vw] font-serif font-black whitespace-nowrap leading-none transform -rotate-12">
-          ATELIER
+          PEN CLUB
         </span>
       </div>
 
@@ -92,7 +92,7 @@ export default function Loader({ fullScreen = false, progress = 0 }: LoaderProps
           transition={{ delay: 0.5 }}
           className="text-[10px] font-sans font-black uppercase tracking-[0.5em] text-white/40"
         >
-          {roundedProgress === 100 ? "Ready for Entry" : "Initializing Digital Atelier"}
+          {roundedProgress === 100 ? "Ready for Entry" : "Initializing Pen Club"}
         </motion.span>
       </div>
 

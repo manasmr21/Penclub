@@ -25,7 +25,7 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="mt-32 mb-10">
+    <div className="mt-32 pb-24 px-4">
       <AuthForm type="signup" />
     </div>
   );

@@ -57,36 +57,36 @@ export function Sidebar({
         `}
         >
           {!collapsed ? (
-            <div className="flex items-center gap-3 animate-slideRight">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                <span className="text-white font-bold text-xl">P</span>
+            <div className="flex items-center gap-3 animate-slideRight font-inter">
+              <div className="w-10 h-10 rounded-none bg-[#0F4C9C] flex items-center justify-center border border-primary/25 shadow-sm">
+                <span className="text-white font-bold text-xl font-serif">P</span>
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-800">PenClub</h1>
-                <p className="text-xs text-gray-500 mt-0.5">Admin Portal</p>
+                <h1 className="text-lg font-serif font-bold text-primary tracking-tight">PenClub</h1>
+                <p className="text-[9px] font-bold uppercase tracking-widest text-primary/45 mt-0.5">Admin Portal</p>
               </div>
             </div>
           ) : (
             <div className="w-full flex justify-center animate-fadeIn">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                <span className="text-white font-bold text-lg">P</span>
+              <div className="w-10 h-10 rounded-none bg-[#0F4C9C] flex items-center justify-center border border-primary/25 shadow-sm">
+                <span className="text-white font-bold text-lg font-serif">P</span>
               </div>
             </div>
           )}
 
           {/* Close button - mobile only */}
           <button
-            className="lg:hidden p-2 rounded-xl hover:bg-gray-100 transition-all duration-200 active:scale-95"
+            className="lg:hidden p-2 rounded-none hover:bg-primary/5 transition-all duration-200 active:scale-95"
             onClick={() => setMobileOpen(false)}
             aria-label="Close sidebar"
           >
-            <X className="w-5 h-5 text-gray-600" />
+            <X className="w-5 h-5 text-primary" />
           </button>
         </div>
 
         {/* Navigation Menu */}
         <nav
-          className="p-4 space-y-2 flex-1 overflow-y-auto custom-scrollbar"
+          className="p-4 space-y-1.5 flex-1 overflow-y-auto custom-scrollbar font-inter"
           style={{ height: "calc(100% - 140px)" }}
         >
           {menuItems.map((item, index) => {
@@ -100,12 +100,12 @@ export function Sidebar({
                 onMouseEnter={() => setHoveredItem(index)}
                 onMouseLeave={() => setHoveredItem(null)}
                 className={`
-                  group relative flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer 
+                  group relative flex items-center gap-3 px-4 py-3 rounded-none cursor-pointer 
                   transition-all duration-300
                   ${
                     isActive
-                      ? "bg-gradient-to-r from-blue-50 to-purple-50 text-blue-700"
-                      : "hover:bg-gray-50 text-gray-700"
+                      ? "bg-[#0F4C9C]/8 text-[#0F4C9C] border-l-4 border-l-[#0F4C9C]"
+                      : "hover:bg-primary/5 text-primary/70"
                   }
                   ${collapsed ? "justify-center px-2" : ""}
                   ${mounted ? "translate-x-0 opacity-100" : "translate-x-4 opacity-0"}
@@ -123,21 +123,21 @@ export function Sidebar({
                   <Icon
                     className={`
                     w-5 h-5 transition-all duration-300
-                    ${isActive ? "text-blue-600" : "text-gray-500 group-hover:text-gray-700 group-hover:scale-110"}
+                    ${isActive ? "text-[#0F4C9C]" : "text-primary/50 group-hover:text-primary group-hover:scale-105"}
                   `}
                   />
 
                   {/* Active indicator dot */}
                   {isActive && !collapsed && (
-                    <div className="absolute -right-2 -top-1 w-2 h-2 bg-blue-500 rounded-full animate-ping"></div>
+                    <div className="absolute -right-2 -top-1 w-1.5 h-1.5 bg-[#0F4C9C] rounded-full animate-ping"></div>
                   )}
                 </div>
 
                 {!collapsed && (
                   <span
                     className={`
-                    font-medium transition-all duration-300
-                    ${isActive ? "text-blue-700" : "group-hover:translate-x-1"}
+                    font-bold text-xs uppercase tracking-widest transition-all duration-300
+                    ${isActive ? "text-[#0F4C9C]" : "group-hover:translate-x-1"}
                   `}
                   >
                     {item.name}
