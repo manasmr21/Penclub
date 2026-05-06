@@ -122,67 +122,76 @@ function ArticleDetailsModal({ article, onClose }: { article: Blog | null; onClo
 
   const getStatusColor = (status: string) => {
     switch(status) {
-      case "posted": return "text-green-700 bg-green-100";
-      case "pending": return "text-yellow-700 bg-yellow-100";
-      case "draft": return "text-gray-700 bg-gray-100";
-      case "edited": return "text-blue-700 bg-blue-100";
-      case "deleted": return "text-red-700 bg-red-100";
-      default: return "text-gray-700 bg-gray-100";
+      case "posted": return "border-green-600 text-green-700";
+      case "pending": return "border-yellow-500 text-yellow-700";
+      case "draft": return "border-primary/20 text-primary/50";
+      case "edited": return "border-blue-500 text-blue-700";
+      case "deleted": return "border-red-500 text-red-700";
+      default: return "border-primary/20 text-primary/40";
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch(status) {
-      case "posted": return <CheckCircle className="w-4 h-4" />;
-      case "pending": return <Clock className="w-4 h-4" />;
-      case "draft": return <FileText className="w-4 h-4" />;
-      case "edited": return <Edit className="w-4 h-4" />;
-      case "deleted": return <Trash2 className="w-4 h-4" />;
+      case "posted": return <CheckCircle className="w-3 h-3" />;
+      case "pending": return <Clock className="w-3 h-3" />;
+      case "draft": return <FileText className="w-3 h-3" />;
+      case "edited": return <Edit className="w-3 h-3" />;
+      case "deleted": return <Trash2 className="w-3 h-3" />;
       default: return null;
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
-      <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-border/20">
-        <div className="sticky top-0 bg-white/80 backdrop-blur-md border-b border-border/10 p-6 flex items-center justify-between z-10">
-          <h2 className="text-xl font-bold text-primary tracking-tight">Article Details</h2>
-          <button onClick={onClose} className="cursor-pointer p-2 hover:bg-background rounded-full transition-all">
-            <X className="w-5 h-5 text-primary" />
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-[#0A192F]/60 backdrop-blur-sm">
+      <div className="bg-white w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-2xl border border-primary/10">
+        {/* Header */}
+        <div className="sticky top-0 bg-white border-b border-primary/10 px-8 py-6 flex items-center justify-between z-10">
+          <div>
+            <p className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40 mb-1">Article</p>
+            <h2 className="text-2xl font-serif font-bold text-[#0A192F]">Article Details</h2>
+          </div>
+          <button
+            onClick={onClose}
+            className="h-9 w-9 flex items-center justify-center border border-primary/20 text-primary/40 hover:text-primary hover:border-primary transition-all cursor-pointer"
+          >
+            <X className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="p-6 space-y-6">
+        <div className="p-8 space-y-6">
           {/* Cover Image */}
           {article.coverImage && (
-            <img
-              src={article.coverImage}
-              alt={article.title}
-              className="w-full h-64 object-cover rounded-lg"
-            />
+            <div className="border border-primary/10 overflow-hidden">
+              <img
+                src={article.coverImage}
+                alt={article.title}
+                className="w-full h-56 object-cover"
+              />
+            </div>
           )}
 
           {/* Title and Status */}
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <h3 className="text-2xl font-bold text-primary tracking-tight">{article.title}</h3>
-              <span className={`inline-flex items-center gap-1 px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full ${getStatusColor(article.status)}`}>
+          <div className="space-y-3">
+            <div className="flex items-start gap-3 flex-wrap">
+              <h3 className="text-2xl font-serif font-bold text-[#0A192F] flex-1">{article.title}</h3>
+              <span className={`inline-flex items-center gap-1.5 px-3 py-1 text-[10px] font-sans font-bold uppercase tracking-widest border ${getStatusColor(article.status)} shrink-0`}>
                 {getStatusIcon(article.status)}
                 {article.status}
               </span>
             </div>
-            
-            <div className="flex items-center gap-4 text-sm text-gray-500">
-              <div className="flex items-center gap-1">
-                <User className="w-4 h-4" />
+
+            <div className="flex flex-wrap items-center gap-5 text-[10px] font-sans font-bold uppercase tracking-widest text-primary/40">
+              <div className="flex items-center gap-1.5">
+                <User className="w-3.5 h-3.5" />
                 <span>{article.user?.name || "Unknown"}</span>
               </div>
-              <div className="flex items-center gap-1">
-                <Calendar className="w-4 h-4" />
+              <div className="flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5" />
                 <span>{new Date(article.createdAt).toLocaleDateString()}</span>
               </div>
-              <div className="flex items-center gap-1">
-                <Heart className="w-4 h-4" />
+              <div className="flex items-center gap-1.5">
+                <Heart className="w-3.5 h-3.5" />
                 <span>{article.likesCount} likes</span>
               </div>
             </div>
@@ -190,14 +199,13 @@ function ArticleDetailsModal({ article, onClose }: { article: Blog | null; onClo
 
           {/* Tags */}
           {article.tags.length > 0 && (
-            <div>
-              <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                <Tag className="w-4 h-4" />
-                Tags
-              </h4>
+            <div className="space-y-2">
+              <p className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40 flex items-center gap-2">
+                <Tag className="w-3 h-3" /> Tags
+              </p>
               <div className="flex flex-wrap gap-2">
                 {article.tags.map((tag, idx) => (
-                  <span key={idx} className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded-full">
+                  <span key={idx} className="px-3 py-1 border border-primary/10 text-[10px] font-sans font-bold uppercase tracking-widest text-primary/60">
                     #{tag}
                   </span>
                 ))}
@@ -206,10 +214,10 @@ function ArticleDetailsModal({ article, onClose }: { article: Blog | null; onClo
           )}
 
           {/* Content */}
-          <div>
-            <h4 className="font-semibold text-gray-900 mb-2">Content</h4>
-            <div className="prose max-w-none">
-              <p className="text-gray-600 leading-relaxed">{article.content}</p>
+          <div className="space-y-2">
+            <p className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40">Content</p>
+            <div className="border border-primary/10 bg-zinc-50 p-5">
+              <p className="text-sm font-sans text-primary/80 leading-relaxed">{article.content}</p>
             </div>
           </div>
         </div>

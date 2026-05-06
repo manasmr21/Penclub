@@ -2,34 +2,34 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateUserDto {
   @ApiProperty({
-    example: 'John Doe'
+    example: 'John Doe',
   })
   name?: string;
 
   @ApiProperty({
-    example: 'Avid reader of mystery novels.'
+    example: 'Avid reader of mystery novels.',
   })
   bio?: string;
 
   @ApiProperty({
-    description: "Public id for profile picture"
+    description: 'Public id for profile picture',
   })
-  profilePictureId?: string
+  profilePictureId?: string;
 
   @ApiProperty({
     example: ['fiction', 'mystery'],
-    required: false
+    required: false,
   })
   interests?: string[];
 
   @ApiProperty({
     example: 'https://images.example.com/profile.jpg',
-    required: false
+    required: false,
   })
   profilePicture?: string;
 
   @ApiProperty({
-    example: ['https://twitter.com/johndoe', 'https://facebook.com/johndoe']
+    example: ['https://twitter.com/johndoe', 'https://facebook.com/johndoe'],
   })
   socialLinks?: string[];
 }

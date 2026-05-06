@@ -113,26 +113,36 @@ function BookDetailsModal({ book, onClose }: { book: Book | null; onClose: () =>
   if (!book) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
-      <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-border/20">
-        <div className="sticky top-0 bg-white/80 backdrop-blur-md border-b border-border/10 p-6 flex items-center justify-between z-10">
-          <h2 className="text-xl font-bold text-primary tracking-tight">Book Details</h2>
-          <button onClick={onClose} className="cursor-pointer p-2 hover:bg-background rounded-full transition-all">
-            <X className="w-5 h-5 text-primary" />
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-[#0A192F]/60 backdrop-blur-sm">
+      <div className="bg-white w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-2xl border border-primary/10">
+        {/* Header */}
+        <div className="sticky top-0 bg-white border-b border-primary/10 px-8 py-6 flex items-center justify-between z-10">
+          <div>
+            <p className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40 mb-1">Library</p>
+            <h2 className="text-2xl font-serif font-bold text-[#0A192F]">Book Details</h2>
+          </div>
+          <button
+            onClick={onClose}
+            className="h-9 w-9 flex items-center justify-center border border-primary/20 text-primary/40 hover:text-primary hover:border-primary transition-all cursor-pointer"
+          >
+            <X className="w-4 h-4" />
           </button>
         </div>
-        <div className="p-6 space-y-4">
-          <h3 className="text-xl font-bold">{book.title}</h3>
-          <p className="text-gray-600">by {book.author?.name}</p>
-          <p className="text-sm">{book.description}</p>
+
+        <div className="p-8 space-y-6">
+          <div>
+            <h3 className="text-2xl font-serif font-bold text-[#0A192F]">{book.title}</h3>
+            <p className="text-sm font-sans italic text-primary/60 mt-1">by {book.author?.name}</p>
+          </div>
+          <p className="text-sm font-sans text-primary/80 leading-relaxed">{book.description}</p>
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="text-sm text-gray-500">Genre</p>
-              <p className="font-medium">{book.genre}</p>
+            <div className="border border-primary/10 bg-zinc-50 p-4">
+              <p className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40 mb-1">Genre</p>
+              <p className="font-sans font-bold text-[#0A192F]">{book.genre}</p>
             </div>
-            <div>
-              <p className="text-sm text-gray-500">Release Date</p>
-              <p className="font-medium">{new Date(book.releaseDate).toLocaleDateString()}</p>
+            <div className="border border-primary/10 bg-zinc-50 p-4">
+              <p className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40 mb-1">Release Date</p>
+              <p className="font-sans font-bold text-[#0A192F]">{new Date(book.releaseDate).toLocaleDateString()}</p>
             </div>
           </div>
         </div>

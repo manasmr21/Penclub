@@ -1,8 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import cookieParser from "cookie-parser"
-import dotenv from "dotenv"
+import cookieParser from 'cookie-parser';
+import dotenv from 'dotenv';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -10,11 +10,11 @@ async function bootstrap() {
   dotenv.config();
 
   app.enableCors({
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
     credentials: true,
   });
 
-  app.use(cookieParser(process.env.cookie_secrete))
+  app.use(cookieParser(process.env.cookie_secrete));
 
   const config = new DocumentBuilder()
     .setTitle('Penclub API')
@@ -22,7 +22,6 @@ async function bootstrap() {
     .setVersion('1.0')
     .addBearerAuth() // if using JWT later
     .build();
-
 
   const document = SwaggerModule.createDocument(app, config);
 

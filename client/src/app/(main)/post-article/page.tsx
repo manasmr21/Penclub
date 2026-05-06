@@ -7,19 +7,18 @@ import { createArticle } from "@/src/lib/articles-api";
 import { useAppStore } from "@/src/lib/store/store";
 import { extractErrorMessage } from "@/src/lib/http-client";
 
-const inputClasses = "w-full rounded-xl border border-[var(--border)] bg-[#f3f4f6] px-4 text-sm outline-none transition focus:ring-2 focus:ring-[var(--primary)]";
-const labelClasses = "ml-1 block text-[11px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]";
+const inputClasses = "h-12 w-full rounded-none border border-primary/20 bg-zinc-50 px-4 text-sm font-sans text-[#0A192F] outline-none transition-all focus:border-primary focus:bg-white placeholder:text-primary/20";
+const labelClasses = "block text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40";
 
 export default function PostArticlePage() {
   const router = useRouter();
   const { user, hydrated, setError } = useAppStore();
-  
+
   const [formData, setFormData] = useState({ title: "", content: "", tags: "" });
   const [file, setFile] = useState<File>();
-  const [preview, setPreview] = useState<string>(""); // State for preview URL
+  const [preview, setPreview] = useState<string>("");
   const [loading, setLoading] = useState(false);
 
-  // Clean up memory when component unmounts or file changes
   useEffect(() => {
     if (!file) return;
     const url = URL.createObjectURL(file);
@@ -27,7 +26,7 @@ export default function PostArticlePage() {
     return () => URL.revokeObjectURL(url);
   }, [file]);
 
-  if (!hydrated) return <div className="p-16 text-center">Loading...</div>;
+  if (!hydrated) return <div className="p-16 text-center font-sans text-primary/40 text-sm uppercase tracking-widest">Loading...</div>;
   if (!user || user.role !== "author") return <AccessDenied user={user} />;
 
   async function handleSubmit(e: FormEvent) {
@@ -50,38 +49,42 @@ export default function PostArticlePage() {
   }
 
   return (
-    // Increased mt-20 to mt-28 for more top space
     <div className="mx-auto mt-28 mb-16 w-full max-w-xl px-4">
-      <div className="relative rounded-2xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-sm">
-        
-        <button onClick={() => router.back()} className="absolute right-4 top-4 p-2 text-[var(--muted-foreground)]">
-          <X size={20} />
+      <div className="relative border border-primary/10 bg-white p-6 sm:p-10 shadow-sm">
+
+        {/* Close button */}
+        <button
+          onClick={() => router.back()}
+          className="absolute right-5 top-5 h-8 w-8 flex items-center justify-center border border-primary/20 text-primary/40 hover:text-primary hover:border-primary transition-all cursor-pointer"
+        >
+          <X size={16} />
         </button>
 
-        <h1 className="mb-6 text-center text-2xl font-extrabold">Post Article</h1>
+        <h1 className="mb-8 text-center text-2xl font-serif font-bold text-[#0A192F]">Post Article</h1>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Cover Image Preview & Input */}
+        <form onSubmit={handleSubmit} className="space-y-6">
+
+          {/* Cover Image */}
           <div className="space-y-2">
             <label className={labelClasses}>Cover Image</label>
             {preview ? (
-              <div className="relative group aspect-video w-full overflow-hidden rounded-xl border border-[var(--border)]">
+              <div className="relative group aspect-video w-full overflow-hidden border border-primary/10">
                 <img src={preview} alt="Preview" className="h-full w-full object-cover" />
-                <button 
+                <button
                   type="button"
                   onClick={() => { setFile(undefined); setPreview(""); }}
-                  className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition group-hover:opacity-100 text-white font-medium"
+                  className="absolute inset-0 flex items-center justify-center bg-[#0A192F]/60 opacity-0 transition-opacity group-hover:opacity-100 text-white text-[10px] font-sans font-bold uppercase tracking-widest"
                 >
                   Change Image
                 </button>
               </div>
             ) : (
-              <label className="flex flex-col items-center justify-center aspect-video w-full cursor-pointer rounded-xl border-2 border-dashed border-[var(--border)] bg-[#f3f4f6] transition hover:bg-[var(--border)]/20">
-                <ImageIcon className="mb-2 text-[var(--muted-foreground)]" size={32} />
-                <span className="text-xs text-[var(--muted-foreground)] font-medium">Click to upload cover image</span>
-                <input 
-                  type="file" 
-                  accept="image/*" 
+              <label className="flex flex-col items-center justify-center aspect-video w-full cursor-pointer border border-dashed border-primary/20 bg-zinc-50 transition-all hover:border-primary hover:text-primary group">
+                <ImageIcon className="mb-2 text-primary/30 group-hover:text-primary transition-colors" size={28} />
+                <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-primary/40 group-hover:text-primary transition-colors">Click to upload cover image</span>
+                <input
+                  type="file"
+                  accept="image/*"
                   className="hidden"
                   onChange={e => setFile(e.target.files?.[0])}
                 />
@@ -89,27 +92,29 @@ export default function PostArticlePage() {
             )}
           </div>
 
-          <div className="space-y-4 rounded-2xl border border-[var(--border)] p-4 bg-white/50">
-            <InputField label="Title" value={formData.title} onChange={v => setFormData({...formData, title: v})} required />
-            <InputField label="Tags (Comma separated)" value={formData.tags} onChange={v => setFormData({...formData, tags: v})} />
+          {/* Title & Tags */}
+          <div className="space-y-5 border border-primary/10 bg-zinc-50/50 p-5">
+            <InputField label="Title" value={formData.title} onChange={(v: string) => setFormData({...formData, title: v})} required />
+            <InputField label="Tags" placeholder="Poetry, Fiction, Essay (comma separated)" value={formData.tags} onChange={(v: string) => setFormData({...formData, tags: v})} />
           </div>
 
-          <div className="space-y-1.5">
+          {/* Content */}
+          <div className="space-y-2">
             <label className={labelClasses}>Content</label>
-            <textarea 
-              className={`${inputClasses} min-h-[160px] py-3`} 
+            <textarea
+              className="min-h-[200px] w-full resize-none rounded-none border border-primary/20 bg-zinc-50 p-4 text-sm font-serif italic text-[#0A192F]/80 outline-none transition-all focus:border-primary focus:bg-white placeholder:text-primary/20"
               placeholder="Write your story..."
-              required 
-              value={formData.content} 
+              required
+              value={formData.content}
               onChange={e => setFormData({...formData, content: e.target.value})}
             />
           </div>
 
-          <button 
+          <button
             disabled={loading}
-            className="h-12 w-full rounded-xl bg-[var(--primary)] font-semibold text-white hover:opacity-90 disabled:opacity-50 shadow-md"
+            className="h-12 w-full rounded-none bg-[#0A192F] font-sans font-bold text-[10px] uppercase tracking-[0.2em] text-white transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
-            {loading ? "Posting..." : "Publish Article"}
+            {loading ? "Publishing..." : "Publish Article"}
           </button>
         </form>
       </div>
@@ -117,11 +122,16 @@ export default function PostArticlePage() {
   );
 }
 
-function InputField({ label, ...props }: any) {
+function InputField({ label, placeholder, ...props }: any) {
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-2">
       <label className={labelClasses}>{label}</label>
-      <input className={`h-11 ${inputClasses}`} {...props} onChange={e => props.onChange(e.target.value)} />
+      <input
+        className={inputClasses}
+        placeholder={placeholder || ""}
+        {...props}
+        onChange={e => props.onChange(e.target.value)}
+      />
     </div>
   );
 }
@@ -129,11 +139,16 @@ function InputField({ label, ...props }: any) {
 function AccessDenied({ user }: { user: any }) {
   return (
     <div className="max-w-2xl mx-auto mt-28 px-4 text-center">
-      <h1 className="text-2xl font-bold">Access Restricted</h1>
-      <p className="text-[var(--muted-foreground)] mt-2">
+      <h1 className="text-2xl font-serif font-bold text-[#0A192F]">Access Restricted</h1>
+      <p className="text-sm font-sans italic text-primary/60 mt-3">
         {!user ? "Please sign in to post articles." : "Only accounts with 'Author' status can post."}
       </p>
-      <button onClick={() => window.history.back()} className="mt-4 text-[var(--primary)] font-medium underline">Go Back</button>
+      <button
+        onClick={() => window.history.back()}
+        className="mt-6 h-10 px-6 rounded-none border border-primary/20 text-[10px] font-sans font-bold uppercase tracking-widest text-primary/60 hover:border-primary hover:text-primary transition-all cursor-pointer"
+      >
+        Go Back
+      </button>
     </div>
   );
 }

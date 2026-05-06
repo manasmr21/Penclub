@@ -65,112 +65,110 @@ export default function ProfileSettingsPage() {
   }
 
   return (
-    <div className="main-container px-3 sm:px-6 pt-20 sm:pt-24 pb-12">
-      <div className="mx-auto max-w-6xl">
-        <div className="mb-5 sm:mb-6 flex items-center gap-2 text-primary">
-          <Settings size={18} />
-          <h1 className="text-2xl font-bold tracking-tight">Profile Settings</h1>
+    <div className="relative min-h-screen bg-white">
+      <div className="max-w-5xl mx-auto px-4 pt-24 pb-20">
+        <div className="mb-10 sm:mb-12 flex flex-col gap-2">
+          <h1 className="text-4xl md:text-5xl font-serif font-bold tracking-tight leading-tight text-[#0A192F]">Profile Settings</h1>
+          <p className="text-sm md:text-base font-serif italic text-primary/60">Manage your details and preferences</p>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-12">
-          <aside className="md:col-span-4 lg:col-span-3 md:sticky md:top-24 md:self-start">
-            <div className="rounded-2xl border border-border bg-card p-3 sm:p-4">
-              <div className="flex flex-col gap-2">
-                <button
-                  type="button"
-                  onClick={() => setActiveSection("details")}
-                  className={`flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-medium transition ${
-                    activeSection === "details"
-                      ? "bg-primary/10 text-primary"
-                      : "text-foreground hover:bg-muted/70"
-                  }`}
-                >
-                  <Settings size={16} />
-                  Profile Details
-                </button>
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-12 items-start">
+          <aside className="md:col-span-4 lg:col-span-3 md:sticky md:top-32">
+            <div className="flex flex-col border-l border-primary/10">
+              <button
+                type="button"
+                onClick={() => setActiveSection("details")}
+                className={`flex w-full items-center gap-3 px-6 py-4 text-left text-[10px] font-sans font-bold uppercase tracking-[0.2em] transition-all border-l-2 -ml-[1px] ${
+                  activeSection === "details"
+                    ? "border-primary bg-primary/5 text-primary"
+                    : "border-transparent text-primary/40 hover:text-primary/70 hover:bg-primary/5"
+                }`}
+              >
+                <Settings size={14} />
+                Profile Details
+              </button>
 
-                <button
-                  type="button"
-                  onClick={() => setActiveSection("edit")}
-                  className={`flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-medium transition ${
-                    activeSection === "edit"
-                      ? "bg-primary/10 text-primary"
-                      : "text-foreground hover:bg-muted/70"
-                  }`}
-                >
-                  <UserCog size={16} />
-                  Edit Profile
-                </button>
+              <button
+                type="button"
+                onClick={() => setActiveSection("edit")}
+                className={`flex w-full items-center gap-3 px-6 py-4 text-left text-[10px] font-sans font-bold uppercase tracking-[0.2em] transition-all border-l-2 -ml-[1px] ${
+                  activeSection === "edit"
+                    ? "border-primary bg-primary/5 text-primary"
+                    : "border-transparent text-primary/40 hover:text-primary/70 hover:bg-primary/5"
+                }`}
+              >
+                <UserCog size={14} />
+                Edit Profile
+              </button>
 
-                <button
-                  type="button"
-                  onClick={() => router.push("/forgot-password")}
-                  className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-foreground transition hover:bg-muted/70"
-                >
-                  <KeyRound size={16} />
-                  Reset Password
-                </button>
+              <button
+                type="button"
+                onClick={() => router.push("/forgot-password")}
+                className="flex w-full items-center gap-3 px-6 py-4 text-left text-[10px] font-sans font-bold uppercase tracking-[0.2em] transition-all border-l-2 -ml-[1px] border-transparent text-primary/40 hover:text-primary/70 hover:bg-primary/5"
+              >
+                <KeyRound size={14} />
+                Reset Password
+              </button>
 
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  disabled={logoutLoading}
-                  className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-60"
-                >
-                  <LogOut size={16} />
-                  {logoutLoading ? "Logging out..." : "Logout"}
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={handleLogout}
+                disabled={logoutLoading}
+                className="flex w-full items-center gap-3 px-6 py-4 text-left text-[10px] font-sans font-bold uppercase tracking-[0.2em] transition-all border-l-2 -ml-[1px] border-transparent text-red-600/60 hover:text-red-600 hover:bg-red-50 disabled:opacity-60"
+              >
+                <LogOut size={14} />
+                {logoutLoading ? "Logging out..." : "Logout"}
+              </button>
             </div>
           </aside>
 
-          <section className="md:col-span-8 lg:col-span-9">
+          <section className="md:col-span-8 lg:col-span-9 w-full max-w-3xl">
             {activeSection === "edit" ? (
               <ProfileEditor inModal={false} onClose={() => setActiveSection("details")} />
             ) : (
-              <div className="rounded-2xl border border-border bg-card p-4 sm:p-6">
-                <h2 className="text-xl font-semibold text-foreground">User Details</h2>
+              <div className="border border-primary/10 bg-white p-8 md:p-10 rounded-none relative">
+                <h2 className="text-2xl font-serif font-bold text-[#0A192F] mb-8">User Details</h2>
 
-                <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div className="rounded-xl border border-border/70 bg-background p-3">
-                    <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">Name</p>
-                    <p className="mt-1 text-sm font-medium text-foreground">{fieldValue(user.name)}</p>
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                  <div className="border border-primary/10 bg-zinc-50/50 p-4 rounded-none">
+                    <p className="text-[10px] uppercase font-sans font-bold tracking-[0.2em] text-primary/40">Name</p>
+                    <p className="mt-2 text-sm font-sans font-medium text-[#0A192F]">{fieldValue(user.name)}</p>
                   </div>
-                  <div className="rounded-xl border border-border/70 bg-background p-3">
-                    <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">Username</p>
-                    <p className="mt-1 text-sm font-medium text-foreground">@{fieldValue(user.username)}</p>
+                  <div className="border border-primary/10 bg-zinc-50/50 p-4 rounded-none">
+                    <p className="text-[10px] uppercase font-sans font-bold tracking-[0.2em] text-primary/40">Username</p>
+                    <p className="mt-2 text-sm font-sans font-medium text-[#0A192F]">@{fieldValue(user.username)}</p>
                   </div>
-                  <div className="rounded-xl border border-border/70 bg-background p-3">
-                    <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">Email</p>
-                    <p className="mt-1 text-sm font-medium text-foreground break-all">{fieldValue(user.email)}</p>
+                  <div className="border border-primary/10 bg-zinc-50/50 p-4 rounded-none">
+                    <p className="text-[10px] uppercase font-sans font-bold tracking-[0.2em] text-primary/40">Email</p>
+                    <p className="mt-2 text-sm font-sans font-medium text-[#0A192F] break-all">{fieldValue(user.email)}</p>
                   </div>
-                  <div className="rounded-xl border border-border/70 bg-background p-3">
-                    <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">Role</p>
-                    <p className="mt-1 text-sm font-medium capitalize text-foreground">{fieldValue(user.role)}</p>
+                  <div className="border border-primary/10 bg-zinc-50/50 p-4 rounded-none">
+                    <p className="text-[10px] uppercase font-sans font-bold tracking-[0.2em] text-primary/40">Role</p>
+                    <p className="mt-2 text-sm font-sans font-medium capitalize text-[#0A192F]">{fieldValue(user.role)}</p>
                   </div>
-                  <div className="rounded-xl border border-border/70 bg-background p-3">
-                    <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">Email Verified</p>
-                    <p className="mt-1 text-sm font-medium text-foreground">{user.isEmailVerified ? "Yes" : "No"}</p>
+                  <div className="border border-primary/10 bg-zinc-50/50 p-4 rounded-none">
+                    <p className="text-[10px] uppercase font-sans font-bold tracking-[0.2em] text-primary/40">Email Verified</p>
+                    <p className="mt-2 text-sm font-sans font-medium text-[#0A192F]">{user.isEmailVerified ? "Yes" : "No"}</p>
                   </div>
                 </div>
 
-                <div className="mt-5 rounded-xl border border-border/70 bg-background p-3">
-                  <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">Bio</p>
-                  <p className="mt-2 text-sm text-foreground">{fieldValue(user.bio)}</p>
+                <div className="mt-6 border border-primary/10 bg-zinc-50/50 p-6 rounded-none">
+                  <p className="text-[10px] uppercase font-sans font-bold tracking-[0.2em] text-primary/40 mb-3">Bio</p>
+                  <p className="text-sm font-sans text-primary/80 leading-relaxed">{fieldValue(user.bio)}</p>
                 </div>
 
-                <div className="mt-5 rounded-xl border border-border/70 bg-background p-3">
-                  <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">Interests</p>
+                <div className="mt-6 border border-primary/10 bg-zinc-50/50 p-6 rounded-none">
+                  <p className="text-[10px] uppercase font-sans font-bold tracking-[0.2em] text-primary/40 mb-4">Interests</p>
                   {parsedInterests.length > 0 ? (
-                    <div className="mt-2 flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-2">
                       {parsedInterests.map((interest) => (
-                        <span key={interest} className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                        <span key={interest} className="px-4 py-1.5 border border-primary/10 text-[10px] font-sans font-bold uppercase tracking-[0.1em] text-primary/80 bg-white">
                           {interest}
                         </span>
                       ))}
                     </div>
                   ) : (
-                    <p className="mt-2 text-sm text-muted-foreground">No interests added yet.</p>
+                    <p className="text-sm font-sans text-primary/60 italic">No interests added yet.</p>
                   )}
                 </div>
               </div>

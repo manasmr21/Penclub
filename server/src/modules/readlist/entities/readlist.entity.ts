@@ -1,33 +1,33 @@
 import {
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-    CreateDateColumn,
-    UpdateDateColumn,
-    Index
-} from "typeorm";
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  Index,
+} from 'typeorm';
 
-@Entity("readlists")
-@Index(["userId"])
+@Entity('readlists')
+@Index(['userId'])
 export class Readlist {
-    @PrimaryGeneratedColumn("uuid")
-    id: string;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-    @Column({ length: 100 })
-    name: string;
+  @Column({ length: 100 })
+  name: string;
 
-    @Column({ type: "uuid" })
-    userId: string;
+  @Column({ type: 'uuid' })
+  userId: string;
 
-    @Column("text", { array: true, default: [] })
-    booksId: string[];
+  @Column('text', { array: true, default: [] })
+  booksId: string[];
 
-    @Column({ default: false })
-    isPublic: boolean;
+  @Column({ default: false })
+  isPublic: boolean;
 
-    @CreateDateColumn()
-    createdAt: Date;
+  @CreateDateColumn()
+  createdAt: Date;
 
-    @UpdateDateColumn()
-    updatedAt: Date;
+  @UpdateDateColumn()
+  updatedAt: Date;
 }

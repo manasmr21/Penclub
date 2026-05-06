@@ -2,45 +2,45 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class UserDto {
   @ApiProperty({
-    example: 'johndoe@gmail.com'
+    example: 'johndoe@gmail.com',
   })
   email: string;
 
   @ApiProperty({
-    example: 'johndoe123'
+    example: 'johndoe123',
   })
   username: string;
 
   @ApiProperty({
-    example: 'John Doe'
+    example: 'John Doe',
   })
   name: string;
 
   @ApiProperty({
-    example: 'password123'
+    example: 'password123',
   })
   password: string;
 
   @ApiProperty()
-  confirmPassword: string
+  confirmPassword: string;
 
   @ApiProperty({
-    example: 'reader'
+    example: 'reader',
   })
   role: string;
 
   @ApiProperty({
-    example: 'Avid reader of mystery novels.'
+    example: 'Avid reader of mystery novels.',
   })
   bio?: string;
 
   @ApiProperty({
-    example: ['fiction', 'mystery']
+    example: ['fiction', 'mystery'],
   })
   interest?: string[];
 
   @ApiProperty({
-    example: ['https://twitter.com/johndoe', 'https://facebook.com/johndoe']
+    example: ['https://twitter.com/johndoe', 'https://facebook.com/johndoe'],
   })
   socialeLinks?: string[];
 }

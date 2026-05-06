@@ -8,7 +8,11 @@ import { JwtAuthModule } from '../JWT/jwt.module';
 import { BlogModule } from '../blog/blog.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Comment, Blog]), JwtAuthModule, BlogModule],
+  imports: [
+    TypeOrmModule.forFeature([Comment, Blog]),
+    JwtAuthModule,
+    BlogModule,
+  ],
   providers: [CommentsService],
   controllers: [CommentsController],
   exports: [CommentsService],

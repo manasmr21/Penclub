@@ -97,86 +97,67 @@ function PublisherDetailsModal({ publisher, onClose }: { publisher: Publisher | 
   if (!publisher) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
-      <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-border/20">
-        <div className="sticky top-0 bg-white/80 backdrop-blur-md border-b border-border/10 p-6 flex items-center justify-between z-10">
-          <h2 className="text-xl font-bold text-primary tracking-tight">Publisher Details</h2>
-          <button 
-            onClick={onClose} 
-            className="cursor-pointer p-2 hover:bg-background rounded-full transition-all"
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-[#0A192F]/60 backdrop-blur-sm">
+      <div className="bg-white w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-2xl border border-primary/10">
+        {/* Header */}
+        <div className="sticky top-0 bg-white border-b border-primary/10 px-8 py-6 flex items-center justify-between z-10">
+          <div>
+            <p className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40 mb-1">Publication House</p>
+            <h2 className="text-2xl font-serif font-bold text-[#0A192F]">Publisher Details</h2>
+          </div>
+          <button
+            onClick={onClose}
+            className="h-9 w-9 flex items-center justify-center border border-primary/20 text-primary/40 hover:text-primary hover:border-primary transition-all cursor-pointer"
           >
-            <X className="w-5 h-5 text-primary" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="p-6 space-y-6">
+        <div className="p-8 space-y-8">
           {/* Logo and Name */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
             <img
               src={publisher.logo}
               alt={publisher.name}
-              className="w-20 h-20 rounded-xl object-cover"
+              className="w-16 h-16 object-cover border border-primary/10"
             />
             <div>
-              <h3 className="text-xl font-bold text-gray-900">{publisher.name}</h3>
-              <p className="text-sm text-gray-500">ID: {publisher.publisherId}</p>
+              <h3 className="text-2xl font-serif font-bold text-[#0A192F]">{publisher.name}</h3>
+              <p className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40 mt-1">ID: {publisher.publisherId}</p>
             </div>
           </div>
 
           {/* Contact Information */}
           <div className="space-y-3">
-            <h4 className="font-semibold text-gray-900 flex items-center gap-2">
-              <Mail className="w-4 h-4" />
-              Contact Information
-            </h4>
-            <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+            <p className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40 flex items-center gap-2">
+              <Mail className="w-3 h-3" /> Contact Information
+            </p>
+            <div className="border border-primary/10 bg-zinc-50 p-5 space-y-4">
               <div className="flex items-center gap-3 text-sm">
-                <Mail className="w-4 h-4 text-gray-400" />
-                <span className="text-gray-600">{publisher.email}</span>
+                <Mail className="w-4 h-4 text-primary/30 shrink-0" />
+                <span className="font-sans text-[#0A192F]">{publisher.email}</span>
               </div>
               <div className="flex items-center gap-3 text-sm">
-                <Phone className="w-4 h-4 text-gray-400" />
-                <span className="text-gray-600">{publisher.number}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Additional Information */}
-          <div className="space-y-3">
-            <h4 className="font-semibold text-gray-900 flex items-center gap-2">
-              <Building2 className="w-4 h-4" />
-              Additional Information
-            </h4>
-            <div className="bg-gray-50 rounded-lg p-4 space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Publisher ID:</span>
-                <span className="text-gray-900 font-mono">{publisher.publisherId}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Logo ID:</span>
-                <span className="text-gray-900 font-mono">{publisher.logoId}</span>
+                <Phone className="w-4 h-4 text-primary/30 shrink-0" />
+                <span className="font-sans text-[#0A192F]">{publisher.number}</span>
               </div>
             </div>
           </div>
 
           {/* Timeline */}
           <div className="space-y-3">
-            <h4 className="font-semibold text-gray-900 flex items-center gap-2">
-              <Calendar className="w-4 h-4" />
-              Timeline
-            </h4>
-            <div className="bg-gray-50 rounded-lg p-4 space-y-2">
+            <p className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40 flex items-center gap-2">
+              <Calendar className="w-3 h-3" /> Timeline
+            </p>
+            <div className="border border-primary/10 bg-zinc-50 p-5 space-y-3">
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Created:</span>
-                <span className="text-gray-900">
-                  {new Date(publisher.createdAt).toLocaleDateString()}
-                </span>
+                <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-primary/40">Created</span>
+                <span className="font-sans text-[#0A192F]">{new Date(publisher.createdAt).toLocaleDateString()}</span>
               </div>
+              <div className="h-px bg-primary/5" />
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Last Updated:</span>
-                <span className="text-gray-900">
-                  {new Date(publisher.updatedAt).toLocaleDateString()}
-                </span>
+                <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-primary/40">Last Updated</span>
+                <span className="font-sans text-[#0A192F]">{new Date(publisher.updatedAt).toLocaleDateString()}</span>
               </div>
             </div>
           </div>
@@ -187,9 +168,9 @@ function PublisherDetailsModal({ publisher, onClose }: { publisher: Publisher | 
 }
 
 // Add/Edit Publisher Modal
-function PublisherFormModal({ publisher, onClose, onSave }: { 
-  publisher?: Publisher | null; 
-  onClose: () => void; 
+function PublisherFormModal({ publisher, onClose, onSave }: {
+  publisher?: Publisher | null;
+  onClose: () => void;
   onSave: (data: any) => void;
 }) {
   const [formData, setFormData] = useState({
@@ -205,23 +186,28 @@ function PublisherFormModal({ publisher, onClose, onSave }: {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
-      <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-border/20 overflow-hidden">
-        <div className="bg-white border-b border-border/10 p-6 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-primary tracking-tight">
-            {publisher ? "Edit Publisher" : "Add New Publisher"}
-          </h2>
-          <button 
-            onClick={onClose} 
-            className="cursor-pointer p-2 hover:bg-background rounded-full transition-all"
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-[#0A192F]/60 backdrop-blur-sm">
+      <div className="bg-white w-full max-w-xl shadow-2xl border border-primary/10 overflow-hidden">
+        {/* Header */}
+        <div className="px-8 py-6 border-b border-primary/10 flex items-center justify-between">
+          <div>
+            <p className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40 mb-1">Publications</p>
+            <h2 className="text-2xl font-serif font-bold text-[#0A192F]">
+              {publisher ? "Edit Publisher" : "Add Publisher"}
+            </h2>
+          </div>
+          <button
+            onClick={onClose}
+            className="h-9 w-9 flex items-center justify-center border border-primary/20 text-primary/40 hover:text-primary hover:border-primary transition-all cursor-pointer"
           >
-            <X className="w-5 h-5 text-primary" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+        <form onSubmit={handleSubmit} className="p-8 space-y-6">
+          {/* Name */}
+          <div className="space-y-2">
+            <label className="block text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40">
               Publisher Name
             </label>
             <input
@@ -229,12 +215,14 @@ function PublisherFormModal({ publisher, onClose, onSave }: {
               required
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-400"
+              placeholder="e.g. Penguin Random House"
+              className="h-12 w-full rounded-none border border-primary/20 bg-zinc-50 px-4 text-sm font-sans text-[#0A192F] outline-none transition-all focus:border-primary focus:bg-white placeholder:text-primary/20"
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+          {/* Email */}
+          <div className="space-y-2">
+            <label className="block text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40">
               Email
             </label>
             <input
@@ -242,12 +230,14 @@ function PublisherFormModal({ publisher, onClose, onSave }: {
               required
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-400"
+              placeholder="contact@publisher.com"
+              className="h-12 w-full rounded-none border border-primary/20 bg-zinc-50 px-4 text-sm font-sans text-[#0A192F] outline-none transition-all focus:border-primary focus:bg-white placeholder:text-primary/20"
             />
           </div>
 
-          <div>
-            <label className="block text-xs font-bold uppercase tracking-widest text-muted-foreground mb-2">
+          {/* Phone */}
+          <div className="space-y-2">
+            <label className="block text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40">
               Phone Number
             </label>
             <input
@@ -255,37 +245,43 @@ function PublisherFormModal({ publisher, onClose, onSave }: {
               required
               value={formData.number}
               onChange={(e) => setFormData({ ...formData, number: e.target.value })}
-              className="w-full px-4 py-3 bg-white border border-border/40 rounded-xl focus:outline-none focus:border-primary/40 transition-all text-sm"
+              placeholder="+1 (212) 000-0000"
+              className="h-12 w-full rounded-none border border-primary/20 bg-zinc-50 px-4 text-sm font-sans text-[#0A192F] outline-none transition-all focus:border-primary focus:bg-white placeholder:text-primary/20"
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+          {/* Publisher ID */}
+          <div className="space-y-2">
+            <label className="block text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40">
               Publisher ID
+              {publisher && <span className="ml-2 font-normal normal-case tracking-normal text-primary/30">(read-only)</span>}
             </label>
             <input
               type="text"
               required
               value={formData.publisherId}
               onChange={(e) => setFormData({ ...formData, publisherId: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-50"
               readOnly={!!publisher}
+              className={`h-12 w-full rounded-none border border-primary/20 px-4 text-sm font-sans text-[#0A192F] outline-none transition-all focus:border-primary ${
+                publisher ? "bg-zinc-100 cursor-not-allowed text-primary/40" : "bg-zinc-50 focus:bg-white"
+              }`}
             />
           </div>
 
-          <div className="flex gap-4 pt-4">
+          {/* Actions */}
+          <div className="flex flex-col-reverse sm:flex-row gap-4 pt-2 border-t border-primary/10">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-5 py-3 text-xs font-bold uppercase tracking-widest text-primary bg-white border border-primary/20 rounded-full hover:bg-primary/5 transition-all shadow-sm cursor-pointer"
+              className="h-12 flex-1 rounded-none border border-primary/20 bg-transparent text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/60 transition-all hover:border-primary/40 hover:text-primary cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 px-5 py-3 text-xs font-bold uppercase tracking-widest text-white bg-primary rounded-full hover:bg-primary/90 transition-all shadow-[0_4px_12px_rgba(13,56,125,0.2)] cursor-pointer"
+              className="h-12 flex-[2] rounded-none bg-[#0A192F] text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-white transition-all hover:opacity-90 active:scale-95 cursor-pointer"
             >
-              {publisher ? "Update" : "Create"}
+              {publisher ? "Update Publisher" : "Create Publisher"}
             </button>
           </div>
         </form>

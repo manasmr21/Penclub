@@ -9,12 +9,12 @@ export class UpdateCommentDto extends PartialType(CreateCommentDto) {
   content: string;
 
   @ApiProperty({
-    example: "9asd08f2-d9asd0as-da0sd9a0"
+    example: '9asd08f2-d9asd0as-da0sd9a0',
   })
-  blogId: string
-  
+  blogId: string;
+
   @ApiProperty({
-    example: "9asd08f2-d9asd0as-da0sd9a0"
+    example: '9asd08f2-d9asd0as-da0sd9a0',
   })
   parentId?: string | undefined;
 }

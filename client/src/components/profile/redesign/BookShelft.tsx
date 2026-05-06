@@ -187,104 +187,121 @@ const BookShelft = () => {
       </div>
 
       {editingBook && typeof window !== "undefined" && createPortal(
-                <div className="fixed inset-0 z-[9999] flex flex-col items-center py-20 px-4 bg-slate-900/40 backdrop-blur-md transition-all animate-in fade-in duration-300">
-                  <div className="relative w-full max-w-xl max-h-[calc(100vh-10rem)] overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl ring-1 ring-slate-200 animate-in slide-in-from-top-8 duration-300 scrollbar-hide">
-                    <button
-                      onClick={closeEditModal}
-                      className="absolute right-6 top-6 p-2 rounded-full hover:bg-slate-100 text-slate-400 transition-colors"
-                    >
-                      <X size={20} />
-                    </button>
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center px-4 bg-[#0A192F]/60 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="relative w-full max-w-xl max-h-[calc(100vh-4rem)] overflow-y-auto bg-white shadow-2xl border border-primary/10 animate-in slide-in-from-top-4 duration-300 scrollbar-hide">
 
-                    <div className="flex flex-col items-center mb-4 text-center">
-                      <h2 className="text-xl font-bold text-[#1e2741]">Edit Book</h2>
+            {/* Modal Header */}
+            <div className="sticky top-0 z-10 px-8 py-6 border-b border-primary/10 flex justify-between items-center bg-white">
+              <div>
+                <p className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40 mb-1">Publication</p>
+                <h2 className="text-2xl font-serif font-bold text-[#0A192F]">Edit Book</h2>
+              </div>
+              <button
+                onClick={closeEditModal}
+                className="h-9 w-9 flex items-center justify-center border border-primary/20 text-primary/40 hover:text-primary hover:border-primary transition-all cursor-pointer"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <form onSubmit={handleEditSubmit} className="p-8 space-y-6">
+
+              {/* Cover Image */}
+              <div className="space-y-2">
+                <p className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40">Cover Image</p>
+                <div className="relative group aspect-[3/4] w-[140px] mx-auto overflow-hidden border border-primary/20 bg-zinc-50 cursor-pointer">
+                  <img
+                    src={coverImageFiles.length > 0 ? URL.createObjectURL(coverImageFiles[0]) : (getBookPrimaryImage(editingBook) || "/placeholder-book.png")}
+                    alt="Preview"
+                    className="h-full w-full object-cover transition-opacity duration-300 group-hover:opacity-30"
+                  />
+                  <label className="absolute inset-0 flex items-center justify-center cursor-pointer opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                    <div className="flex flex-col items-center gap-2 text-[#0A192F] text-center px-4">
+                      <ImageIcon size={20} />
+                      <span className="text-[10px] font-sans font-bold uppercase tracking-widest">Change</span>
                     </div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      className="hidden"
+                      onChange={(e) => setCoverImageFiles(Array.from(e.target.files ?? []))}
+                    />
+                  </label>
+                </div>
+                {!!coverImageFiles.length && (
+                  <p className="text-[10px] font-sans font-bold uppercase tracking-widest text-center text-primary/40 mt-1">
+                    {coverImageFiles.length} image{coverImageFiles.length > 1 ? "s" : ""} selected
+                  </p>
+                )}
+              </div>
 
-                    <form onSubmit={handleEditSubmit} className="space-y-4">
-                      <div className="space-y-1">
-                        <label className="ml-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-500">Cover Images</label>
-                        <div className="relative group aspect-[2/3] w-[180px] mx-auto overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
-                          <img
-                            src={coverImageFiles.length > 0 ? URL.createObjectURL(coverImageFiles[0]) : (getBookPrimaryImage(editingBook) || "/placeholder-book.png")}
-                            alt="Preview"
-                            className="h-full w-full object-cover transition-opacity group-hover:opacity-40"
-                          />
-                          <label className="absolute inset-0 flex items-center justify-center cursor-pointer opacity-0 transition group-hover:opacity-100">
-                            <div className="flex flex-col items-center gap-2 text-slate-900 text-center px-4">
-                              <ImageIcon size={24} />
-                              <span className="text-sm font-semibold">Select Images</span>
-                            </div>
-                            <input
-                              type="file"
-                              accept="image/*"
-                              multiple
-                              className="hidden"
-                              onChange={(e) => setCoverImageFiles(Array.from(e.target.files ?? []))}
-                            />
-                          </label>
-                        </div>
-                        {!!coverImageFiles.length && (
-                          <p className="text-[10px] text-center text-slate-500 mt-1">{coverImageFiles.length} new image(s) selected</p>
-                        )}
-                      </div>
+              {/* Title */}
+              <div className="space-y-2">
+                <label className="block text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40">
+                  Title
+                </label>
+                <input
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className="h-12 w-full rounded-none border border-primary/20 bg-zinc-50 px-4 text-sm font-sans text-[#0A192F] outline-none transition-all focus:border-primary focus:bg-white"
+                  placeholder="Book title"
+                  required
+                />
+              </div>
 
-                      <div className="space-y-3">
-                        <div className="space-y-1">
-                          <label className="ml-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-500">Title</label>
-                          <input
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            className="w-full h-11 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none transition focus:ring-2 focus:ring-primary focus:bg-white"
-                            placeholder="Book title"
-                            required
-                          />
-                        </div>
+              {/* Description */}
+              <div className="space-y-2">
+                <label className="block text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40">
+                  Description
+                </label>
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  className="min-h-[130px] w-full resize-none rounded-none border border-primary/20 bg-zinc-50 p-4 text-sm font-sans text-[#0A192F]/80 outline-none transition-all focus:border-primary focus:bg-white"
+                  placeholder="Book description..."
+                  rows={5}
+                  required
+                />
+              </div>
 
-                        <div className="space-y-1">
-                          <label className="ml-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-500">Description</label>
-                          <textarea
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                            className="w-full min-h-[140px] rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm outline-none transition focus:ring-2 focus:ring-primary focus:bg-white resize-none"
-                            placeholder="Book description..."
-                            required
-                          />
-                        </div>
+              {/* Genre */}
+              <div className="space-y-2">
+                <label className="block text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40">
+                  Genre
+                </label>
+                <input
+                  value={genre}
+                  onChange={(e) => setGenre(e.target.value)}
+                  className="h-12 w-full rounded-none border border-primary/20 bg-zinc-50 px-4 text-sm font-sans text-[#0A192F] outline-none transition-all focus:border-primary focus:bg-white"
+                  placeholder="Fiction, Mystery, etc."
+                  required
+                />
+              </div>
 
-                        <div className="space-y-1">
-                          <label className="ml-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-500">Genre</label>
-                          <input
-                            value={genre}
-                            onChange={(e) => setGenre(e.target.value)}
-                            className="w-full h-11 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none transition focus:ring-2 focus:ring-primary focus:bg-white"
-                            placeholder="Fiction, Mystery, etc."
-                            required
-                          />
-                        </div>
-                      </div>
-
-                      <div className="flex justify-end gap-2 pt-2">
-                        <button
-                          type="button"
-                          onClick={closeEditModal}
-                          className="px-5 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-colors"
-                          disabled={isSaving}
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          type="submit"
-                          disabled={isSaving}
-                          className="px-7 py-2 rounded-xl text-sm bg-primary font-semibold text-white shadow-lg shadow-primary/20 hover:opacity-90 disabled:opacity-50 transition-all"
-                        >
-                          {isSaving ? "Saving..." : "Save Changes"}
-                        </button>
-                      </div>
-                    </form>
-                  </div>
-                </div>,
-                document.body
-              )}
+              {/* Action Buttons */}
+              <div className="flex flex-col-reverse sm:flex-row gap-4 pt-2 border-t border-primary/10">
+                <button
+                  type="button"
+                  onClick={closeEditModal}
+                  disabled={isSaving}
+                  className="h-12 flex-1 rounded-none border border-primary/20 bg-transparent text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/60 transition-all hover:border-primary/40 hover:text-primary disabled:opacity-50 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSaving}
+                  className="h-12 flex-[2] rounded-none bg-[#0A192F] text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-white transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+                >
+                  {isSaving ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>,
+        document.body
+      )}
             </div>
             );
 };

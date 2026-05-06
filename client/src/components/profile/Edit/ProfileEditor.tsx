@@ -20,11 +20,11 @@ interface FormInputProps {
 }
 
 const ProfileHeader = ({ onClose }: { onClose?: () => void }) => (
-  <header className="sticky top-0 z-10 flex items-center justify-between border-b border-[var(--border)] bg-white px-3 py-3 sm:px-4">
-    <button type="button" onClick={onClose} className="text-sm text-[var(--primary)] transition-opacity hover:opacity-80">
+  <header className="sticky top-0 z-10 flex items-center justify-between border-b border-primary/10 bg-white px-6 py-6 sm:px-8">
+    <button type="button" onClick={onClose} className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40 hover:text-primary transition-colors cursor-pointer">
       &lt; Back
     </button>
-    <h1 className="text-base sm:text-xl font-semibold text-[var(--foreground)]">Edit Profile</h1>
+    <h1 className="text-2xl font-serif font-bold text-[#0A192F]">Edit Profile</h1>
     <div className="w-10" />
   </header>
 );
@@ -71,28 +71,23 @@ const ProfilePictureUpdate = ({
   };
 
   return (
-    <div className="flex flex-col items-center gap-2">
-      <div className="relative h-20 w-20">
-        <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border border-[var(--border)] bg-[var(--card)] text-2xl font-bold text-[var(--primary)] shadow-sm">
+    <div className="flex flex-col items-center gap-4 mb-6">
+      <div className="relative h-32 w-32 group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+        <div className="flex h-32 w-32 items-center justify-center overflow-hidden border border-primary/20 bg-zinc-50 text-3xl font-serif text-primary/40 transition-all group-hover:border-primary/40">
           {imageSource ? (
             <img src={imageSource} className="h-full w-full object-cover" alt="Profile Preview" />
           ) : (
             <span className="select-none">{getInitials()}</span>
           )}
         </div>
-
         <input type="file" ref={fileInputRef} hidden accept="image/*" onChange={handleFileChange} />
-
-        <button
-          type="button"
-          onClick={() => fileInputRef.current?.click()}
-          className="absolute bottom-0 right-0 flex h-6 w-6 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--background)] text-[10px] text-[var(--primary)] shadow-sm transition hover:opacity-80"
-        >
-          E
-        </button>
+        
+        <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors flex items-center justify-center pointer-events-none">
+           <span className="opacity-0 group-hover:opacity-100 text-[10px] font-sans font-bold uppercase tracking-widest text-primary bg-white/80 px-3 py-1.5 border border-primary/10">Edit</span>
+        </div>
       </div>
 
-      <button type="button" onClick={() => fileInputRef.current?.click()} className="text-xs text-[var(--secondary)] hover:underline p-2">
+      <button type="button" onClick={() => fileInputRef.current?.click()} className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40 hover:text-primary transition-colors cursor-pointer">
         Change Photo
       </button>
     </div>
@@ -100,18 +95,18 @@ const ProfilePictureUpdate = ({
 };
 
 const FormInput = ({ id, label, value, onChange, type = 'text', prefix }: FormInputProps) => (
-  <div className="space-y-1">
-    <label htmlFor={id} className="ml-1 block text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted-foreground)]">
+  <div className="space-y-2">
+    <label htmlFor={id} className="block text-[10px] uppercase font-sans font-bold tracking-[0.2em] text-primary/40">
       {label}
     </label>
     <div className="relative">
-      {prefix && <span className="absolute left-3.5 top-3 text-xs text-[var(--muted-foreground)]">{prefix}</span>}
+      {prefix && <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-primary/40">{prefix}</span>}
       <input
         id={id}
         type={type}
         value={value}
         onChange={onChange}
-        className={`h-10 w-full rounded-xl border border-[var(--border)] bg-gray-100 px-3.5 text-sm text-[var(--foreground)] outline-none transition focus:ring-2 focus:ring-[var(--primary)] ${prefix ? 'pl-7' : ''}`}
+        className={`h-12 w-full rounded-none border border-primary/20 bg-zinc-50 px-4 text-sm font-sans text-[#0A192F] outline-none transition-all focus:border-primary focus:bg-white focus:ring-0 ${prefix ? 'pl-8' : ''}`}
       />
     </div>
   </div>
@@ -264,14 +259,14 @@ export default function ProfileEditor({ inModal = false, onClose }: ProfileEdito
 
   return (
     <div
-      className={`w-full rounded-2xl border border-[var(--border)] bg-white text-[var(--foreground)] shadow-sm ${inModal
-          ? "mx-auto mt-4 sm:mt-10 max-w-2xl max-h-[92vh] overflow-y-auto"
+      className={`w-full rounded-none border border-primary/10 bg-white shadow-sm ${inModal
+          ? "mx-auto mt-4 sm:mt-10 max-w-xl max-h-[92vh] overflow-y-auto"
           : "mx-auto max-w-none"
         }`}
     >
       <ProfileHeader onClose={handleClose} />
 
-      <div className="space-y-3 p-3 sm:p-4">
+      <div className="space-y-6 p-6 sm:p-10">
         <ProfilePictureUpdate
           currentPicture={user?.profilePicture}
           name={user?.name}
@@ -285,41 +280,38 @@ export default function ProfileEditor({ inModal = false, onClose }: ProfileEdito
               type="button"
               onClick={handleVerifyNow}
               disabled={verifyLoading}
-              className="h-10 rounded-full border border-[var(--primary)] px-5 text-sm font-semibold text-[var(--primary)] transition hover:opacity-85 disabled:opacity-60"
+              className="h-10 rounded-none border border-primary px-6 text-[10px] font-sans font-bold uppercase tracking-widest text-primary transition-all hover:bg-primary hover:text-white disabled:opacity-60 cursor-pointer"
             >
               {verifyLoading ? "Sending OTP..." : "Verify Now"}
             </button>
           </div>
         )}
 
-        <form className="space-y-2" onSubmit={handleSave}>
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+        <form className="space-y-6" onSubmit={handleSave}>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <FormInput id="fullName" label="Full Name" value={name} onChange={(e) => setName(e.target.value)} />
             <FormInput id="username" label="Username" value={username} onChange={(e) => setUsername(e.target.value)} prefix="@" />
           </div>
 
-          <div className="space-y-1">
-            <label className="ml-1 block text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted-foreground)]">
+          <div className="space-y-2">
+            <label className="block text-[10px] uppercase font-sans font-bold tracking-[0.2em] text-primary/40">
               Bio
             </label>
             <textarea
               value={bio}
               onChange={(e) => setBio(e.target.value)}
-              /* Changed bg-[var(--background)] to bg-gray-100 */
-              className="min-h-25 w-full resize-none rounded-xl border border-[var(--border)] bg-gray-100 p-3 text-sm outline-none transition focus:ring-2 focus:ring-[var(--primary)]"
+              className="min-h-[120px] w-full resize-none rounded-none border border-primary/20 bg-zinc-50 p-4 text-sm font-sans text-[#0A192F] outline-none transition-all focus:border-primary focus:bg-white focus:ring-0"
               rows={4}
             />
-            <p className="text-right text-[10px] text-[var(--muted-foreground)]">{bio.length} / 300</p>
+            <p className="text-right text-[10px] font-sans font-bold text-primary/40 tracking-widest">{bio.length} / 300</p>
           </div>
 
           {selected.length > 0 && (
-            /* Changed bg-[var(--background)] to bg-gray-100 */
-            <div className="flex flex-wrap gap-1 rounded-xl border border-[var(--border)] bg-gray-100 p-2">
+            <div className="flex flex-wrap gap-2 border border-primary/20 bg-zinc-50 p-4 rounded-none">
               {selected.map((item) => (
                 <span
                   key={item}
-                  /* Changed bg-[var(--card)] to bg-white for contrast */
-                  className="cursor-pointer rounded-full border border-[var(--border)] bg-white px-3 py-1 text-xs transition hover:opacity-80"
+                  className="cursor-pointer rounded-none border border-primary/10 bg-white px-4 py-1.5 text-[10px] font-sans font-bold uppercase tracking-[0.1em] text-primary/80 transition-all hover:border-primary/40"
                   onClick={() => toggleInterest(item)}
                 >
                   {item} x
@@ -328,15 +320,15 @@ export default function ProfileEditor({ inModal = false, onClose }: ProfileEdito
             </div>
           )}
 
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 pt-2">
             {allInterests.map((item) => (
               <button
                 type="button"
                 key={item}
                 onClick={() => toggleInterest(item)}
-                className={`rounded-full border px-3 py-1 text-xs transition ${selected.includes(item)
-                    ? "border-[var(--primary)] bg-[var(--primary)] text-[var(--primary-foreground)]"
-                    : "border-[var(--border)] bg-gray-100 hover:bg-gray-200" /* Changed to gray-100 */
+                className={`rounded-none border px-4 py-1.5 text-[10px] font-sans font-bold uppercase tracking-[0.1em] transition-all cursor-pointer ${selected.includes(item)
+                    ? "border-primary bg-primary text-white"
+                    : "border-primary/20 bg-transparent text-primary/60 hover:border-primary/40"
                   }`}
               >
                 {item}
@@ -344,20 +336,19 @@ export default function ProfileEditor({ inModal = false, onClose }: ProfileEdito
             ))}
           </div>
 
-          <div className="flex flex-col-reverse sm:flex-row gap-2.5 pt-1">
+          <div className="flex flex-col-reverse sm:flex-row gap-4 pt-6">
             <button
               type="button"
               onClick={handleClose}
               disabled={loading}
-              /* Changed bg-[var(--card)] to bg-gray-100 */
-              className="h-11 w-full sm:flex-1 rounded-full border border-[var(--border)] bg-gray-100 text-sm font-medium transition hover:bg-gray-200 disabled:opacity-50"
+              className="h-12 w-full sm:flex-1 rounded-none border border-primary/20 bg-transparent text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/60 transition-all hover:border-primary/40 hover:text-primary disabled:opacity-50 cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading || initialSyncLoading}
-              className="h-11 w-full sm:flex-1 rounded-full bg-[linear-gradient(90deg,var(--primary),var(--secondary))] text-sm font-semibold text-[var(--primary-foreground)] shadow-[0_12px_30px_rgba(10,56,125,0.2)] transition disabled:cursor-not-allowed disabled:opacity-50"
+              className="h-12 w-full sm:flex-1 rounded-none bg-primary text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-white shadow-lg transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
             >
               {loading ? "Saving..." : initialSyncLoading ? "Loading..." : "Save Changes"}
             </button>

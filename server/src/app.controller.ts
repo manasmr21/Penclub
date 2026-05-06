@@ -4,8 +4,9 @@ import { DataSource } from 'typeorm';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService,
-    private readonly dataSource: DataSource
+  constructor(
+    private readonly appService: AppService,
+    private readonly dataSource: DataSource,
   ) {}
 
   @Get()
@@ -13,18 +14,16 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  @Get("/db-health")
-  async dbHealth(){
+  @Get('/db-health')
+  async dbHealth() {
     const result = await this.dataSource.query(
-      'SELECT current_database(), version();'
-    )
+      'SELECT current_database(), version();',
+    );
 
-    return{
+    return {
       conncted: true,
       database: result[0].current_database,
-      version: result[0].version
-    }
-
+      version: result[0].version,
+    };
   }
-
 }
