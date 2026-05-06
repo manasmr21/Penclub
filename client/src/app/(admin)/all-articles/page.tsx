@@ -20,99 +20,9 @@ import {
   RefreshCw
 } from "lucide-react";
 import { StatCard } from "@/src/components/cards";
+import { StatCardSkeleton, ArticleCardSkeleton } from "@/src/components/Skeleton";
+import { Blog, MOCK_ARTICLES } from "@/src/utils/dummyData/dummyData";
 
-interface Blog {
-  id: string;
-  title: string;
-  content: string;
-  tags: string[];
-  coverImage: string | null;
-  coverImageId: string | null;
-  userId: string;
-  user?: {
-    id: string;
-    name: string;
-    email: string;
-  };
-  status: "posted" | "pending" | "draft" | "deleted" | "edited";
-  likesCount: number;
-  createdAt: Date;
-  deletedAt: Date | null;
-}
-
-// Mock data
-const MOCK_ARTICLES: Blog[] = [
-  {
-    id: "1",
-    title: "The Future of Digital Publishing",
-    content: "Digital publishing is evolving rapidly...",
-    tags: ["publishing", "digital", "trends"],
-    coverImage: "https://images.unsplash.com/photo-1456327102063-fb5054efe647?w=400",
-    coverImageId: "cover1",
-    userId: "1",
-    user: { id: "1", name: "John Doe", email: "john@example.com" },
-    status: "posted",
-    likesCount: 234,
-    createdAt: new Date("2024-03-15"),
-    deletedAt: null
-  },
-  {
-    id: "2",
-    title: "10 Tips for Aspiring Authors",
-    content: "Writing a book is a journey...",
-    tags: ["writing", "authors", "tips"],
-    coverImage: "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=400",
-    coverImageId: "cover2",
-    userId: "2",
-    user: { id: "2", name: "Jane Smith", email: "jane@example.com" },
-    status: "posted",
-    likesCount: 567,
-    createdAt: new Date("2024-03-10"),
-    deletedAt: null
-  },
-  {
-    id: "3",
-    title: "Understanding Book Genres",
-    content: "A comprehensive guide to book genres...",
-    tags: ["genres", "books", "guide"],
-    coverImage: null,
-    coverImageId: null,
-    userId: "4",
-    user: { id: "4", name: "Sarah Johnson", email: "sarah@example.com" },
-    status: "pending",
-    likesCount: 0,
-    createdAt: new Date("2024-03-18"),
-    deletedAt: null
-  },
-  {
-    id: "4",
-    title: "Marketing Your First Book",
-    content: "Essential marketing strategies...",
-    tags: ["marketing", "promotion", "books"],
-    coverImage: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=400",
-    coverImageId: "cover4",
-    userId: "1",
-    user: { id: "1", name: "John Doe", email: "john@example.com" },
-    status: "draft",
-    likesCount: 0,
-    createdAt: new Date("2024-03-20"),
-    deletedAt: null
-  },
-  {
-    id: "5",
-    title: "The Rise of Audiobooks",
-    content: "How audiobooks are changing reading habits...",
-    tags: ["audiobooks", "trends", "technology"],
-    coverImage: "https://images.unsplash.com/photo-1476275466078-4007374efbbe?w=400",
-    coverImageId: "cover5",
-    userId: "5",
-    user: { id: "5", name: "Mike Wilson", email: "mike@example.com" },
-    status: "edited",
-    likesCount: 89,
-    createdAt: new Date("2024-03-05"),
-    deletedAt: null
-  }
-];
 
 // Article Details Modal
 function ArticleDetailsModal({ article, onClose }: { article: Blog | null; onClose: () => void }) {
@@ -201,13 +111,22 @@ function ArticleDetailsModal({ article, onClose }: { article: Blog | null; onClo
   );
 }
 
+
 export default function ArticlesPage() {
+  const [isLoading, setIsLoading] = useState(true);
   const [articles, setArticles] = useState<Blog[]>(MOCK_ARTICLES);
   const [filteredArticles, setFilteredArticles] = useState<Blog[]>(MOCK_ARTICLES);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedArticle, setSelectedArticle] = useState<Blog | null>(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     let filtered = [...articles];
@@ -283,38 +202,48 @@ export default function ArticlesPage() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-          <StatCard
-            title="Total Articles"
-            value={stats.total.toString()}
-            icon={FileText}
-            theme="blue"
-          />
-          <StatCard
-            title="Published"
-            value={stats.posted.toString()}
-            icon={CheckCircle}
-            theme="green"
-          />
-          <StatCard
-            title="Pending"
-            value={stats.pending.toString()}
-            icon={Clock}
-            theme="ocean"
-          />
-          <StatCard
-            title="Drafts"
-            value={stats.draft.toString()}
-            icon={FileText}
-            theme="gold"
-          />
-          <StatCard
-            title="Total Likes"
-            value={stats.totalLikes.toString()}
-            icon={Heart}
-            theme="coral"
-          />
-        </div>
+        {isLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 animate-fadeIn">
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 animate-fadeIn">
+            <StatCard
+              title="Total Articles"
+              value={stats.total.toString()}
+              icon={FileText}
+              theme="blue"
+            />
+            <StatCard
+              title="Published"
+              value={stats.posted.toString()}
+              icon={CheckCircle}
+              theme="green"
+            />
+            <StatCard
+              title="Pending"
+              value={stats.pending.toString()}
+              icon={Clock}
+              theme="ocean"
+            />
+            <StatCard
+              title="Drafts"
+              value={stats.draft.toString()}
+              icon={FileText}
+              theme="gold"
+            />
+            <StatCard
+              title="Total Likes"
+              value={stats.totalLikes.toString()}
+              icon={Heart}
+              theme="coral"
+            />
+          </div>
+        )}
 
         {/* Search and Filter */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
@@ -346,14 +275,20 @@ export default function ArticlesPage() {
         </div>
 
         {/* Articles Grid */}
-        {filteredArticles.length === 0 ? (
+        {isLoading ? (
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 animate-fadeIn">
+            <ArticleCardSkeleton />
+            <ArticleCardSkeleton />
+            <ArticleCardSkeleton />
+          </div>
+        ) : filteredArticles.length === 0 ? (
           <div className="text-center py-12 border border-dashed border-primary/20 bg-primary/[0.01]">
             <FileText className="w-16 h-16 text-primary/30 mx-auto mb-4" />
             <h3 className="text-lg font-serif font-bold text-primary uppercase tracking-widest">No articles found</h3>
             <p className="text-xs text-muted-foreground font-serif italic mt-1">Try adjusting your search or create a new article</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 animate-fadeIn">
             {filteredArticles.map((article) => (
               <div key={article.id} className={`bg-card border border-primary/15 rounded-none overflow-hidden hover:border-primary/40 hover:bg-primary/[0.01] transition-all duration-300 flex flex-col group ${getCardStatusBorder(article.status)}`}>
                 {/* Article Image */}

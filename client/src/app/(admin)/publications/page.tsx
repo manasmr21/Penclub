@@ -16,83 +16,9 @@ import {
   CheckCircle
 } from "lucide-react";
 import { StatCard } from "@/src/components/cards";
+import { StatCardSkeleton, PublisherCardSkeleton } from "@/src/components/Skeleton";
+import { Publisher, MOCK_PUBLISHERS } from "@/src/utils/dummyData/dummyData";
 
-interface Publisher {
-  id: string;
-  name: string;
-  publisherId: string;
-  email: string;
-  number: string;
-  logo: string;
-  logoId: string;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt?: Date | null;
-}
-
-// Mock data based on the entity
-const MOCK_PUBLISHERS: Publisher[] = [
-  {
-    id: "1",
-    name: "Penguin Random House",
-    publisherId: "PRH001",
-    email: "contact@penguinrandomhouse.com",
-    number: "+1 (212) 123-4567",
-    logo: "https://ui-avatars.com/api/?name=PRH&background=0D387D&color=fff",
-    logoId: "logo_prh_001",
-    createdAt: new Date("2024-01-15"),
-    updatedAt: new Date("2024-03-20"),
-    deletedAt: null
-  },
-  {
-    id: "2",
-    name: "HarperCollins Publishers",
-    publisherId: "HC002",
-    email: "info@harpercollins.com",
-    number: "+1 (212) 207-7000",
-    logo: "https://ui-avatars.com/api/?name=HC&background=4D127A&color=fff",
-    logoId: "logo_hc_002",
-    createdAt: new Date("2024-02-01"),
-    updatedAt: new Date("2024-03-18"),
-    deletedAt: null
-  },
-  {
-    id: "3",
-    name: "Simon & Schuster",
-    publisherId: "SS003",
-    email: "publishers@simonandschuster.com",
-    number: "+1 (212) 698-7000",
-    logo: "https://ui-avatars.com/api/?name=SS&background=065F46&color=fff",
-    logoId: "logo_ss_003",
-    createdAt: new Date("2024-01-20"),
-    updatedAt: new Date("2024-03-15"),
-    deletedAt: null
-  },
-  {
-    id: "4",
-    name: "Hachette Livre",
-    publisherId: "HL004",
-    email: "contact@hachette.com",
-    number: "+33 (1) 43-92-30-00",
-    logo: "https://ui-avatars.com/api/?name=HL&background=854D0E&color=fff",
-    logoId: "logo_hl_004",
-    createdAt: new Date("2024-02-10"),
-    updatedAt: new Date("2024-03-12"),
-    deletedAt: null
-  },
-  {
-    id: "5",
-    name: "Macmillan Publishers",
-    publisherId: "MP005",
-    email: "info@macmillan.com",
-    number: "+1 (646) 307-5151",
-    logo: "https://ui-avatars.com/api/?name=MP&background=0D387D&color=fff",
-    logoId: "logo_mp_005",
-    createdAt: new Date("2024-01-25"),
-    updatedAt: new Date("2024-03-10"),
-    deletedAt: null
-  }
-];
 
 // Publisher Details Modal Component
 function PublisherDetailsModal({ publisher, onClose }: { publisher: Publisher | null; onClose: () => void }) {
@@ -296,7 +222,9 @@ function PublisherFormModal({ publisher, onClose, onSave }: {
   );
 }
 
+
 export default function PublishersPage() {
+  const [isLoading, setIsLoading] = useState(true);
   const [publishers, setPublishers] = useState<Publisher[]>(MOCK_PUBLISHERS);
   const [filteredPublishers, setFilteredPublishers] = useState<Publisher[]>(MOCK_PUBLISHERS);
   const [searchTerm, setSearchTerm] = useState("");
@@ -304,6 +232,13 @@ export default function PublishersPage() {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showFormModal, setShowFormModal] = useState(false);
   const [editingPublisher, setEditingPublisher] = useState<Publisher | null>(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Filter publishers
   useEffect(() => {
@@ -399,20 +334,27 @@ export default function PublishersPage() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatCard
-            title="Total Publishers"
-            value={stats.total.toString()}
-            icon={Building2}
-            theme="blue"
-          />
-          <StatCard
-            title="Active Publishers"
-            value={stats.active.toString()}
-            icon={CheckCircle}
-            theme="ocean"
-          />
-        </div>
+        {isLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-fadeIn">
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-fadeIn">
+            <StatCard
+              title="Total Publishers"
+              value={stats.total.toString()}
+              icon={Building2}
+              theme="blue"
+            />
+            <StatCard
+              title="Active Publishers"
+              value={stats.active.toString()}
+              icon={CheckCircle}
+              theme="ocean"
+            />
+          </div>
+        )}
 
         {/* Search */}
         <div className="mb-8 border-b border-primary/10 pb-4">
@@ -429,14 +371,20 @@ export default function PublishersPage() {
         </div>
 
         {/* Publishers Grid */}
-        {filteredPublishers.length === 0 ? (
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fadeIn">
+            <PublisherCardSkeleton />
+            <PublisherCardSkeleton />
+            <PublisherCardSkeleton />
+          </div>
+        ) : filteredPublishers.length === 0 ? (
           <div className="text-center py-12 border border-dashed border-primary/20 bg-primary/[0.01]">
             <Building2 className="w-16 h-16 text-primary/30 mx-auto mb-4" />
             <h3 className="text-lg font-serif font-bold text-primary uppercase tracking-widest">No publishers found</h3>
             <p className="text-xs text-muted-foreground font-serif italic mt-1">Try adjusting your search filters or add a new publisher</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fadeIn">
             {filteredPublishers.map((publisher) => (
               <div
                 key={publisher.id}

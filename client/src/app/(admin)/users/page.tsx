@@ -4,133 +4,26 @@ import { useState, useEffect } from "react";
 import { Search, Trash2, UserCheck, UserX, Eye, Users, Shield, BookOpen } from "lucide-react";
 import { UserDetailsModal } from "./UserDetailsModal";
 import { StatCard } from "@/src/components/cards";
+import { StatCardSkeleton, UserCardSkeleton } from "@/src/components/Skeleton";
+import { User, MOCK_USERS } from "@/src/utils/dummyData/dummyData";
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  username: string;
-  role: string;
-  isLoggedIn: boolean;
-  isEmailVerified?: boolean;
-  profilePicture?: string;
-  bio?: string;
-  followersCount?: number;
-  followingCount?: number;
-  books?: any[];
-  blogs?: any[];
-  interests?: string[];
-  socialLinks?: string[];
-  createdAt?: string;
-  updatedAt?: string;
-}
 
-// Mock data
-const MOCK_USERS: User[] = [
-  {
-    id: "1",
-    name: "John Doe",
-    email: "john@example.com",
-    username: "johndoe",
-    role: "author",
-    isLoggedIn: true,
-    isEmailVerified: true,
-    profilePicture: null,
-    bio: "Passionate writer and storyteller. Author of multiple best-selling novels.",
-    followersCount: 1234,
-    followingCount: 567,
-    books: [{ id: "b1" }, { id: "b2" }],
-    blogs: [{ id: "bl1" }],
-    interests: ["Fiction", "Fantasy", "Sci-Fi"],
-    socialLinks: ["https://twitter.com/johndoe", "https://github.com/johndoe"],
-    createdAt: new Date("2024-01-15").toISOString(),
-    updatedAt: new Date("2024-03-20").toISOString()
-  },
-  {
-    id: "2",
-    name: "Jane Smith",
-    email: "jane@example.com",
-    username: "janesmith",
-    role: "reader",
-    isLoggedIn: true,
-    isEmailVerified: true,
-    profilePicture: null,
-    bio: "Avid reader and book reviewer",
-    followersCount: 456,
-    followingCount: 789,
-    books: [],
-    blogs: [],
-    interests: ["Romance", "Mystery", "Thriller"],
-    socialLinks: [],
-    createdAt: new Date("2024-02-01").toISOString(),
-    updatedAt: new Date("2024-03-18").toISOString()
-  },
-  {
-    id: "3",
-    name: "Admin User",
-    email: "admin@penclub.com",
-    username: "admin",
-    role: "admin",
-    isLoggedIn: true,
-    isEmailVerified: true,
-    profilePicture: null,
-    bio: "Platform Administrator",
-    followersCount: 999,
-    followingCount: 100,
-    books: [],
-    blogs: [],
-    interests: ["Management", "Technology"],
-    socialLinks: [],
-    createdAt: new Date("2024-01-01").toISOString(),
-    updatedAt: new Date("2024-03-15").toISOString()
-  },
-  {
-    id: "4",
-    name: "Sarah Johnson",
-    email: "sarah@example.com",
-    username: "sarahj",
-    role: "author",
-    isLoggedIn: false,
-    isEmailVerified: false,
-    profilePicture: null,
-    bio: "Poet and creative writer",
-    followersCount: 2345,
-    followingCount: 234,
-    books: [{ id: "b3" }],
-    blogs: [{ id: "bl2" }, { id: "bl3" }],
-    interests: ["Poetry", "Drama"],
-    socialLinks: ["https://instagram.com/sarahj"],
-    createdAt: new Date("2024-02-20").toISOString(),
-    updatedAt: new Date("2024-03-10").toISOString()
-  },
-  {
-    id: "5",
-    name: "Mike Wilson",
-    email: "mike@example.com",
-    username: "mikew",
-    role: "reader",
-    isLoggedIn: true,
-    isEmailVerified: true,
-    profilePicture: null,
-    bio: "Tech enthusiast and book lover",
-    followersCount: 789,
-    followingCount: 345,
-    books: [],
-    blogs: [],
-    interests: ["Technology", "Science Fiction"],
-    socialLinks: ["https://twitter.com/mikew"],
-    createdAt: new Date("2024-03-01").toISOString(),
-    updatedAt: new Date("2024-03-25").toISOString()
-  }
-];
 
 export default function UsersPage() {
+  const [isLoading, setIsLoading] = useState(true);
   const [users, setUsers] = useState<User[]>(MOCK_USERS);
   const [filteredUsers, setFilteredUsers] = useState<User[]>(MOCK_USERS);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("all");
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Filter users
   useEffect(() => {
@@ -194,32 +87,41 @@ export default function UsersPage() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatCard
-            title="Total Users"
-            value={stats.total.toString()}
-            icon={Users}
-            theme="blue"
-          />
-          <StatCard
-            title="Authors"
-            value={stats.authors.toString()}
-            icon={BookOpen}
-            theme="purple"
-          />
-          <StatCard
-            title="Readers"
-            value={stats.readers.toString()}
-            icon={Users}
-            theme="ocean"
-          />
-          <StatCard
-            title="Admins"
-            value={stats.admins.toString()}
-            icon={Shield}
-            theme="coral"
-          />
-        </div>
+        {isLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-fadeIn">
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-fadeIn">
+            <StatCard
+              title="Total Users"
+              value={stats.total.toString()}
+              icon={Users}
+              theme="blue"
+            />
+            <StatCard
+              title="Authors"
+              value={stats.authors.toString()}
+              icon={BookOpen}
+              theme="purple"
+            />
+            <StatCard
+              title="Readers"
+              value={stats.readers.toString()}
+              icon={Users}
+              theme="ocean"
+            />
+            <StatCard
+              title="Admins"
+              value={stats.admins.toString()}
+              icon={Shield}
+              theme="coral"
+            />
+          </div>
+        )}
 
         {/* Filters and Search */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 border-b border-primary/10 pb-4">
@@ -253,12 +155,18 @@ export default function UsersPage() {
         </div>
 
         {/* Users Grid */}
-        {filteredUsers.length === 0 ? (
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fadeIn">
+            <UserCardSkeleton />
+            <UserCardSkeleton />
+            <UserCardSkeleton />
+          </div>
+        ) : filteredUsers.length === 0 ? (
           <div className="text-center py-12 border border-dashed border-primary/20 bg-primary/[0.01]">
             <p className="text-sm font-serif italic text-primary/50">No users found match your filters</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fadeIn">
             {filteredUsers.map((user) => (
               <div
                 key={user.id}

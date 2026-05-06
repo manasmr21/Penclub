@@ -18,96 +18,9 @@ import {
   TrendingUp
 } from "lucide-react";
 import { StatCard } from "@/src/components/cards";
+import { StatCardSkeleton, BookCardSkeleton } from "@/src/components/Skeleton";
+import { Book, MOCK_BOOKS } from "@/src/utils/dummyData/dummyData";
 
-interface BookImage {
-  url: string;
-  publicId: string;
-}
-
-interface Book {
-  id: string;
-  title: string;
-  images: BookImage[];
-  description: string;
-  genre: string;
-  releaseDate: string;
-  purchaseLinks: string[];
-  authorId: string;
-  author?: {
-    id: string;
-    name: string;
-    email: string;
-  };
-  state: "pending" | "approved" | "not_approved";
-  approved: boolean;
-  isAdvertised: boolean;
-  trial: string | null;
-  likesCount: number;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt?: Date | null;
-}
-
-// Mock data
-const MOCK_BOOKS: Book[] = [
-  {
-    id: "1",
-    title: "The Midnight Library",
-    images: [{ url: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=200", publicId: "book1" }],
-    description: "Between life and death there is a library.",
-    genre: "Fiction",
-    releaseDate: "2024-01-15",
-    purchaseLinks: ["https://amazon.com/book1"],
-    authorId: "1",
-    author: { id: "1", name: "John Doe", email: "john@example.com" },
-    state: "approved",
-    approved: true,
-    isAdvertised: true,
-    trial: null,
-    likesCount: 1234,
-    createdAt: new Date("2024-01-15"),
-    updatedAt: new Date("2024-03-20"),
-    deletedAt: null
-  },
-  {
-    id: "2",
-    title: "Atomic Habits",
-    images: [{ url: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=200", publicId: "book2" }],
-    description: "No matter your goals, Atomic Habits offers a proven framework.",
-    genre: "Self-Help",
-    releaseDate: "2024-02-01",
-    purchaseLinks: ["https://amazon.com/book2"],
-    authorId: "2",
-    author: { id: "2", name: "Jane Smith", email: "jane@example.com" },
-    state: "approved",
-    approved: true,
-    isAdvertised: false,
-    trial: null,
-    likesCount: 2345,
-    createdAt: new Date("2024-02-01"),
-    updatedAt: new Date("2024-03-18"),
-    deletedAt: null
-  },
-  {
-    id: "3",
-    title: "The Silent Patient",
-    images: [{ url: "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=200", publicId: "book3" }],
-    description: "A shocking psychological thriller.",
-    genre: "Thriller",
-    releaseDate: "2024-01-20",
-    purchaseLinks: ["https://amazon.com/book3"],
-    authorId: "4",
-    author: { id: "4", name: "Sarah Johnson", email: "sarah@example.com" },
-    state: "pending",
-    approved: false,
-    isAdvertised: false,
-    trial: "Chapter 1 preview available",
-    likesCount: 567,
-    createdAt: new Date("2024-02-20"),
-    updatedAt: new Date("2024-03-10"),
-    deletedAt: null
-  }
-];
 
 // Book Details Modal
 function BookDetailsModal({ book, onClose }: { book: Book | null; onClose: () => void }) {
@@ -187,13 +100,22 @@ function BookDetailsModal({ book, onClose }: { book: Book | null; onClose: () =>
   );
 }
 
+
 export default function BooksPage() {
+  const [isLoading, setIsLoading] = useState(true);
   const [books, setBooks] = useState<Book[]>(MOCK_BOOKS);
   const [filteredBooks, setFilteredBooks] = useState<Book[]>(MOCK_BOOKS);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     let filtered = [...books];
@@ -275,32 +197,41 @@ export default function BooksPage() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatCard
-            title="Total Books"
-            value={stats.total.toString()}
-            icon={BookOpen}
-            theme="blue"
-          />
-          <StatCard
-            title="Approved"
-            value={stats.approved.toString()}
-            icon={CheckCircle}
-            theme="green"
-          />
-          <StatCard
-            title="Pending"
-            value={stats.pending.toString()}
-            icon={Clock}
-            theme="ocean"
-          />
-          <StatCard
-            title="Not Approved"
-            value={stats.notApproved.toString()}
-            icon={XCircle}
-            theme="coral"
-          />
-        </div>
+        {isLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-fadeIn">
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-fadeIn">
+            <StatCard
+              title="Total Books"
+              value={stats.total.toString()}
+              icon={BookOpen}
+              theme="blue"
+            />
+            <StatCard
+              title="Approved"
+              value={stats.approved.toString()}
+              icon={CheckCircle}
+              theme="green"
+            />
+            <StatCard
+              title="Pending"
+              value={stats.pending.toString()}
+              icon={Clock}
+              theme="ocean"
+            />
+            <StatCard
+              title="Not Approved"
+              value={stats.notApproved.toString()}
+              icon={XCircle}
+              theme="coral"
+            />
+          </div>
+        )}
 
         {/* Search and Filter */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
@@ -331,14 +262,20 @@ export default function BooksPage() {
         </div>
 
         {/* Books Grid */}
-        {filteredBooks.length === 0 ? (
+        {isLoading ? (
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 animate-fadeIn">
+            <BookCardSkeleton />
+            <BookCardSkeleton />
+            <BookCardSkeleton />
+          </div>
+        ) : filteredBooks.length === 0 ? (
           <div className="text-center py-12 border border-dashed border-primary/20 bg-primary/[0.01]">
             <BookOpen className="w-16 h-16 text-primary/30 mx-auto mb-4" />
             <h3 className="text-lg font-serif font-bold text-primary uppercase tracking-widest">No books found</h3>
             <p className="text-xs text-muted-foreground font-serif italic mt-1">Try adjusting your search criteria</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 animate-fadeIn">
             {filteredBooks.map((book) => (
               <div key={book.id} className={`bg-card border border-primary/15 rounded-none overflow-hidden hover:border-primary/40 hover:bg-primary/[0.01] transition-all duration-300 flex flex-col group justify-between ${getCardStatusBorder(book.state)}`}>
                 <div>

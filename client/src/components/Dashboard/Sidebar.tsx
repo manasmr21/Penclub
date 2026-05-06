@@ -159,10 +159,7 @@ export function Sidebar({
                   </div>
                 )}
 
-                {/* Active indicator for collapsed mode */}
-                {collapsed && isActive && (
-                  <div className="absolute left-0 w-1 h-8 bg-gradient-to-b from-blue-500 to-purple-600 rounded-r-full"></div>
-                )}
+
 
                 {/* Hover arrow for collapsed mode */}
                 {collapsed && hoveredItem === index && (

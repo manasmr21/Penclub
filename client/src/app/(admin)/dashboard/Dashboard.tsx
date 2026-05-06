@@ -20,66 +20,17 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { BaseCard, StatCard, QuickStatCard } from "@/src/components/cards";
+import { StatCardSkeleton, ChartSkeleton, ListSkeleton } from "@/src/components/Skeleton";
+import { 
+  MOCK_TASKS, 
+  MOCK_ACTIVITIES, 
+  MOCK_CHART_DATA, 
+  MOCK_LINE_CHART_DATA, 
+  MOCK_QUICK_STATS 
+} from "@/src/utils/dummyData/dummyData";
 
 const now = Date.now();
 
-// Shimmering Skeleton Components for Dashboard loading state
-function StatCardSkeleton() {
-  return (
-    <div className="bg-[#FAF9F5] border border-primary/10 p-6 rounded-none animate-pulse relative overflow-hidden">
-      <div className="flex justify-between items-start mb-4">
-        <div className="h-4 w-24 bg-primary/10 rounded-none" />
-        <div className="h-8 w-8 bg-primary/10 rounded-none" />
-      </div>
-      <div className="h-8 w-32 bg-primary/10 rounded-none mb-3" />
-      <div className="h-3.5 w-20 bg-primary/10 rounded-none" />
-      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary/5" />
-    </div>
-  );
-}
-
-function ChartSkeleton({ title }) {
-  return (
-    <div className="bg-[#FAF9F5] border border-primary/10 p-6 rounded-none animate-pulse h-[352px] flex flex-col justify-between relative overflow-hidden">
-      <div>
-        <div className="h-5 w-32 bg-primary/10 rounded-none mb-2" />
-        <div className="h-3.5 w-48 bg-primary/10 rounded-none" />
-      </div>
-      <div className="flex items-end justify-between gap-4 h-44 pt-4">
-        {[40, 60, 30, 80, 50, 70, 45].map((h, i) => (
-          <div key={i} className="flex-1 bg-primary/[0.06] rounded-none" style={{ height: `${h}%` }} />
-        ))}
-      </div>
-      <div className="flex justify-between mt-4 border-t border-primary/5 pt-2">
-        {[...Array(6)].map((_, i) => (
-          <div key={i} className="h-3 w-8 bg-primary/10 rounded-none" />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function ListSkeleton({ title }) {
-  return (
-    <div className="bg-[#FAF9F5] border border-primary/10 p-6 rounded-none animate-pulse h-80 flex flex-col justify-between relative overflow-hidden">
-      <div>
-        <div className="h-5 w-32 bg-primary/10 rounded-none mb-2" />
-        <div className="h-3.5 w-48 bg-primary/10 rounded-none mb-6" />
-      </div>
-      <div className="space-y-4 flex-1">
-        {[...Array(4)].map((_, i) => (
-          <div key={i} className="flex items-center gap-4">
-            <div className="h-8 w-8 bg-[#FAF9F5] border border-primary/10 rounded-none" />
-            <div className="flex-1 space-y-2">
-              <div className="h-3.5 w-3/4 bg-primary/10 rounded-none" />
-              <div className="h-2.5 w-1/2 bg-primary/10 rounded-none" />
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 // Recent Activity Component
 function RecentActivity({ activities }) {
@@ -408,106 +359,11 @@ export function Dashboard() {
     return () => clearTimeout(timer);
   }, []);
 
-  const [tasks, setTasks] = useState([
-    {
-      id: 1,
-      title: "Review quarterly report",
-      completed: false,
-      priority: "high",
-      dueDate: "Today",
-    },
-    {
-      id: 2,
-      title: "Update user documentation",
-      completed: true,
-      priority: "medium",
-      dueDate: "Tomorrow",
-    },
-    {
-      id: 3,
-      title: "Fix navigation bug",
-      completed: false,
-      priority: "high",
-      dueDate: "Today",
-    },
-    {
-      id: 4,
-      title: "Prepare team meeting",
-      completed: false,
-      priority: "low",
-      dueDate: "Tomorrow",
-    },
-    {
-      id: 5,
-      title: "Deploy latest updates",
-      completed: true,
-      priority: "medium",
-      dueDate: "Yesterday",
-    },
-  ]);
-
-  const [activities] = useState([
-    {
-      type: "user",
-      title: "New user registered",
-      description: "John Doe joined the platform",
-      timestamp: new Date(now - 1000 * 60 * 15).toISOString(),
-      status: "completed",
-    },
-    {
-      type: "document",
-      title: "Document uploaded",
-      description: "Q4 Report.pdf was uploaded",
-      timestamp: new Date(now - 1000 * 60 * 45).toISOString(),
-      status: "completed",
-    },
-    {
-      type: "comment",
-      title: "New comment",
-      description: "Sarah commented on your post",
-      timestamp: new Date(now - 1000 * 60 * 120).toISOString(),
-      status: "pending",
-    },
-    {
-      type: "view",
-      title: "High traffic alert",
-      description: "Page views increased by 150%",
-      timestamp: new Date(now - 1000 * 60 * 180).toISOString(),
-    },
-    {
-      type: "user",
-      title: "Subscription renewed",
-      description: "Premium plan renewed by Acme Corp",
-      timestamp: new Date(now - 1000 * 60 * 240).toISOString(),
-      status: "completed",
-    },
-  ]);
-
-  const [chartData] = useState([
-    { label: "Mon", value: 45 },
-    { label: "Tue", value: 62 },
-    { label: "Wed", value: 78 },
-    { label: "Thu", value: 55 },
-    { label: "Fri", value: 89 },
-    { label: "Sat", value: 42 },
-    { label: "Sun", value: 38 },
-  ]);
-
-  const [lineChartData] = useState([
-    { label: "Jan", value: 34 },
-    { label: "Feb", value: 45 },
-    { label: "Mar", value: 62 },
-    { label: "Apr", value: 50 },
-    { label: "May", value: 78 },
-    { label: "Jun", value: 92 },
-  ]);
-
-  const quickStats = [
-    { icon: Star, label: "Rating", value: "4.8", change: 12 },
-    { icon: Clock, label: "Response Time", value: "2.4m", change: -8 },
-    { icon: CheckCircle, label: "Completion", value: "94%", change: 5 },
-    { icon: AlertCircle, label: "Issues", value: "3", change: -15 },
-  ];
+  const [tasks, setTasks] = useState(MOCK_TASKS);
+  const [activities] = useState(MOCK_ACTIVITIES);
+  const [chartData] = useState(MOCK_CHART_DATA);
+  const [lineChartData] = useState(MOCK_LINE_CHART_DATA);
+  const quickStats = MOCK_QUICK_STATS;
 
   const handleToggleTask = (taskId) => {
     setTasks(

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { SettingsSkeleton } from "@/src/components/Skeleton";
 import {
   User,
   Bell,
@@ -383,9 +384,18 @@ function DangerZone() {
   );
 }
 
+
 // Main Settings Page
 export default function SettingsPage() {
+  const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("profile");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const tabs = [
     { id: "profile", label: "Profile", icon: User },
@@ -431,10 +441,16 @@ export default function SettingsPage() {
 
         {/* Content Area */}
         <div className="flex-1 bg-card border border-primary/20 rounded-none p-8">
-          {activeTab === "profile" && <ProfileSettings />}
-          {activeTab === "security" && <SecuritySettings />}
-          {activeTab === "notifications" && <NotificationsSettings />}
-          {activeTab === "danger" && <DangerZone />}
+          {isLoading ? (
+            <SettingsSkeleton />
+          ) : (
+            <div className="animate-fadeIn">
+              {activeTab === "profile" && <ProfileSettings />}
+              {activeTab === "security" && <SecuritySettings />}
+              {activeTab === "notifications" && <NotificationsSettings />}
+              {activeTab === "danger" && <DangerZone />}
+            </div>
+          )}
         </div>
       </div>
     </div>

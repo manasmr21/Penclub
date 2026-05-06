@@ -89,24 +89,24 @@ function NotificationItem({ notification, onMarkAsRead, onDelete }) {
         {!notification.read && (
           <button
             onClick={() => onMarkAsRead(notification.id)}
-            className="p-1 hover:bg-gray-200 rounded transition-colors"
+            className="p-1 hover:bg-primary/5 rounded-none transition-colors"
             title="Mark as read"
           >
-            <CheckCircle className="w-4 h-4 text-gray-400" />
+            <CheckCircle className="w-4 h-4 text-primary/45" />
           </button>
         )}
         <button
           onClick={() => onDelete(notification.id)}
-          className="p-1 hover:bg-gray-200 rounded transition-colors ml-1"
+          className="p-1 hover:bg-primary/5 rounded-none transition-colors ml-1"
           title="Delete"
         >
-          <X className="w-4 h-4 text-gray-400" />
+          <X className="w-4 h-4 text-primary/45" />
         </button>
       </div>
 
       {/* Unread indicator */}
       {!notification.read && (
-        <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-8 bg-blue-500 rounded-r-full"></div>
+        <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1.5 h-8 bg-[#0F4C9C] rounded-none"></div>
       )}
     </div>
   );
@@ -144,15 +144,15 @@ export function NotificationPanel({ isOpen, onClose, notifications, onMarkAsRead
       {/* Panel */}
       <div
         ref={panelRef}
-        className="absolute right-0 mt-2 w-96 bg-white rounded-xl border border-gray-200 overflow-hidden z-50 animate-slideDown"
+        className="absolute right-0 mt-2 w-96 bg-white rounded-none border border-primary/20 overflow-hidden z-50 animate-slideDown"
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+        <div className="flex items-center justify-between p-4 border-b border-primary/10 bg-white">
           <div className="flex items-center gap-2">
-            <Bell className="w-5 h-5 text-gray-600" />
-            <h3 className="font-semibold text-gray-900">Notifications</h3>
+            <Bell className="w-5 h-5 text-primary" />
+            <h3 className="font-serif font-bold text-sm uppercase tracking-wider text-primary">Notifications</h3>
             {unreadCount > 0 && (
-              <span className="px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-700 rounded-full">
+              <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-[#0F4C9C]/10 text-[#0F4C9C] rounded-none">
                 {unreadCount} new
               </span>
             )}
@@ -161,7 +161,7 @@ export function NotificationPanel({ isOpen, onClose, notifications, onMarkAsRead
           {notifications.length > 0 && unreadCount > 0 && (
             <button
               onClick={onMarkAllAsRead}
-              className="text-xs text-blue-600 hover:text-blue-700 font-medium hover:underline"
+              className="text-xs text-secondary hover:text-[#0F4C9C] font-bold uppercase tracking-wider"
             >
               Mark all as read
             </button>
@@ -172,9 +172,9 @@ export function NotificationPanel({ isOpen, onClose, notifications, onMarkAsRead
         <div className="max-h-96 overflow-y-auto custom-scrollbar">
           {notifications.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 px-4">
-              <Bell className="w-12 h-12 text-gray-300 mb-3" />
-              <p className="text-gray-500 text-sm">No notifications yet</p>
-              <p className="text-gray-400 text-xs mt-1">We'll notify you when something arrives</p>
+              <Bell className="w-12 h-12 text-primary/20 mb-3" />
+              <p className="text-primary/60 text-sm font-serif italic">No notifications yet</p>
+              <p className="text-primary/40 text-xs mt-1">We'll notify you when something arrives</p>
             </div>
           ) : (
             notifications.map((notification) => (
@@ -190,14 +190,14 @@ export function NotificationPanel({ isOpen, onClose, notifications, onMarkAsRead
 
         {/* Footer */}
         {notifications.length > 0 && (
-          <div className="p-3 border-t border-gray-100 bg-gray-50 text-center">
+          <div className="p-3 border-t border-primary/10 bg-[#FAF9F5] text-center">
             <button
               onClick={() => {
                 // Navigate to all notifications page
                 console.log('View all notifications');
                 onClose();
               }}
-              className="text-sm text-gray-600 hover:text-gray-900 font-medium"
+              className="text-xs text-secondary hover:text-[#0F4C9C] font-bold uppercase tracking-wider"
             >
               View all notifications →
             </button>
