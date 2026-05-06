@@ -123,6 +123,16 @@ const UserDetails = ({ isOwnProfile = true, userOverride }: UserDetailsProps) =>
       animate={{ opacity: 1 }}
       className="bg-[#0A192F] px-8 py-10 mb-10 text-white relative w-full"
     >
+      {isOwnProfile && (
+        <Link 
+          href="/profile/settings" 
+          className="absolute top-6 right-6 p-2 bg-white/5 border border-white/10 text-white hover:bg-white/10 hover:border-white/20 transition-all cursor-pointer"
+          title="Atelier Settings"
+        >
+          <IoSettingsOutline size={18} />
+        </Link>
+      )}
+
       <div className="max-w-5xl mx-auto flex flex-col items-center">
         {/* Top Content Row */}
         <div className="w-full flex flex-col md:flex-row items-center md:items-start justify-start gap-10 md:gap-14 mb-10">
@@ -145,11 +155,6 @@ const UserDetails = ({ isOwnProfile = true, userOverride }: UserDetailsProps) =>
                 )}
               </div>
             </div>
-            {isOwnProfile && (
-              <Link href="/profile/settings" className="absolute -bottom-2 -right-2 w-8 h-8 bg-white text-[#0A192F] flex items-center justify-center shadow-lg cursor-pointer hover:bg-zinc-100 transition-colors">
-                <Edit3 size={14} />
-              </Link>
-            )}
           </div>
 
           {/* User Info (Right on Desktop) */}

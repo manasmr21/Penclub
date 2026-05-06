@@ -28,32 +28,32 @@ const Hero = () => {
           </div>
 
           {/* MIDDLE SECTION */}
-          <div className="middle-content w-[95%] max-w-[1920px] 2xl:m-auto flex flex-col lg:flex-row items-center justify-center lg:justify-between gap-10 flex-1 py-8">
+          <div className="middle-content w-[95%] max-w-[1920px] 2xl:m-auto flex flex-col lg:flex-row items-center justify-center lg:justify-between gap-6 lg:gap-10 flex-1 py-4 md:py-8">
             {/* LEFT SIDE (SHIFTED UP) */}
-            <div className="left-sect text-center lg:text-left lg:-translate-y-12 xl:-translate-y-20 transition-transform duration-300">
-              <div className="leading-[60px] font-quicksand text-[clamp(3rem,3.5vw,6rem)]">
-                <p className="text-primary font-semibold ">
+            <div className="left-sect flex-1 min-w-0 text-center lg:text-left lg:-translate-y-12 xl:-translate-y-20 transition-transform duration-300">
+              <div className="leading-[1.15] md:leading-[1.1] font-quicksand text-[clamp(2.2rem,4.5vw,5.5rem)]">
+                <p className="text-primary font-semibold">
                   Where{" "}
-                  <span className="font-gveret text-secondary font-semibold">
+                  <span className="font-gveret text-secondary font-semibold text-[1.15em] inline-block">
                     stories
                   </span>{" "}
                   find
                 </p>
-                <p className="text-primary font-semibold ">
+                <p className="text-primary font-semibold">
                   their{" "}
-                  <span className="font-gveret text-secondary font-semibold">
+                  <span className="font-gveret text-secondary font-semibold text-[1.15em] inline-block">
                     voice
                   </span>
                 </p>
               </div>
 
-              <button className="cursor-pointer mt-8 text-sm text-[clamp(1rem,1.2vw,2rem)] uppercase bg-[#ea6312] text-white rounded-full px-8 py-2 shadow-xl shadow-[#ecb150] hover:scale-105 transition-all duration-100 active:scale-[0.98]">
+              <button className="cursor-pointer mt-6 md:mt-8 text-sm md:text-base lg:text-lg uppercase bg-[#ea6312] text-white rounded-full px-6 py-2.5 md:px-8 md:py-3 shadow-md md:shadow-xl shadow-[#ecb150]/40 hover:scale-105 transition-all duration-100 active:scale-[0.98] hover:shadow-lg md:hover:shadow-2xl">
                 Explore
               </button>
             </div>
 
             {/* RIGHT SIDE */}
-            <div className="right-sect w-full max-w-[600px] 2xl:max-w-[900px]">
+            <div className="right-sect flex-1 min-w-0 w-full max-w-[600px] lg:max-w-[450px] xl:max-w-[600px] 2xl:max-w-[900px] lg:translate-y-6 xl:translate-y-10 transition-transform duration-300">
               <HeroCarousel />
             </div>
           </div>

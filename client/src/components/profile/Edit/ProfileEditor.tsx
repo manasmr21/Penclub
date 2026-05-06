@@ -20,11 +20,11 @@ interface FormInputProps {
 }
 
 const ProfileHeader = ({ onClose }: { onClose?: () => void }) => (
-  <header className="sticky top-0 z-10 flex items-center justify-between border-b border-[var(--border)] bg-white px-3 py-3 sm:px-4">
-    <button type="button" onClick={onClose} className="text-sm text-[var(--primary)] transition-opacity hover:opacity-80">
-      &lt; Back
+  <header className="flex items-center justify-between border-b border-primary/10 bg-transparent pb-4 mb-6">
+    <button type="button" onClick={onClose} className="text-xs uppercase tracking-widest font-bold text-primary hover:opacity-80 transition duration-150">
+      &larr; Back
     </button>
-    <h1 className="text-base sm:text-xl font-semibold text-[var(--foreground)]">Edit Profile</h1>
+    <h1 className="text-xl font-serif font-bold text-primary tracking-tight">Edit Profile</h1>
     <div className="w-10" />
   </header>
 );
@@ -71,9 +71,9 @@ const ProfilePictureUpdate = ({
   };
 
   return (
-    <div className="flex flex-col items-center gap-2">
-      <div className="relative h-20 w-20">
-        <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border border-[var(--border)] bg-[var(--card)] text-2xl font-bold text-[var(--primary)] shadow-sm">
+    <div className="flex flex-col items-center gap-3 border-b border-primary/10 pb-6 mb-6">
+      <div className="relative h-24 w-24">
+        <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-none border border-primary/20 bg-card text-3xl font-serif font-bold text-primary shadow-sm">
           {imageSource ? (
             <img src={imageSource} className="h-full w-full object-cover" alt="Profile Preview" />
           ) : (
@@ -86,13 +86,18 @@ const ProfilePictureUpdate = ({
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="absolute bottom-0 right-0 flex h-6 w-6 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--background)] text-[10px] text-[var(--primary)] shadow-sm transition hover:opacity-80"
+          className="absolute bottom-1 right-1 flex h-7 w-7 items-center justify-center rounded-none border border-primary/20 bg-background text-[11px] font-bold text-primary shadow-sm transition hover:bg-primary hover:text-white duration-150"
+          title="Edit Photo"
         >
-          E
+          ✏️
         </button>
       </div>
 
-      <button type="button" onClick={() => fileInputRef.current?.click()} className="text-xs text-[var(--secondary)] hover:underline p-2">
+      <button 
+        type="button" 
+        onClick={() => fileInputRef.current?.click()} 
+        className="text-[10px] uppercase tracking-widest font-bold text-secondary hover:text-primary transition duration-150"
+      >
         Change Photo
       </button>
     </div>
@@ -101,17 +106,17 @@ const ProfilePictureUpdate = ({
 
 const FormInput = ({ id, label, value, onChange, type = 'text', prefix }: FormInputProps) => (
   <div className="space-y-1">
-    <label htmlFor={id} className="ml-1 block text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted-foreground)]">
+    <label htmlFor={id} className="block text-[10px] font-bold uppercase tracking-[0.2em] text-primary/50">
       {label}
     </label>
-    <div className="relative">
-      {prefix && <span className="absolute left-3.5 top-3 text-xs text-[var(--muted-foreground)]">{prefix}</span>}
+    <div className="relative flex items-center">
+      {prefix && <span className="absolute left-0 text-sm font-mono text-primary/70">{prefix}</span>}
       <input
         id={id}
         type={type}
         value={value}
         onChange={onChange}
-        className={`h-10 w-full rounded-xl border border-[var(--border)] bg-gray-100 px-3.5 text-sm text-[var(--foreground)] outline-none transition focus:ring-2 focus:ring-[var(--primary)] ${prefix ? 'pl-7' : ''}`}
+        className={`w-full border-b border-primary/20 bg-transparent py-2.5 text-sm font-serif text-primary outline-none transition duration-150 focus:border-primary ${prefix ? 'pl-5' : ''}`}
       />
     </div>
   </div>
@@ -135,6 +140,7 @@ export default function ProfileEditor({ inModal = false, onClose }: ProfileEdito
   const [loading, setLoading] = useState(false);
   const [verifyLoading, setVerifyLoading] = useState(false);
   const [initialSyncLoading, setInitialSyncLoading] = useState(false);
+
   const handleClose = () => {
     if (onClose) {
       onClose();
@@ -151,7 +157,6 @@ export default function ProfileEditor({ inModal = false, onClose }: ProfileEdito
     const syncLatestProfile = async () => {
       try {
         setInitialSyncLoading(true);
-        // Reuses authenticated endpoint to read latest persisted profile fields.
         const response = await updateUserProfile(user.id, new FormData()) as ProfileResponse;
         if (isMounted && response?.user) {
           updateUser(response.user);
@@ -264,14 +269,14 @@ export default function ProfileEditor({ inModal = false, onClose }: ProfileEdito
 
   return (
     <div
-      className={`w-full rounded-2xl border border-[var(--border)] bg-white text-[var(--foreground)] shadow-sm ${inModal
-          ? "mx-auto mt-4 sm:mt-10 max-w-2xl max-h-[92vh] overflow-y-auto"
+      className={`w-full bg-transparent text-primary ${inModal
+          ? "mx-auto mt-4 sm:mt-10 max-w-2xl max-h-[92vh] overflow-y-auto border border-primary/20 bg-card p-6"
           : "mx-auto max-w-none"
         }`}
     >
-      <ProfileHeader onClose={handleClose} />
+      {inModal && <ProfileHeader onClose={handleClose} />}
 
-      <div className="space-y-3 p-3 sm:p-4">
+      <div className="space-y-6">
         <ProfilePictureUpdate
           currentPicture={user?.profilePicture}
           name={user?.name}
@@ -280,84 +285,88 @@ export default function ProfileEditor({ inModal = false, onClose }: ProfileEdito
         />
 
         {user?.isEmailVerified === false && (
-          <div className="flex justify-center pt-1">
+          <div className="flex justify-center border-b border-primary/10 pb-6 mb-6">
             <button
               type="button"
               onClick={handleVerifyNow}
               disabled={verifyLoading}
-              className="h-10 rounded-full border border-[var(--primary)] px-5 text-sm font-semibold text-[var(--primary)] transition hover:opacity-85 disabled:opacity-60"
+              className="h-10 rounded-none border border-primary px-5 text-xs font-bold uppercase tracking-widest text-primary hover:bg-primary/5 transition duration-150 disabled:opacity-60"
             >
-              {verifyLoading ? "Sending OTP..." : "Verify Now"}
+              {verifyLoading ? "Sending OTP..." : "Verify Identity"}
             </button>
           </div>
         )}
 
-        <form className="space-y-2" onSubmit={handleSave}>
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+        <form className="space-y-6" onSubmit={handleSave}>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             <FormInput id="fullName" label="Full Name" value={name} onChange={(e) => setName(e.target.value)} />
             <FormInput id="username" label="Username" value={username} onChange={(e) => setUsername(e.target.value)} prefix="@" />
           </div>
 
-          <div className="space-y-1">
-            <label className="ml-1 block text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted-foreground)]">
-              Bio
+          <div className="space-y-2">
+            <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-primary/50">
+              Biography
             </label>
             <textarea
               value={bio}
               onChange={(e) => setBio(e.target.value)}
-              /* Changed bg-[var(--background)] to bg-gray-100 */
-              className="min-h-25 w-full resize-none rounded-xl border border-[var(--border)] bg-gray-100 p-3 text-sm outline-none transition focus:ring-2 focus:ring-[var(--primary)]"
+              className="min-h-[120px] w-full resize-none border border-primary/20 bg-transparent p-3 text-sm font-serif text-primary outline-none transition duration-150 focus:border-primary rounded-none"
               rows={4}
+              placeholder="Tell your story..."
             />
-            <p className="text-right text-[10px] text-[var(--muted-foreground)]">{bio.length} / 300</p>
+            <p className="text-right text-[10px] font-semibold text-primary/40 tracking-wider uppercase">{bio.length} / 300 Characters</p>
           </div>
 
-          {selected.length > 0 && (
-            /* Changed bg-[var(--background)] to bg-gray-100 */
-            <div className="flex flex-wrap gap-1 rounded-xl border border-[var(--border)] bg-gray-100 p-2">
-              {selected.map((item) => (
-                <span
+          <div className="space-y-3">
+            <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-primary/50">
+              Atelier Interests & Topics
+            </label>
+            
+            {selected.length > 0 && (
+              <div className="flex flex-wrap gap-2 border border-primary/10 bg-primary/5 p-3 rounded-none">
+                {selected.map((item) => (
+                  <span
+                    key={item}
+                    className="cursor-pointer border border-primary bg-card px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-primary transition hover:bg-red-50 hover:text-red-600 hover:border-red-200"
+                    onClick={() => toggleInterest(item)}
+                    title="Remove Tag"
+                  >
+                    {item} &times;
+                  </span>
+                ))}
+              </div>
+            )}
+
+            <div className="flex flex-wrap gap-2 pt-1">
+              {allInterests.map((item) => (
+                <button
+                  type="button"
                   key={item}
-                  /* Changed bg-[var(--card)] to bg-white for contrast */
-                  className="cursor-pointer rounded-full border border-[var(--border)] bg-white px-3 py-1 text-xs transition hover:opacity-80"
                   onClick={() => toggleInterest(item)}
+                  className={`border px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition rounded-none ${selected.includes(item)
+                      ? "border-primary bg-primary text-white"
+                      : "border-primary/20 bg-transparent text-primary/60 hover:bg-primary/5 hover:text-primary hover:border-primary/40"
+                    }`}
                 >
-                  {item} x
-                </span>
+                  {item}
+                </button>
               ))}
             </div>
-          )}
-
-          <div className="flex flex-wrap gap-2">
-            {allInterests.map((item) => (
-              <button
-                type="button"
-                key={item}
-                onClick={() => toggleInterest(item)}
-                className={`rounded-full border px-3 py-1 text-xs transition ${selected.includes(item)
-                    ? "border-[var(--primary)] bg-[var(--primary)] text-[var(--primary-foreground)]"
-                    : "border-[var(--border)] bg-gray-100 hover:bg-gray-200" /* Changed to gray-100 */
-                  }`}
-              >
-                {item}
-              </button>
-            ))}
           </div>
 
-          <div className="flex flex-col-reverse sm:flex-row gap-2.5 pt-1">
+          <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4 border-t border-primary/10">
             <button
               type="button"
               onClick={handleClose}
               disabled={loading}
-              /* Changed bg-[var(--card)] to bg-gray-100 */
-              className="h-11 w-full sm:flex-1 rounded-full border border-[var(--border)] bg-gray-100 text-sm font-medium transition hover:bg-gray-200 disabled:opacity-50"
+              className="h-12 w-full sm:flex-1 border border-primary/20 bg-transparent text-xs font-bold uppercase tracking-widest text-primary transition hover:bg-primary/5 rounded-none"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading || initialSyncLoading}
-              className="h-11 w-full sm:flex-1 rounded-full bg-[linear-gradient(90deg,var(--primary),var(--secondary))] text-sm font-semibold text-[var(--primary-foreground)] shadow-[0_12px_30px_rgba(10,56,125,0.2)] transition disabled:cursor-not-allowed disabled:opacity-50"
+              className="h-12 w-full sm:flex-1 bg-primary border border-primary text-xs font-bold uppercase tracking-widest text-white transition hover:bg-transparent hover:text-primary rounded-none shadow-md"
             >
               {loading ? "Saving..." : initialSyncLoading ? "Loading..." : "Save Changes"}
             </button>
@@ -366,5 +375,4 @@ export default function ProfileEditor({ inModal = false, onClose }: ProfileEdito
       </div>
     </div>
   );
-
 }
