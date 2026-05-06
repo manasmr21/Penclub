@@ -28,9 +28,8 @@ import { Blog, MOCK_ARTICLES } from "@/src/utils/dummyData/dummyData";
 function ArticleDetailsModal({ article, onClose }: { article: Blog | null; onClose: () => void }) {
   if (!article) return null;
 
-<<<<<<< HEAD
   const getStatusColor = (status: string) => {
-    switch(status) {
+    switch (status) {
       case "posted": return "border-green-600 text-green-700";
       case "pending": return "border-yellow-500 text-yellow-700";
       case "draft": return "border-primary/20 text-primary/50";
@@ -41,7 +40,7 @@ function ArticleDetailsModal({ article, onClose }: { article: Blog | null; onClo
   };
 
   const getStatusIcon = (status: string) => {
-    switch(status) {
+    switch (status) {
       case "posted": return <CheckCircle className="w-3 h-3" />;
       case "pending": return <Clock className="w-3 h-3" />;
       case "draft": return <FileText className="w-3 h-3" />;
@@ -65,138 +64,73 @@ function ArticleDetailsModal({ article, onClose }: { article: Blog | null; onClo
             className="h-9 w-9 flex items-center justify-center border border-primary/20 text-primary/40 hover:text-primary hover:border-primary transition-all cursor-pointer"
           >
             <X className="w-4 h-4" />
-=======
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-      <div className="bg-card rounded-none max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-primary/30 font-inter">
-        <div className="sticky top-0 bg-white border-b border-primary/20 p-6 flex items-center justify-between z-10">
-          <h2 className="text-lg font-serif font-bold text-primary uppercase tracking-widest">Article Details</h2>
-          <button 
-            onClick={onClose} 
-            className="cursor-pointer p-2 hover:bg-primary/5 border border-transparent hover:border-primary/10 rounded-none transition-all"
-          >
-            <X className="w-5 h-5 text-primary" />
->>>>>>> c925529b424592087f1d1eb7f565490ef3cd21cb
-          </button>
-        </div>
+                  </button>
+                </div>
 
-        <div className="p-8 space-y-6">
-          {/* Cover Image */}
-          {article.coverImage && (
-<<<<<<< HEAD
-            <div className="border border-primary/10 overflow-hidden">
-              <img
-                src={article.coverImage}
-                alt={article.title}
-                className="w-full h-56 object-cover"
-              />
-            </div>
-          )}
+                <div className="p-8 space-y-6">
+                  {/* Cover Image */}
+                  {article.coverImage && (
+                    <div className="border border-primary/10 overflow-hidden">
+                      <img
+                        src={article.coverImage}
+                        alt={article.title}
+                        className="w-full h-56 object-cover"
+                      />
+                    </div>
+                  )}
 
-          {/* Title and Status */}
-          <div className="space-y-3">
-            <div className="flex items-start gap-3 flex-wrap">
-              <h3 className="text-2xl font-serif font-bold text-[#0A192F] flex-1">{article.title}</h3>
-              <span className={`inline-flex items-center gap-1.5 px-3 py-1 text-[10px] font-sans font-bold uppercase tracking-widest border ${getStatusColor(article.status)} shrink-0`}>
-                {getStatusIcon(article.status)}
-                {article.status}
-              </span>
-            </div>
+                  {/* Title and Status */}
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3 flex-wrap">
+                      <h3 className="text-2xl font-serif font-bold text-[#0A192F] flex-1">{article.title}</h3>
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 text-[10px] font-sans font-bold uppercase tracking-widest border ${getStatusColor(article.status)} shrink-0`}>
+                        {getStatusIcon(article.status)}
+                        {article.status}
+                      </span>
+                    </div>
 
-            <div className="flex flex-wrap items-center gap-5 text-[10px] font-sans font-bold uppercase tracking-widest text-primary/40">
-              <div className="flex items-center gap-1.5">
-                <User className="w-3.5 h-3.5" />
-                <span>{article.user?.name || "Unknown"}</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5" />
-                <span>{new Date(article.createdAt).toLocaleDateString()}</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <Heart className="w-3.5 h-3.5" />
-                <span>{article.likesCount} likes</span>
-=======
-            <img
-              src={article.coverImage}
-              alt={article.title}
-              className="w-full h-64 object-cover rounded-none border border-primary/25 shadow-sm"
-            />
-          )}
+                    <div className="flex flex-wrap items-center gap-5 text-[10px] font-sans font-bold uppercase tracking-widest text-primary/40">
+                      <div className="flex items-center gap-1.5">
+                        <User className="w-3.5 h-3.5" />
+                        <span>{article.user?.name || "Unknown"}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <Calendar className="w-3.5 h-3.5" />
+                        <span>{new Date(article.createdAt).toLocaleDateString()}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <Heart className="w-3.5 h-3.5" />
+                        <span>{article.likesCount} likes</span>
+                            </div>
+                          </div>
+                        </div>
 
-          {/* Title and Status */}
-          <div className="border-b border-primary/10 pb-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-              <h3 className="text-2xl font-serif font-bold text-primary tracking-tight leading-tight">{article.title}</h3>
-              <span className={`px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest border self-start ${
-                article.status === "posted" ? "border-green-600/30 text-green-600 bg-green-500/5" :
-                article.status === "pending" ? "border-orange-600/30 text-orange-600 bg-orange-500/5" :
-                article.status === "edited" ? "border-secondary/30 text-secondary bg-secondary/5" :
-                "border-primary/30 text-primary bg-primary/5"
-              }`}>
-                {article.status}
-              </span>
-            </div>
-            
-            <div className="flex flex-wrap items-center gap-6 text-xs text-primary/60">
-              <div className="flex items-center gap-1.5 font-serif italic">
-                <User className="w-4 h-4 text-primary/40" />
-                <span>{article.user?.name || "Unknown"}</span>
-              </div>
-              <div className="flex items-center gap-1.5 font-serif italic">
-                <Calendar className="w-4 h-4 text-primary/40" />
-                <span>{new Date(article.createdAt).toLocaleDateString()}</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <Heart className="w-4 h-4 text-red-500 fill-red-500/10" />
-                <span className="text-[10px] font-bold uppercase tracking-wider text-primary/50">{article.likesCount} likes</span>
->>>>>>> c925529b424592087f1d1eb7f565490ef3cd21cb
-              </div>
-            </div>
-          </div>
-
-          {/* Tags */}
-          {article.tags.length > 0 && (
-            <div className="space-y-2">
-<<<<<<< HEAD
+                        {/* Tags */}
+                        {article.tags.length > 0 && (
+                          <div className="space-y-2">
               <p className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40 flex items-center gap-2">
                 <Tag className="w-3 h-3" /> Tags
               </p>
               <div className="flex flex-wrap gap-2">
                 {article.tags.map((tag, idx) => (
                   <span key={idx} className="px-3 py-1 border border-primary/10 text-[10px] font-sans font-bold uppercase tracking-widest text-primary/60">
-=======
-              <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary/50 flex items-center gap-2">
-                <Tag className="w-4 h-4" />
-                Tags
-              </h4>
-              <div className="flex flex-wrap gap-2">
-                {article.tags.map((tag, idx) => (
-                  <span key={idx} className="px-3 py-1 text-xs border border-primary/20 bg-primary/5 text-primary rounded-none font-medium">
->>>>>>> c925529b424592087f1d1eb7f565490ef3cd21cb
-                    #{tag}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
+                                    #{tag}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
 
-          {/* Content */}
-<<<<<<< HEAD
-          <div className="space-y-2">
-            <p className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40">Content</p>
-            <div className="border border-primary/10 bg-zinc-50 p-5">
-              <p className="text-sm font-sans text-primary/80 leading-relaxed">{article.content}</p>
-=======
-          <div className="space-y-3">
-            <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary/50">Content</h4>
-            <div className="bg-primary/[0.01] rounded-none p-5 border border-primary/15 leading-relaxed text-sm font-serif italic text-primary/80">
-              <p className="whitespace-pre-line leading-relaxed">"{article.content}"</p>
->>>>>>> c925529b424592087f1d1eb7f565490ef3cd21cb
-            </div>
-          </div>
+      {/* Content */}
+  <div className="space-y-2">
+    <p className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40">Content</p>
+    <div className="border border-primary/10 bg-zinc-50 p-5">
+      <p className="text-sm font-sans text-primary/80 leading-relaxed">{article.content}</p>
         </div>
       </div>
     </div>
+  </div>
+    </div >
   );
 }
 
@@ -219,7 +153,7 @@ export default function ArticlesPage() {
 
   useEffect(() => {
     let filtered = [...articles];
-    
+
     if (searchTerm) {
       filtered = filtered.filter(article =>
         article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -228,11 +162,11 @@ export default function ArticlesPage() {
         article.user?.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-    
+
     if (statusFilter !== "all") {
       filtered = filtered.filter(article => article.status === statusFilter);
     }
-    
+
     setFilteredArticles(filtered);
   }, [searchTerm, statusFilter, articles]);
 
@@ -257,7 +191,7 @@ export default function ArticlesPage() {
   };
 
   const getCardStatusBorder = (status: string) => {
-    switch(status) {
+    switch (status) {
       case "posted": return "border-l-4 border-l-green-500/70";
       case "pending": return "border-l-4 border-l-orange-500/70";
       case "draft": return "border-l-4 border-l-gold-500/70";
@@ -277,7 +211,7 @@ export default function ArticlesPage() {
             <h1 className="text-3xl font-serif font-bold text-primary mt-1 tracking-tight">Articles</h1>
             <p className="text-xs text-muted-foreground mt-1.5 font-serif italic">Manage blog articles and literary posts</p>
           </div>
-          
+
           <div className="flex items-center gap-4">
             <button className="cursor-pointer flex items-center gap-2 px-5 py-2.5 text-xs font-bold uppercase tracking-widest text-primary bg-white border border-primary/20 rounded-none hover:bg-primary/5 transition-all">
               <Download className="w-4 h-4" />
@@ -389,11 +323,10 @@ export default function ArticlesPage() {
                       className="w-full h-full object-cover rounded-none group-hover:scale-105 transition-transform"
                     />
                     <div className="absolute top-3 right-3">
-                      <span className={`px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider border ${
-                        article.status === "posted" ? "border-green-600/30 text-green-600 bg-white" :
-                        article.status === "pending" ? "border-orange-600/30 text-orange-600 bg-white" :
-                        "border-primary/20 text-primary bg-white"
-                      }`}>
+                      <span className={`px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider border ${article.status === "posted" ? "border-green-600/30 text-green-600 bg-white" :
+                          article.status === "pending" ? "border-orange-600/30 text-orange-600 bg-white" :
+                            "border-primary/20 text-primary bg-white"
+                        }`}>
                         {article.status}
                       </span>
                     </div>
@@ -404,11 +337,10 @@ export default function ArticlesPage() {
                   <div className="relative h-32 bg-primary/5 border-b border-primary/10 flex items-center justify-center">
                     <FileText className="w-12 h-12 text-primary/30 animate-pulse" />
                     <div className="absolute top-3 right-3">
-                      <span className={`px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider border ${
-                        article.status === "posted" ? "border-green-600/30 text-green-600 bg-white" :
-                        article.status === "pending" ? "border-orange-600/30 text-orange-600 bg-white" :
-                        "border-primary/20 text-primary bg-white"
-                      }`}>
+                      <span className={`px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider border ${article.status === "posted" ? "border-green-600/30 text-green-600 bg-white" :
+                          article.status === "pending" ? "border-orange-600/30 text-orange-600 bg-white" :
+                            "border-primary/20 text-primary bg-white"
+                        }`}>
                         {article.status}
                       </span>
                     </div>
@@ -420,7 +352,7 @@ export default function ArticlesPage() {
                   <div>
                     <h3 className="text-lg font-serif font-bold text-primary group-hover:text-secondary transition-colors line-clamp-2 leading-tight">{article.title}</h3>
                     <p className="text-xs text-muted-foreground line-clamp-2 mt-2 font-serif italic leading-relaxed">"{article.content}"</p>
-                    
+
                     {/* Tags */}
                     {article.tags.length > 0 && (
                       <div className="flex flex-wrap gap-1.5 mt-4">
@@ -466,7 +398,7 @@ export default function ArticlesPage() {
                       <span>View</span>
                     </button>
                     <button
-                      onClick={() => {}}
+                      onClick={() => { }}
                       className="cursor-pointer flex items-center justify-center gap-1.5 py-2.5 text-[9px] font-bold uppercase tracking-widest hover:bg-primary hover:text-white text-primary border border-primary/20 rounded-none transition-all"
                     >
                       <Edit className="w-3.5 h-3.5" />

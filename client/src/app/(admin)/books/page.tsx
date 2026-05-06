@@ -27,7 +27,6 @@ function BookDetailsModal({ book, onClose }: { book: Book | null; onClose: () =>
   if (!book) return null;
 
   return (
-<<<<<<< HEAD
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-[#0A192F]/60 backdrop-blur-sm">
       <div className="bg-white w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-2xl border border-primary/10">
         {/* Header */}
@@ -58,73 +57,6 @@ function BookDetailsModal({ book, onClose }: { book: Book | null; onClose: () =>
             <div className="border border-primary/10 bg-zinc-50 p-4">
               <p className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40 mb-1">Release Date</p>
               <p className="font-sans font-bold text-[#0A192F]">{new Date(book.releaseDate).toLocaleDateString()}</p>
-=======
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-      <div className="bg-card rounded-none max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-primary/30 font-inter">
-        <div className="sticky top-0 bg-white border-b border-primary/20 p-6 flex items-center justify-between z-10">
-          <h2 className="text-lg font-serif font-bold text-primary uppercase tracking-widest">Book Details</h2>
-          <button 
-            onClick={onClose} 
-            className="cursor-pointer p-2 hover:bg-primary/5 border border-transparent hover:border-primary/10 rounded-none transition-all"
-          >
-            <X className="w-5 h-5 text-primary" />
-          </button>
-        </div>
-
-        <div className="p-6 space-y-6">
-          {/* Header */}
-          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 border-b border-primary/10 pb-6">
-            {book.images[0] && (
-              <img
-                src={book.images[0].url}
-                alt={book.title}
-                className="w-28 h-36 rounded-none object-cover border border-primary/20 shadow-sm"
-              />
-            )}
-            <div className="text-center sm:text-left">
-              <h3 className="text-2xl font-serif font-bold text-primary tracking-tight">{book.title}</h3>
-              <p className="text-sm text-muted-foreground mt-1 font-serif italic">by {book.author?.name || "Unknown"}</p>
-              
-              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 mt-4">
-                <span className={`px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest border ${
-                  book.state === "approved" ? "border-green-600/30 text-green-600 bg-green-500/5" :
-                  book.state === "pending" ? "border-orange-600/30 text-orange-600 bg-orange-500/5" :
-                  "border-red-600/30 text-red-600 bg-red-600/5"
-                }`}>
-                  {book.state}
-                </span>
-                {book.isAdvertised && (
-                  <span className="px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest border border-secondary/30 text-secondary bg-secondary/5">
-                    Advertised
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Description */}
-          <div className="space-y-2">
-            <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary/50">Synopsis</h4>
-            <p className="text-sm font-serif italic text-primary/80 leading-relaxed border-l-2 border-primary/20 pl-3">
-              "{book.description}"
-            </p>
-          </div>
-
-          {/* Details Metadata */}
-          <div className="space-y-3">
-            <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary/50">Book Ledger</h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="bg-primary/[0.01] rounded-none p-4 border border-primary/15">
-                <p className="text-[9px] font-bold uppercase tracking-wider text-primary/40 mb-1">Genre</p>
-                <p className="text-sm font-serif font-bold text-primary">{book.genre}</p>
-              </div>
-              <div className="bg-primary/[0.01] rounded-none p-4 border border-primary/15">
-                <p className="text-[9px] font-bold uppercase tracking-wider text-primary/40 mb-1">Release Date</p>
-                <p className="text-sm font-serif font-bold text-primary">
-                  {new Date(book.releaseDate).toLocaleDateString()}
-                </p>
-              </div>
->>>>>>> c925529b424592087f1d1eb7f565490ef3cd21cb
             </div>
           </div>
         </div>

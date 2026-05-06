@@ -28,7 +28,7 @@ export default function UsersPage() {
   // Filter users
   useEffect(() => {
     let filtered = [...users];
-    
+
     if (activeTab === "authors") {
       filtered = filtered.filter(user => user.role === "author");
     } else if (activeTab === "readers") {
@@ -36,7 +36,7 @@ export default function UsersPage() {
     } else if (activeTab === "admins") {
       filtered = filtered.filter(user => user.role === "admin");
     }
-    
+
     if (searchTerm) {
       filtered = filtered.filter(user =>
         user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -44,7 +44,7 @@ export default function UsersPage() {
         user.username.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-    
+
     setFilteredUsers(filtered);
   }, [activeTab, searchTerm, users]);
 
@@ -55,7 +55,7 @@ export default function UsersPage() {
   };
 
   const handleToggleStatus = (id: string) => {
-    setUsers(users.map(user => 
+    setUsers(users.map(user =>
       user.id === id ? { ...user, isLoggedIn: !user.isLoggedIn } : user
     ));
   };
@@ -130,11 +130,10 @@ export default function UsersPage() {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`cursor-pointer px-4 py-2 text-[10px] font-bold uppercase tracking-widest border transition-all ${
-                  activeTab === tab 
-                    ? "bg-primary text-white border-primary" 
-                    : "border-primary/15 text-primary/60 hover:bg-primary/5 hover:text-primary"
-                }`}
+                className={`cursor-pointer px-4 py-2 text-[10px] font-bold uppercase tracking-widest border transition-all ${activeTab === tab
+                  ? "bg-primary text-white border-primary"
+                  : "border-primary/15 text-primary/60 hover:bg-primary/5 hover:text-primary"
+                  }`}
               >
                 {tab === "all" ? "All Users" : tab}
               </button>
@@ -184,15 +183,14 @@ export default function UsersPage() {
                       <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 border border-white"></div>
                     )}
                   </div>
-                  
+
                   <div className="min-w-0">
                     <div className="flex items-center flex-wrap gap-2">
                       <h3 className="font-bold text-primary group-hover:text-secondary transition-colors text-sm truncate">{user.name}</h3>
-                      <span className={`px-2 py-0.5 text-[8px] font-bold uppercase tracking-widest border ${
-                        user.role === "author" ? "border-secondary/30 text-secondary bg-secondary/5" :
+                      <span className={`px-2 py-0.5 text-[8px] font-bold uppercase tracking-widest border ${user.role === "author" ? "border-secondary/30 text-secondary bg-secondary/5" :
                         user.role === "admin" ? "border-red-600/30 text-red-600 bg-red-500/5" :
-                        "border-primary/30 text-primary bg-primary/5"
-                      }`}>
+                          "border-primary/30 text-primary bg-primary/5"
+                        }`}>
                         {user.role}
                       </span>
                     </div>
@@ -215,7 +213,7 @@ export default function UsersPage() {
                   >
                     <Eye className="w-4 h-4" />
                   </button>
-                  
+
                   <button
                     onClick={() => handleToggleStatus(user.id)}
                     className="cursor-pointer p-2 hover:bg-primary hover:text-white text-primary border border-primary/20 rounded-none transition-all"
