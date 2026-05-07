@@ -21,7 +21,7 @@
 
 .menu-items ul li {
   border: 2px solid transparent;
-  padding: 6px 16px;
+  padding: 0;
   border-radius: 8px;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   background: transparent;
@@ -30,6 +30,7 @@
 
 .menu-items ul li a {
   display: block;
+  padding: 6px 16px;
   transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   color: #1D4E89;
 }

@@ -240,7 +240,7 @@ const Navbar = () => {
                     <Link
                       href={link.href}
                       onClick={closeMenu}
-                      className="text-4xl md:text-5xl font-serif font-black text-white hover:text-white/60 transition-colors inline-block"
+                      className="text-4xl md:text-5xl font-serif font-black text-white hover:text-white/60 transition-colors block"
                     >
                       {link.label}
                     </Link>
