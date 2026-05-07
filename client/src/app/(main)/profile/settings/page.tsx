@@ -96,7 +96,7 @@ export default function ProfileSettingsPage() {
     <div className="relative min-h-screen bg-[#FDF9F0]/60">
       <div className="max-w-5xl mx-auto px-4 pt-20 pb-20">
         <div className="mb-10 sm:mb-12 flex flex-col gap-2">
-          <p className="text-[10px] font-sans font-black uppercase tracking-[0.2em] text-[#E6693E]">Atelier preferences</p>
+
           <h1 className="text-4xl md:text-5xl font-serif font-bold tracking-tight leading-tight text-[#1D4E89]">
             Profile Settings
           </h1>

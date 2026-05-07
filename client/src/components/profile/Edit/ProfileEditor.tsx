@@ -289,9 +289,7 @@ export default function ProfileEditor({ inModal = false, onClose }: ProfileEdito
             />
 
             <div className="space-y-3">
-              <label className="text-[10px] font-sans font-black uppercase tracking-[0.2em] text-[#1D4E89]/60">
-                Atelier Focus & Topics
-              </label>
+
               <div className="flex flex-wrap gap-2">
                 {allInterests.map((item) => (
                   <motion.button

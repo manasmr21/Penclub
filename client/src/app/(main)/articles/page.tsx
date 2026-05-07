@@ -92,7 +92,7 @@ export default function ArticlesPage() {
 
   const allTags = useMemo(() => {
     if (loading) {
-      return ["All", "Design", "Writing", "Atelier", "Literature", "Guides", "Essays"];
+      return ["All", "Design", "Writing", "Literature", "Guides", "Essays"];
     }
     const tagsSet = new Set(articles.flatMap(a => a.tags || []));
     return ["All", ...Array.from(tagsSet)];
@@ -121,7 +121,7 @@ export default function ArticlesPage() {
     <div className="min-h-screen bg-[#FDF9F0] text-[#1A1A1A]">
 
       {/* BEGIN: HeroSection */}
-      <section className="relative overflow-hidden bg-[#FDF9F0] pt-10 md:pt-20 pb-16 md:pb-28 px-4 md:px-8">
+      <section className="relative overflow-hidden bg-[#FDF9F0] pt-6 md:pt-12 pb-16 md:pb-28 px-4 md:px-8">
 
         {/* Abstract shape exactly matching bookshelf */}
         <div className="absolute bottom-[-20%] md:bottom-[-10%] left-[-10%] w-[120%] h-[60%] bg-[#1D4E89] rounded-t-[50%] z-0 -rotate-2 pointer-events-none" />
@@ -184,8 +184,6 @@ export default function ArticlesPage() {
             />
           </motion.div>
 
-
-
           <motion.h1
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
@@ -194,14 +192,7 @@ export default function ArticlesPage() {
           >
             Read narratives <br /> that shape <span className="font-serif italic text-[#1D4E89] font-normal">the culture</span>
           </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: "easeOut", delay: 0.32 }}
-            className="mt-6 text-lg text-black md:text-white font-bold font-sans"
-          >
-            Articles, editorials, and commentary from the Digital Atelier.
-          </motion.p>
+
           <motion.button
             initial={{ opacity: 0, y: 18, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}

@@ -116,7 +116,7 @@ const ArticleDetails = () => {
               </div>
               <div>
                 <span className="block text-[9px] font-black uppercase tracking-[0.2em] text-[#1D4E89]/40">Dispatched By</span>
-                <span className="text-sm font-bold text-[#1D4E89]">Atelier Resident</span>
+                <span className="text-sm font-bold text-[#1D4E89]">Official Member</span>
               </div>
             </div>
           </header>
@@ -158,7 +158,7 @@ const ArticleDetails = () => {
             <div className="bg-[#1D4E89] rounded-[2rem] p-10 text-center relative overflow-hidden group">
               <div className="absolute inset-0 bg-[#E6693E] opacity-0 group-hover:opacity-5 transition-opacity duration-500" />
               <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 block mb-2">End of Transmission</span>
-              <h3 className="text-2xl font-serif font-black text-white mb-6">Explore more narratives from the Atelier</h3>
+              <h3 className="text-2xl font-serif font-black text-white mb-6">Explore more narratives</h3>
               <button
                 onClick={() => router.push('/articles')}
                 className="inline-block px-10 py-4 bg-white text-[#1D4E89] font-black text-[10px] uppercase tracking-widest rounded-full hover:scale-105 transition-transform"

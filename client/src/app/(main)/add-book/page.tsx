@@ -94,7 +94,7 @@ export default function AddBookPage() {
         </motion.button>
 
         <div className="mb-8 text-center">
-          <span className="text-[10px] font-sans font-black uppercase tracking-[0.2em] text-[#E6693E]">Atelier library</span>
+
           <h1 className="text-3xl font-serif font-bold text-[#1D4E89] tracking-tight mt-1">Add New Book</h1>
         </div>
 

@@ -37,7 +37,7 @@ const upcomingEvents = [
     month: "JAN",
     year: "2027",
     time: "14:00 - 17:00",
-    location: "Pen Club Atelier, Puri",
+    location: "The Studio, Puri",
     type: "Workshop",
     description: "A hands-on intensive focusing on narrative structure and pacing, held by the serene coastline of Puri.",
     image: "https://images.unsplash.com/photo-1455390582262-044cdead277a?q=80&w=1973&auto=format&fit=crop"

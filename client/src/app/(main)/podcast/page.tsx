@@ -67,9 +67,7 @@ export default function PodcastPage() {
         <div className="absolute left-[-2vw] bottom-[25vh] text-[11vw] font-serif italic font-normal text-[#E6693E]/[0.025] tracking-wide rotate-6 uppercase">
           Frequency
         </div>
-        <div className="absolute right-[5vw] top-[75vh] text-[10vw] font-serif font-bold text-[#1D4E89]/[0.02] tracking-widest -rotate-6 uppercase">
-          Atelier
-        </div>
+
       </div>
 
       {/* Broadsheet Broadcast Header */}
