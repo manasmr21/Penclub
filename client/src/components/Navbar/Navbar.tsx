@@ -135,10 +135,7 @@ const Navbar = () => {
     <>
       <nav
         className={`navbar fixed w-full top-0 z-[999] transition-all duration-500 
-          ${isHomePage && !scrolled
-            ? "bg-transparent border-transparent shadow-none"
-            : "bg-white/60 dark:bg-black/60 backdrop-blur-lg border-b border-primary/50"
-          }`}
+          ${scrolled ? "bg-[var(--background)] shadow-sm" : "bg-transparent shadow-none"}`}
       >
         <div className="w-full max-w-[95%] mx-auto px-6 relative flex items-center justify-between py-1 font-sans">
           <Link href="/" className="logo" onClick={closeMenu}>
@@ -179,11 +176,14 @@ const Navbar = () => {
           <div className="contacts flex items-center gap-3">
             <div className="hidden lg:block">
               {hydrated && user ? profileChip : (
-                <Link
-                  href="/sign-in"
-                  className="cursor-pointer border border-primary hover:bg-transparent hover:text-primary duration-300 font-medium bg-primary py-2 px-8 text-center rounded-none text-white text-sm tracking-widest uppercase font-sans"
-                >
-                  Sign in
+                <Link href="/sign-in" className="inline-block">
+                  <motion.div
+                    whileHover={{ scale: 1.05, y: -1 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="cursor-pointer border-2 border-[#1D4E89] text-white bg-[#1D4E89] hover:bg-[#11325C] hover:border-[#11325C] font-black py-2.5 px-9 text-center rounded-2xl text-[13px] tracking-widest uppercase font-sans shadow-md hover:shadow-lg hover:shadow-[#1D4E89]/20"
+                  >
+                    Sign in
+                  </motion.div>
                 </Link>
               )}
             </div>
@@ -284,12 +284,14 @@ const Navbar = () => {
                       duration: 0.6
                     }}
                   >
-                    <Link
-                      href="/sign-in"
-                      onClick={closeMenu}
-                      className="block w-full min-w-[150px] bg-white text-primary py-4 text-center font-sans font-black text-xs uppercase tracking-widest"
-                    >
-                      Sign In
+                    <Link href="/sign-in" onClick={closeMenu} className="block w-full">
+                      <motion.div
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.97 }}
+                        className="block w-full bg-white text-[#1D4E89] py-3.5 text-center font-sans font-black text-xs uppercase tracking-widest rounded-2xl shadow-lg"
+                      >
+                        Sign In
+                      </motion.div>
                     </Link>
                   </motion.div>
                 )}

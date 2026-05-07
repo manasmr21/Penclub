@@ -10,12 +10,12 @@ import { useAppStore } from "@/src/lib/store/store";
 
 function ProfileLoadingView() {
   return (
-    <div className="min-h-screen pt-32 px-6">
+    <div className="min-h-screen pt-20 px-6">
       <div className="max-w-5xl mx-auto">
-        <div className="profile-panel rounded-[2rem] p-6 sm:p-10 border border-primary/10 bg-card/50 backdrop-blur-sm animate-pulse">
-          <div className="flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-14">
+        <div className="bg-white rounded-3xl p-8 md:p-12 border border-gray-100 shadow-xl relative w-full animate-pulse">
+          <div className="flex flex-col md:flex-row items-center md:items-start gap-10 md:gap-14">
             {/* Avatar Skeleton */}
-            <div className="w-[150px] md:w-[190px] aspect-[4/5] rounded-[2rem] bg-muted/40" />
+            <div className="w-28 h-28 md:w-36 md:h-36 rounded-2xl bg-muted/40 shrink-0" />
 
             {/* Content Skeleton */}
             <div className="flex-1 space-y-5 w-full">
@@ -67,7 +67,7 @@ function ProfilePageContent() {
 
   return (
     <div className="relative min-h-screen">
-      <div className="relative pt-24 pb-20 px-4 sm:px-6">
+      <div className="relative pt-20 pb-20 px-4 sm:px-6">
         <ProfileRedesign />
       </div>
 
@@ -80,7 +80,7 @@ function ProfilePageContent() {
           }}
         >
           <div
-            className="relative w-full max-w-xl max-h-[92vh] overflow-hidden bg-white shadow-2xl border border-primary/10 animate-in zoom-in-95 slide-in-from-bottom-4 duration-300"
+            className="relative w-full max-w-xl max-h-[92vh] overflow-hidden bg-white shadow-2xl border border-gray-100 rounded-3xl animate-in zoom-in-95 slide-in-from-bottom-4 duration-300"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="overflow-y-auto max-h-[92vh] scrollbar-hide">

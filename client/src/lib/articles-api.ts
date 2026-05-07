@@ -76,9 +76,13 @@ export async function fetchAllArticles(
     articles: Array.isArray(data?.blogs) ? data.blogs : [],
     pagination: data?.pagination ?? null,
   };
+ }
+ 
+export async function fetchArticleById(id: string): Promise<PublicArticle | null> {
+  const { data } = await api.get<{ success: boolean; blog: PublicArticle }>(`/blogs/fetch-one/${id}`);
+  return data?.success ? data.blog : null;
 }
-
-export async function createArticle(payload: CreateArticlePayload) {
+ export async function createArticle(payload: CreateArticlePayload) {
   const formData = buildArticleFormData(payload);
   const { data } = await api.post("/blogs/create", formData);
   return data;

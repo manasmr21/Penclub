@@ -122,25 +122,41 @@ const UserDetails = ({ isOwnProfile = true, userOverride }: UserDetailsProps) =>
     <motion.header
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="bg-[#0A192F] px-8 py-10 mb-10 text-white relative w-full"
+      className="bg-white rounded-3xl p-8 md:p-12 mb-12 border border-gray-100 shadow-xl relative w-full text-[#1D4E89]"
     >
       {isOwnProfile && (
-        <Link 
-          href="/profile/settings" 
-          className="absolute top-6 right-6 p-2 bg-white/5 border border-white/10 text-white hover:bg-white/10 hover:border-white/20 transition-all cursor-pointer"
-          title="Pen Club Settings"
-        >
-          <IoSettingsOutline size={18} />
-        </Link>
+        <div className="absolute top-6 right-6 flex gap-2">
+          <motion.button
+            onClick={handleShare}
+            whileHover={{ scale: 1.08, y: -1 }}
+            whileTap={{ scale: 0.92 }}
+            transition={{ type: "spring", stiffness: 400, damping: 15 }}
+            className="p-2.5 bg-transparent border-2 border-[#1D4E89] text-[#1D4E89] hover:bg-[#1D4E89] hover:text-white transition-all cursor-pointer rounded-xl flex items-center justify-center"
+            title="Share Profile"
+          >
+            <Share2 size={16} />
+          </motion.button>
+          <Link href="/profile/settings">
+            <motion.button
+              whileHover={{ scale: 1.08, y: -1 }}
+              whileTap={{ scale: 0.92 }}
+              transition={{ type: "spring", stiffness: 400, damping: 15 }}
+              className="p-2.5 bg-transparent border-2 border-[#1D4E89] text-[#1D4E89] hover:bg-[#1D4E89] hover:text-white transition-all cursor-pointer rounded-xl flex items-center justify-center"
+              title="Pen Club Settings"
+            >
+              <IoSettingsOutline size={16} />
+            </motion.button>
+          </Link>
+        </div>
       )}
 
       <div className="max-w-5xl mx-auto flex flex-col items-center">
         {/* Top Content Row */}
-        <div className="w-full flex flex-col md:flex-row items-center md:items-start justify-start gap-10 md:gap-14 mb-10">
+        <div className="w-full flex flex-col md:flex-row items-center md:items-start justify-start gap-10 md:gap-14 mb-10 text-center md:text-left">
           {/* Profile Picture (Left on Desktop) */}
           <div className="relative shrink-0">
-            <div className="w-28 h-28 md:w-36 md:h-36 rounded-none border-2 border-white/20 p-1">
-              <div className="w-full h-full relative overflow-hidden bg-white/5">
+            <div className="w-28 h-28 md:w-36 md:h-36 rounded-2xl border border-[#1D4E89]/10 p-1 bg-[#FDF9F0]/60 shadow-inner">
+              <div className="w-full h-full relative overflow-hidden rounded-xl bg-gray-50 flex items-center justify-center">
                 {hasProfilePicture ? (
                   <Image
                     src={picUrl!}
@@ -150,7 +166,7 @@ const UserDetails = ({ isOwnProfile = true, userOverride }: UserDetailsProps) =>
                     priority
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-white/20 font-serif font-bold text-5xl">
+                  <div className="w-full h-full flex items-center justify-center text-[#1D4E89]/20 font-serif font-black text-5xl bg-[#1D4E89]/5">
                     {fallbackInitials}
                   </div>
                 )}
@@ -159,25 +175,25 @@ const UserDetails = ({ isOwnProfile = true, userOverride }: UserDetailsProps) =>
           </div>
 
           {/* User Info (Right on Desktop) */}
-          <div className="flex-1 space-y-4 text-center md:text-left w-full">
+          <div className="flex-1 space-y-4 w-full">
             <div className="space-y-3">
-              <h1 className="text-3xl md:text-5xl font-serif font-bold tracking-tight leading-tight">
+              <h1 className="text-3xl md:text-5xl font-serif font-black tracking-tight leading-tight text-gray-900">
                 {displayName}
               </h1>
-              <p className="text-base md:text-lg font-serif italic text-white/70 max-w-2xl">
+              <p className="text-base md:text-lg font-serif italic text-gray-500 max-w-2xl leading-relaxed">
                 {displayBio}
               </p>
             </div>
 
             {user?.interests && user.interests.length > 0 && (
-              <div className="flex flex-wrap justify-center md:justify-start gap-3 pt-2">
-                {(Array.isArray(user.interests) 
-                  ? user.interests 
-                  : typeof user.interests === 'string' 
+              <div className="flex flex-wrap justify-center md:justify-start gap-2.5 pt-2">
+                {(Array.isArray(user.interests)
+                  ? user.interests
+                  : typeof user.interests === 'string'
                     ? (user.interests as string).split(',').map(i => i.trim()).filter(Boolean)
                     : []
                 ).map((tag) => (
-                  <span key={tag} className="px-4 py-1.5 border border-white/20 text-[10px] font-sans font-bold uppercase tracking-widest text-white/80">
+                  <span key={tag} className="px-4 py-1.5 border border-[#E6693E]/20 text-[9px] font-sans font-black uppercase tracking-widest text-[#E6693E] bg-[#E6693E]/5 rounded-full">
                     {tag}
                   </span>
                 ))}
@@ -187,13 +203,13 @@ const UserDetails = ({ isOwnProfile = true, userOverride }: UserDetailsProps) =>
         </div>
 
         {/* Stats Grid */}
-        <div className="w-full max-w-3xl border border-white/10 p-6 grid grid-cols-2 md:grid-cols-4 gap-6 relative">
+        <div className="w-full max-w-3xl border border-[#1D4E89]/10 bg-[#FDF9F0]/40 p-6 grid grid-cols-2 md:grid-cols-4 gap-6 rounded-2xl relative">
           {stats.map((stat, idx) => (
             <div key={stat.label} className="relative flex flex-col items-center">
-              <span className="text-2xl md:text-3xl font-serif font-bold mb-1">{stat.value}</span>
-              <span className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-white/40">{stat.label}</span>
+              <span className="text-2xl md:text-3xl font-serif font-black mb-1 text-gray-900">{stat.value}</span>
+              <span className="text-[9px] font-sans font-black uppercase tracking-[0.2em] text-[#1D4E89]/50">{stat.label}</span>
               {idx < stats.length - 1 && (
-                <div className="hidden md:block absolute -right-3 top-1/2 -translate-y-1/2 h-10 w-[1px] bg-white/10" />
+                <div className="hidden md:block absolute -right-3 top-1/2 -translate-y-1/2 h-10 w-[1px] bg-[#1D4E89]/10" />
               )}
             </div>
           ))}

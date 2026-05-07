@@ -79,22 +79,22 @@ const BookShelft = () => {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="animate-pulse bg-white border border-primary/10 rounded-none flex flex-col h-full">
+          <div key={i} className="animate-pulse bg-white border border-gray-100 rounded-3xl overflow-hidden shadow-md flex flex-col h-full p-4">
             {/* Cover Aspect Skeleton */}
-            <div className="aspect-[4/2.5] bg-primary/5 rounded-none border-b border-primary/5" />
+            <div className="aspect-[4/2.5] bg-primary/5 rounded-2xl" />
             {/* Content Area Skeleton */}
-            <div className="p-6 flex-1 flex flex-col space-y-4">
+            <div className="pt-6 flex-1 flex flex-col space-y-4">
               <div className="space-y-2">
-                <div className="h-6 w-3/4 bg-primary/10 rounded-none" />
-                <div className="h-4 w-1/3 bg-primary/5 rounded-none" />
+                <div className="h-6 w-3/4 bg-primary/10 rounded-xl" />
+                <div className="h-4 w-1/3 bg-primary/5 rounded-lg" />
               </div>
               <div className="space-y-2">
-                <div className="h-3 w-full bg-primary/5 rounded-none" />
-                <div className="h-3 w-5/6 bg-primary/5 rounded-none" />
+                <div className="h-3 w-full bg-primary/5 rounded-full" />
+                <div className="h-3 w-5/6 bg-primary/5 rounded-full" />
               </div>
-              <div className="pt-4 border-t border-primary/5 mt-auto flex justify-between items-center">
-                <div className="h-3 w-20 bg-primary/5 rounded-none" />
-                <div className="h-3 w-16 bg-primary/10 rounded-none" />
+              <div className="pt-4 border-t border-gray-50 mt-auto flex justify-between items-center">
+                <div className="h-3 w-20 bg-primary/5 rounded-full" />
+                <div className="h-3 w-16 bg-primary/10 rounded-full" />
               </div>
             </div>
           </div>
@@ -124,10 +124,10 @@ const BookShelft = () => {
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="group flex flex-col bg-white border border-primary/10 rounded-none transition-all duration-500 hover:shadow-xl hover:-translate-y-1"
+            className="group flex flex-col bg-white border border-gray-100 rounded-3xl overflow-hidden transition-all duration-500 hover:shadow-2xl hover:-translate-y-1.5"
           >
             {/* Cover Section */}
-            <div className="relative aspect-[4/2.5] overflow-hidden rounded-none bg-zinc-100">
+            <div className="relative aspect-[4/2.5] overflow-hidden bg-zinc-100">
               {getBookPrimaryImage(book) ? (
                 <img
                   src={getBookPrimaryImage(book)}
@@ -142,7 +142,7 @@ const BookShelft = () => {
 
               {book.genre && (
                 <div className="absolute top-4 left-4">
-                  <span className="px-3 py-1 bg-white text-[10px] font-sans font-semibold tracking-widest text-primary border border-primary/10">
+                  <span className="px-3 py-1 bg-white text-[9px] font-sans font-black tracking-widest text-[#E6693E] border border-gray-100 rounded-full">
                     {book.genre}
                   </span>
                 </div>
@@ -150,12 +150,22 @@ const BookShelft = () => {
 
               {/* Actions */}
               <div className="absolute top-4 right-4 flex gap-1.5 opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
-                <button onClick={() => openEditModal(book)} className="h-8 w-8 flex items-center justify-center bg-white text-primary hover:bg-primary hover:text-white transition-all cursor-pointer border border-primary/10">
-                  <Pencil size={14} />
-                </button>
-                <button onClick={() => handleDeleteBook(book.id)} className="h-8 w-8 flex items-center justify-center bg-white text-red-600 hover:bg-red-500 hover:text-white transition-all cursor-pointer border border-primary/10">
-                  <Trash2 size={14} />
-                </button>
+                <motion.button
+                  onClick={() => openEditModal(book)}
+                  whileHover={{ scale: 1.12 }}
+                  whileTap={{ scale: 0.88 }}
+                  className="h-8 w-8 flex items-center justify-center bg-white text-primary hover:bg-[#1D4E89] hover:text-white transition-all cursor-pointer border border-[#1D4E89]/10 rounded-lg"
+                >
+                  <Pencil size={13} />
+                </motion.button>
+                <motion.button
+                  onClick={() => handleDeleteBook(book.id)}
+                  whileHover={{ scale: 1.12 }}
+                  whileTap={{ scale: 0.88 }}
+                  className="h-8 w-8 flex items-center justify-center bg-white text-red-600 hover:bg-red-500 hover:text-white transition-all cursor-pointer border border-red-100 rounded-lg"
+                >
+                  <Trash2 size={13} />
+                </motion.button>
               </div>
             </div>
 
@@ -200,20 +210,22 @@ const BookShelft = () => {
 
       {editingBook && typeof window !== "undefined" && createPortal(
         <div className="fixed inset-0 z-[9999] flex items-center justify-center px-4 bg-[#0A192F]/60 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="relative w-full max-w-xl max-h-[calc(100vh-4rem)] overflow-y-auto bg-white shadow-2xl border border-primary/10 animate-in slide-in-from-top-4 duration-300 scrollbar-hide">
+          <div className="relative w-full max-w-xl max-h-[calc(100vh-4rem)] overflow-y-auto bg-white shadow-2xl border border-gray-100 rounded-3xl animate-in slide-in-from-top-4 duration-300 scrollbar-hide">
 
             {/* Modal Header */}
-            <div className="sticky top-0 z-10 px-8 py-6 border-b border-primary/10 flex justify-between items-center bg-white">
+            <div className="sticky top-0 z-10 px-8 py-6 border-b border-gray-50 flex justify-between items-center bg-white">
               <div>
                 <p className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40 mb-1">Publication</p>
                 <h2 className="text-2xl font-serif font-bold text-[#0D387D]">Edit Book</h2>
               </div>
-              <button
+              <motion.button
                 onClick={closeEditModal}
-                className="h-9 w-9 flex items-center justify-center border border-primary/20 text-primary/40 hover:text-primary hover:border-primary transition-all cursor-pointer"
+                whileHover={{ scale: 1.1, rotate: 90 }}
+                whileTap={{ scale: 0.9 }}
+                className="h-9 w-9 flex items-center justify-center border border-gray-100 rounded-xl text-primary/40 hover:text-primary hover:border-primary transition-all cursor-pointer"
               >
                 <X size={16} />
-              </button>
+              </motion.button>
             </div>
 
             <form onSubmit={handleEditSubmit} className="p-8 space-y-6">
@@ -221,7 +233,7 @@ const BookShelft = () => {
               {/* Cover Image */}
               <div className="space-y-2">
                 <p className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/40">Cover Image</p>
-                <div className="relative group aspect-[3/4] w-[140px] mx-auto overflow-hidden border border-primary/20 bg-zinc-50 cursor-pointer">
+                <div className="relative group aspect-[3/4] w-[140px] mx-auto overflow-hidden border border-gray-100 rounded-2xl bg-zinc-50 cursor-pointer">
                   <img
                     src={coverImageFiles.length > 0 ? URL.createObjectURL(coverImageFiles[0]) : (getBookPrimaryImage(editingBook) || "/placeholder-book.png")}
                     alt="Preview"
@@ -256,7 +268,7 @@ const BookShelft = () => {
                 <input
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="h-12 w-full rounded-none border border-primary/20 bg-zinc-50 px-4 text-sm font-sans text-[#0A192F] outline-none transition-all focus:border-primary focus:bg-white"
+                  className="h-12 w-full rounded-2xl border border-gray-100 bg-zinc-50 px-4 text-sm font-sans text-gray-900 outline-none transition-all focus:border-primary focus:bg-white"
                   placeholder="Book title"
                   required
                 />
@@ -270,7 +282,7 @@ const BookShelft = () => {
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="min-h-[130px] w-full resize-none rounded-none border border-primary/20 bg-zinc-50 p-4 text-sm font-sans text-[#0A192F]/80 outline-none transition-all focus:border-primary focus:bg-white"
+                  className="min-h-[130px] w-full resize-none rounded-2xl border border-gray-100 bg-zinc-50 p-4 text-sm font-sans text-gray-800 outline-none transition-all focus:border-primary focus:bg-white"
                   placeholder="Book description..."
                   rows={5}
                   required
@@ -285,7 +297,7 @@ const BookShelft = () => {
                 <input
                   value={genre}
                   onChange={(e) => setGenre(e.target.value)}
-                  className="h-12 w-full rounded-none border border-primary/20 bg-zinc-50 px-4 text-sm font-sans text-[#0A192F] outline-none transition-all focus:border-primary focus:bg-white"
+                  className="h-12 w-full rounded-2xl border border-gray-100 bg-zinc-50 px-4 text-sm font-sans text-gray-900 outline-none transition-all focus:border-primary focus:bg-white"
                   placeholder="Fiction, Mystery, etc."
                   required
                 />
@@ -293,29 +305,33 @@ const BookShelft = () => {
 
               {/* Action Buttons */}
               <div className="flex flex-col-reverse sm:flex-row gap-4 pt-2 border-t border-primary/10">
-                <button
+                <motion.button
                   type="button"
                   onClick={closeEditModal}
                   disabled={isSaving}
-                  className="h-12 flex-1 rounded-none border border-primary/20 bg-transparent text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary/60 transition-all hover:border-primary/40 hover:text-primary disabled:opacity-50 cursor-pointer"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="h-12 flex-1 rounded-2xl border border-gray-100 bg-transparent text-[10px] font-sans font-black uppercase tracking-[0.2em] text-primary/60 transition-all hover:border-primary/40 hover:text-primary disabled:opacity-50 cursor-pointer"
                 >
                   Cancel
-                </button>
-                <button
+                </motion.button>
+                <motion.button
                   type="submit"
                   disabled={isSaving}
-                  className="h-12 flex-[2] rounded-none bg-[#0D387D] text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-white transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+                  whileHover={{ scale: 1.03, y: -1 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="h-12 flex-[2] rounded-2xl bg-primary text-[10px] font-sans font-black uppercase tracking-[0.2em] text-white transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer shadow-lg shadow-primary/20"
                 >
                   {isSaving ? "Saving..." : "Save Changes"}
-                </button>
+                </motion.button>
               </div>
             </form>
           </div>
         </div>,
         document.body
       )}
-            </div>
-            );
+    </div>
+  );
 };
 
-            export default BookShelft;
+export default BookShelft;

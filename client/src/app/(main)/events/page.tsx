@@ -1,8 +1,9 @@
 "use client";
 
-import React from "react";
-import { motion } from "motion/react";
-import { Calendar, MapPin, Clock, ArrowRight, Ticket, Users, Share2, Plus } from "lucide-react";
+import { useState } from "react";
+import { MapPin, Clock, ArrowRight, Sparkles } from "lucide-react";
+import AnimateIn from "@/src/components/ui/AnimateIn";
+import ArchivalRepositoryCard from "@/src/components/ArchivalRepositoryCard";
 
 const upcomingEvents = [
   {
@@ -10,7 +11,7 @@ const upcomingEvents = [
     title: "The Midnight Reading: Gothic Special",
     date: "12",
     month: "NOV",
-    year: "2023",
+    year: "2026",
     time: "21:00 - 00:00",
     location: "The Silver City Library, Cuttack",
     type: "In-Person",
@@ -19,10 +20,10 @@ const upcomingEvents = [
   },
   {
     id: 2,
-    title: "Odisha Literary Meet 2023",
+    title: "Odisha Literary Meet 2026",
     date: "05",
     month: "DEC",
-    year: "2023",
+    year: "2026",
     time: "10:00 - 18:00",
     location: "Exhibition Ground, Bhubaneswar",
     type: "Hybrid",
@@ -34,7 +35,7 @@ const upcomingEvents = [
     title: "Workshop: The Anatomy of a Short Story",
     date: "14",
     month: "JAN",
-    year: "2024",
+    year: "2027",
     time: "14:00 - 17:00",
     location: "Pen Club Atelier, Puri",
     type: "Workshop",
@@ -43,154 +44,162 @@ const upcomingEvents = [
   }
 ];
 
-const EventsPage = () => {
+export default function EventsPage() {
+  const [activeCategory, setActiveCategory] = useState("All");
+
   return (
-    <div className="min-h-screen bg-white font-sans text-primary">
-      {/* Static Background Lettering */}
-      <div className="fixed top-0 right-0 pointer-events-none opacity-[0.02] z-0 mt-32 mr-6">
-        <h1 className="text-[12vw] font-serif font-black leading-none uppercase tracking-tighter [writing-mode:vertical-lr] select-none">
-          Events
-        </h1>
+    <div className="min-h-screen bg-[#FDF9F0] text-[#1D4E89] font-sans pb-24 relative overflow-hidden">
+
+      {/* Ghosted Background Editorial Watermarks */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden select-none z-0">
+        <div className="absolute left-[-5vw] top-[15vh] text-[12vw] font-serif font-black text-[#1D4E89]/[0.025] tracking-widest -rotate-12 uppercase">
+          Gatherings
+        </div>
+        <div className="absolute right-[-8vw] top-[35vh] text-[15vw] font-sans font-black text-[#1D4E89]/[0.02] tracking-[0.2em] rotate-90 uppercase">
+          Symposium
+        </div>
+        <div className="absolute left-[-2vw] bottom-[25vh] text-[11vw] font-serif italic font-normal text-[#E6693E]/[0.025] tracking-wide rotate-6 uppercase">
+          Ledger
+        </div>
+        <div className="absolute right-[5vw] top-[75vh] text-[10vw] font-serif font-bold text-[#1D4E89]/[0.02] tracking-widest -rotate-6 uppercase">
+          Expressions
+        </div>
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 pt-32 pb-24">
-        {/* Editorial Hero */}
-        <div className="border-l border-primary/20 pl-10 mb-20">
-          <motion.div 
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="space-y-4"
-          >
-            <span className="text-[10px] font-black uppercase tracking-[0.5em] text-secondary">Timeline MMXXIII</span>
-            <h1 className="text-6xl md:text-8xl font-serif font-black tracking-tighter leading-none">
-              The Ledger of <br /> <span className="italic font-normal">Gatherings.</span>
-            </h1>
-            <p className="text-xl font-serif italic text-primary/60 max-w-xl">
-              From candlelit readings in historic quarters to state-wide literary meets—explore the curated calendar of the Pen Club community in Odisha.
+      {/* Editorial Header Section */}
+      <header className="max-w-7xl mx-auto px-8 pt-20 pb-12 border-b border-[#1D4E89]/10">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <AnimateIn variant="fade-up" delay={0}>
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-[#E6693E]">
+                <Sparkles size={12} />
+                <span>Timeline MMXXVI</span>
+              </div>
+              <h1 className="text-5xl md:text-7xl font-serif font-black tracking-tight leading-none text-gray-900">
+                The Ledger of <br />
+                <span className="italic font-normal text-[#1D4E89]">Gatherings.</span>
+              </h1>
+            </div>
+          </AnimateIn>
+          <AnimateIn variant="fade-left" delay={0.15}>
+            <p className="text-sm md:text-base font-serif italic text-gray-500 max-w-sm leading-relaxed">
+              From atmospheric candlelit readings in historical quarters to state-wide symposiums—explore our curated calendar of gatherings.
             </p>
-          </motion.div>
+          </AnimateIn>
         </div>
+      </header>
 
-        {/* Focus Section: Featured Event */}
-        <div className="mb-32">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 border border-primary/20">
-            <div className="lg:col-span-8 relative aspect-[16/9] lg:aspect-auto overflow-hidden bg-primary/5">
-              <img 
-                src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2069&auto=format&fit=crop" 
-                alt="Featured Gala" 
-                className="w-full h-full object-cover transition-all duration-1000"
+      <main className="max-w-7xl mx-auto px-8 pt-12">
+        {/* Asymmetrical Featured Broadcast Split */}
+        <section className="mb-20 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          <AnimateIn variant="fade-right" delay={0} className="lg:col-span-7">
+            <div className="relative group rounded-2xl overflow-hidden shadow-xl aspect-[16/10]">
+              <img
+                src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2069&auto=format&fit=crop"
+                alt="Featured Gala"
+                className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
               />
-              <div className="absolute top-8 left-8 bg-white px-6 py-3 border border-primary/10">
-                <span className="text-[10px] font-black uppercase tracking-widest">Featured Transmission</span>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              <div className="absolute bottom-6 left-6 text-white space-y-2">
+                <span className="text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1 bg-[#E6693E] rounded-full">Spotlight Gala</span>
+                <h3 className="text-2xl font-serif font-bold">The Bhubaneswar Winter Symposium</h3>
               </div>
             </div>
-            <div className="lg:col-span-4 p-8 md:p-12 flex flex-col justify-between bg-primary/[0.02]">
-              <div className="space-y-8">
-                <div className="flex items-center gap-4">
-                  <span className="text-4xl font-serif font-black italic">15</span>
-                  <div className="h-px flex-1 bg-primary/20"></div>
-                  <span className="text-[10px] font-black uppercase tracking-widest opacity-40">DEC 2023</span>
-                </div>
-                <h2 className="text-4xl font-serif font-black leading-tight tracking-tighter">
-                  Pen Club <br /> Winter Gala: <br /> <span className="italic font-normal">The Bhubaneswar Chapter</span>
-                </h2>
-                <p className="text-sm font-serif text-primary/60 leading-relaxed italic">
-                  A grand celebration of literature and art in the heart of Bhubaneswar. Formal attire, deep discourse, and open minds.
-                </p>
+          </AnimateIn>
+
+          <AnimateIn variant="fade-left" delay={0.15} className="lg:col-span-5">
+            <div className="space-y-6">
+              <div className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#E6693E]">
+                <span>15 DEC 2026</span>
+                <span className="w-6 h-[1px] bg-[#E6693E]" />
+                <span>BHUBANESWAR</span>
               </div>
-              <button className="w-full mt-12 bg-primary text-white py-5 font-black text-[10px] uppercase tracking-[0.3em] border border-primary hover:bg-transparent hover:text-primary transition-all cursor-pointer">
-                Request Invitation
+              <h2 className="text-3xl md:text-4xl font-serif font-black tracking-tight leading-snug text-gray-900">
+                Pen Club Winter Gala: <br />
+                <span className="font-normal italic text-[#1D4E89]">The Grand Chapter</span>
+              </h2>
+              <p className="text-sm font-serif text-gray-500 leading-relaxed italic">
+                A prestigious seasonal gathering of minds and expressions. Formal attire, deep discourse, manuscript unveilings, and live acoustic recitals.
+              </p>
+              <button className="bg-[#1D4E89] text-white px-8 py-3.5 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-opacity-90 transition-all cursor-pointer shadow-md active:scale-95">
+                Request Exclusive Invitation
               </button>
             </div>
-          </div>
-        </div>
+          </AnimateIn>
+        </section>
 
-        {/* Timeline Grid */}
-        <div className="space-y-0">
-          <div className="flex items-center justify-between mb-12 pb-4 border-b border-primary/20">
-            <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/30">Upcoming Dispatch</h3>
-            <div className="flex gap-8 text-[11px] font-black uppercase tracking-widest text-primary/40">
-              <button className="hover:text-primary transition-colors cursor-pointer">Filter: All</button>
-              <button className="hover:text-primary transition-colors cursor-pointer">Bhubaneswar</button>
-              <button className="hover:text-primary transition-colors cursor-pointer">Cuttack</button>
-              <button className="hover:text-primary transition-colors cursor-pointer">Puri</button>
+        {/* Chronological Row Ledger Section (Unique Horizontal Experience!) */}
+        <section className="mt-16">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#1D4E89]/10 pb-4 mb-8">
+            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400">Chronological Ledger</h3>
+            <div className="flex gap-6 text-xs font-bold uppercase tracking-widest text-gray-400">
+              {["All", "Bhubaneswar", "Cuttack", "Puri"].map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setActiveCategory(cat)}
+                  className={`cursor-pointer transition-colors ${activeCategory === cat ? "text-[#E6693E]" : "hover:text-[#1D4E89]"}`}
+                >
+                  {cat}
+                </button>
+              ))}
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 border-l border-t border-primary/20">
-            {upcomingEvents.map((event, i) => (
-              <motion.div 
-                key={event.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 * i }}
-                className="group border-r border-b border-primary/20 p-8 hover:bg-primary/[0.01] transition-colors"
-              >
-                <div className="flex flex-col h-full space-y-8">
-                  {/* Date Header */}
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-5xl font-serif font-black tracking-tighter group-hover:italic transition-all">
-                      {event.date}
-                    </span>
-                    <div className="flex flex-col">
-                      <span className="text-[10px] font-black uppercase tracking-widest text-secondary">{event.month}</span>
-                      <span className="text-[8px] font-bold text-primary/30 uppercase tracking-[0.2em]">{event.year}</span>
-                    </div>
-                  </div>
-
-                  {/* Image */}
-                  <div className="aspect-[4/3] overflow-hidden transition-all duration-700">
-                    <img src={event.image} alt={event.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-                  </div>
-
-                  {/* Content */}
-                  <div className="space-y-4 flex-1">
-                    <div className="flex justify-between items-center">
-                      <span className="text-[8px] font-black uppercase tracking-widest px-2 py-1 bg-primary text-white">{event.type}</span>
-                      <div className="flex items-center gap-2 text-[11px] font-sans font-bold text-primary/30 uppercase tracking-widest">
-                        <Clock size={10} /> {event.time}
+          {/* Interactive Horizontal Rows */}
+          <div className="divide-y divide-[#1D4E89]/10 border-b border-[#1D4E89]/10">
+            {upcomingEvents.map((event, idx) => (
+              <AnimateIn key={event.id} variant="fade-up" delay={idx * 0.08}>
+                <div
+                  className="group relative py-8 flex flex-col md:flex-row md:items-center justify-between gap-6 transition-all duration-300 hover:px-4 cursor-pointer"
+                >
+                  {/* Floating Preview Image on Hover */}
+                  <div className="flex items-center gap-6 md:w-1/2">
+                    <div className="flex items-baseline gap-2 shrink-0">
+                      <span className="text-4xl font-serif font-black tracking-tighter text-[#E6693E] group-hover:italic">
+                        {event.date}
+                      </span>
+                      <div className="flex flex-col text-[10px] font-black text-[#1D4E89] tracking-widest">
+                        <span>{event.month}</span>
+                        <span className="opacity-30">{event.year}</span>
                       </div>
                     </div>
-                    <h3 className="text-2xl font-serif font-black leading-tight tracking-tighter">
-                      {event.title}
-                    </h3>
-                    <div className="flex items-center gap-2 text-[10px] font-serif italic text-primary/40">
-                      <MapPin size={12} className="text-primary/20" /> {event.location}
+
+                    <div className="space-y-1">
+                      <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-gray-100 text-gray-500">
+                        {event.type}
+                      </span>
+                      <h3 className="text-lg font-serif font-bold text-gray-900 group-hover:text-[#1D4E89] transition-colors leading-snug">
+                        {event.title}
+                      </h3>
                     </div>
                   </div>
 
-                  {/* Footer Action */}
-                  <div className="pt-6 border-t border-primary/10 flex justify-between items-center">
-                    <a href="#" className="text-[11px] font-black uppercase tracking-widest flex items-center gap-3 group/link hover:italic transition-all">
-                      Secure Access <ArrowRight size={14} className="group-hover/link:translate-x-2 transition-transform" />
-                    </a>
-                    <button className="p-2 border border-primary/10 hover:bg-primary hover:text-white hover:rotate-90 transition-all cursor-pointer">
-                      <Plus size={14} strokeWidth={1.5} />
-                    </button>
+                  <div className="flex flex-col sm:flex-row md:items-center justify-between md:w-1/2 gap-4">
+                    <p className="text-xs text-gray-500 max-w-sm italic font-serif leading-relaxed line-clamp-2 md:line-clamp-1">
+                      {event.description}
+                    </p>
+
+                    <div className="flex items-center gap-6 shrink-0">
+                      <div className="flex flex-col text-[10px] text-gray-400 font-bold tracking-wider">
+                        <span className="flex items-center gap-1"><Clock size={10} /> {event.time}</span>
+                        <span className="flex items-center gap-1 mt-0.5"><MapPin size={10} /> {event.location.split(',')[1] || event.location}</span>
+                      </div>
+                      <button className="w-8 h-8 rounded-full border border-gray-200 group-hover:bg-[#1D4E89] group-hover:text-white flex items-center justify-center transition-all">
+                        <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+                      </button>
+                    </div>
                   </div>
+
+                  {/* Animated Background Hover Block */}
+                  <div className="absolute inset-0 bg-white/40 -z-10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-sm" />
                 </div>
-              </motion.div>
+              </AnimateIn>
             ))}
           </div>
-        </div>
+        </section>
+      </main>
 
-        {/* Archival CTA */}
-        <div className="mt-32 p-12 bg-primary text-white flex flex-col md:flex-row items-center justify-between gap-12">
-          <div className="space-y-4 max-w-xl text-center md:text-left">
-            <h2 className="text-4xl font-serif font-black tracking-tighter leading-none italic">
-              History is in the <br /> <span className="font-normal not-italic">Making.</span>
-            </h2>
-            <p className="text-white/60 font-serif italic">
-              Explore our archival footage and transcriptions from past Pen Club gatherings across Odisha.
-            </p>
-          </div>
-          <button className="px-12 py-5 border border-white/20 font-black text-[10px] uppercase tracking-[0.4em] hover:bg-white hover:text-primary transition-all whitespace-nowrap">
-            View Archives
-          </button>
-        </div>
-      </div>
+      <ArchivalRepositoryCard />
     </div>
   );
-};
-
-export default EventsPage;
+}

@@ -74,7 +74,7 @@ function ResetPasswordContent() {
   }
 
   return (
-    <div className="mx-auto mt-32 w-full max-w-md border border-primary/20 bg-card p-8 rounded-none shadow-[0_4px_25px_rgba(13,56,125,0.02)]">
+    <div className="mx-auto mt-2 md:mt-12 w-full max-w-md border border-primary/20 bg-card p-8 rounded-none shadow-[0_4px_25px_rgba(13,56,125,0.02)]">
       <div className="border-b border-primary/15 pb-4 mb-6">
         <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-secondary text-center block">
           Security
@@ -162,7 +162,7 @@ function ResetPasswordContent() {
 
 export default function ResetPasswordPage() {
   return (
-    <Suspense fallback={<div className="pt-28 text-center text-slate-500">Loading...</div>}>
+    <Suspense fallback={<div className="pt-2 md:pt-12 text-center text-slate-500">Loading...</div>}>
       <ResetPasswordContent />
     </Suspense>
   );

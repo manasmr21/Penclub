@@ -4,6 +4,9 @@ import { useAppStore } from '@/src/lib/store/store';
 import { updateProfile, UpdateUserProfilePayload } from "@/src/lib/auth";
 import { resendUserOtp, updateUserProfile } from "@/src/lib/auth-api";
 import { extractErrorMessage } from "@/src/lib/http-client";
+import { X, Camera, Check, ChevronLeft, Hash, Edit3, User, Mail, AtSign } from 'lucide-react';
+import AnimateIn from '@/src/components/ui/AnimateIn';
+import { motion } from 'motion/react';
 
 interface ProfileEditorProps {
   inModal?: boolean;
@@ -14,24 +17,12 @@ interface FormInputProps {
   id: string;
   label: string;
   value?: string;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   type?: React.HTMLInputTypeAttribute;
-  prefix?: React.ReactNode;
+  prefixIcon?: React.ReactNode;
+  isTextArea?: boolean;
 }
 
-const ProfileHeader = ({ onClose }: { onClose?: () => void }) => (
-  <header className="flex items-center justify-between border-b border-primary/10 bg-transparent pb-4 mb-6">
-    <button
-      type="button"
-      onClick={onClose}
-      className="text-xs uppercase tracking-widest font-bold text-primary hover:opacity-80 transition duration-150"
-    >
-      &larr; Back
-    </button>
-    <h1 className="text-xl font-serif font-bold text-primary tracking-tight">Edit Profile</h1>
-    <div className="w-10" />
-  </header>
-);
 
 const ProfilePictureUpdate = ({
   currentPicture,
@@ -55,16 +46,11 @@ const ProfilePictureUpdate = ({
       }
       return splitName[0][0].toUpperCase();
     }
-
-    if (email) {
-      return email.substring(0, 2).toUpperCase();
-    }
-
-    return "NA";
+    if (email) return email.substring(0, 2).toUpperCase();
+    return "PC";
   };
 
-  const hasProfilePicture = typeof currentPicture === "string" && currentPicture.trim().length > 0;
-  const imageSource = preview || (hasProfilePicture ? currentPicture : null);
+  const imageSource = preview || (currentPicture && currentPicture.trim().length > 0 ? currentPicture : null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -75,52 +61,69 @@ const ProfilePictureUpdate = ({
   };
 
   return (
-    <div className="flex flex-col items-center gap-3 border-b border-primary/10 pb-6 mb-6">
-      <div className="relative h-24 w-24">
-        <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-none border border-primary/20 bg-card text-3xl font-serif font-bold text-primary shadow-sm">
+    <div className="flex flex-col items-center justify-center space-y-3 mb-8">
+      <div className="relative group">
+        <div className="h-28 w-28 rounded-3xl bg-[#FDF9F0]/60 flex items-center justify-center overflow-hidden transition-all duration-300 cursor-pointer">
           {imageSource ? (
-            <img src={imageSource} className="h-full w-full object-cover" alt="Profile Preview" />
+            <img src={imageSource} alt="Preview" className="h-full w-full object-cover" />
           ) : (
-            <span className="select-none">{getInitials()}</span>
+            <span className="text-2xl font-serif font-black text-[#1D4E89]/20">{getInitials()}</span>
           )}
+          <input
+            type="file"
+            ref={fileInputRef}
+            className="absolute inset-0 opacity-0 cursor-pointer"
+            accept="image/*"
+            onChange={handleFileChange}
+          />
+
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+            <Camera size={20} className="text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+          </div>
         </div>
-        <input type="file" ref={fileInputRef} hidden accept="image/*" onChange={handleFileChange} />
 
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="absolute bottom-1 right-1 flex h-7 w-7 items-center justify-center rounded-none border border-primary/20 bg-background text-[11px] font-bold text-primary shadow-sm transition hover:bg-primary hover:text-white duration-150"
-          title="Edit Photo"
+          className="absolute -bottom-1 -right-1 w-8 h-8 bg-[#E6693E] text-white flex items-center justify-center rounded-xl hover:scale-110 active:scale-95 transition-all border-2 border-white"
         >
-          ✏️
+          <Edit3 size={14} />
         </button>
       </div>
-
-      <button
-        type="button"
-        onClick={() => fileInputRef.current?.click()}
-        className="text-[10px] uppercase tracking-widest font-bold text-secondary hover:text-primary transition duration-150"
-      >
-        Change Photo
-      </button>
+      <span className="text-[9px] uppercase font-sans font-black tracking-[0.2em] text-[#1D4E89]/50">
+        Update Portrait
+      </span>
     </div>
   );
 };
 
-const FormInput = ({ id, label, value, onChange, type = 'text', prefix }: FormInputProps) => (
-  <div className="space-y-1">
-    <label htmlFor={id} className="block text-[10px] font-bold uppercase tracking-[0.2em] text-primary/50">
+const FormInput = ({ id, label, value, onChange, type = 'text', prefixIcon, isTextArea }: FormInputProps) => (
+  <div className="flex flex-col space-y-1.5 w-full group">
+    <label htmlFor={id} className="text-[10px] font-sans font-black uppercase tracking-[0.2em] text-[#1D4E89]/60 group-focus-within:text-[#1D4E89] transition-colors">
       {label}
     </label>
-    <div className="relative flex items-center">
-      {prefix && <span className="absolute left-0 text-sm font-mono text-primary/70">{prefix}</span>}
-      <input
-        id={id}
-        type={type}
-        value={value}
-        onChange={onChange}
-        className={`w-full border-b border-primary/20 bg-transparent py-2.5 text-sm font-serif text-primary outline-none transition duration-150 focus:border-primary ${prefix ? 'pl-5' : ''}`}
-      />
+    <div className="relative w-full">
+      {prefixIcon && (
+        <div className="absolute left-4 inset-y-0 flex items-center text-[#1D4E89]/30">
+          {prefixIcon}
+        </div>
+      )}
+      {isTextArea ? (
+        <textarea
+          id={id}
+          value={value}
+          onChange={onChange}
+          className={`w-full bg-[#FDF9F0]/40 px-4 py-3.5 text-sm font-sans font-bold text-[#1D4E89] placeholder:text-gray-300 outline-none transition-all duration-300 focus:bg-white rounded-2xl min-h-[120px] resize-none ${prefixIcon ? 'pl-11' : ''}`}
+        />
+      ) : (
+        <input
+          id={id}
+          type={type}
+          value={value}
+          onChange={onChange}
+          className={`w-full bg-[#FDF9F0]/40 px-4 py-3.5 text-sm font-sans font-bold text-[#1D4E89] placeholder:text-gray-300 outline-none transition-all duration-300 focus:bg-white rounded-2xl ${prefixIcon ? 'pl-11' : ''}`}
+        />
+      )}
     </div>
   </div>
 );
@@ -131,10 +134,7 @@ export default function ProfileEditor({ inModal = false, onClose }: ProfileEdito
   const updateUser = useAppStore((s) => s.updateUser);
   const setError = useAppStore((s) => s.setError);
 
-  type UserPatch = Parameters<typeof updateUser>[0];
-  type ProfileResponse = { user?: UserPatch; message?: string };
-
-  const allInterests = ['Poetry', 'Fiction', 'Non-fiction', 'Essays', 'Memoir', 'Fantasy', 'Modernist Fiction'];
+  const allInterests = ['Poetry', 'Fiction', 'Non-fiction', 'Essays', 'Memoir', 'Fantasy', 'Modernist Fiction', 'Digital Art', 'Editorial'];
 
   const [selected, setSelected] = useState<string[]>([]);
   const [bio, setBio] = useState('');
@@ -155,30 +155,21 @@ export default function ProfileEditor({ inModal = false, onClose }: ProfileEdito
 
   useEffect(() => {
     if (!user?.id) return;
-
     let isMounted = true;
-
     const syncLatestProfile = async () => {
       try {
         setInitialSyncLoading(true);
-        const response = await updateUserProfile(user.id, new FormData()) as ProfileResponse;
+        const response = await updateUserProfile(user.id, new FormData()) as any;
         if (isMounted && response?.user) {
           updateUser(response.user);
         }
       } catch {
-        // Keep local persisted store data when refresh fails.
       } finally {
-        if (isMounted) {
-          setInitialSyncLoading(false);
-        }
+        if (isMounted) setInitialSyncLoading(false);
       }
     };
-
     void syncLatestProfile();
-
-    return () => {
-      isMounted = false;
-    };
+    return () => { isMounted = false; };
   }, [user?.id, updateUser]);
 
   useEffect(() => {
@@ -186,16 +177,11 @@ export default function ProfileEditor({ inModal = false, onClose }: ProfileEdito
       setName(user.name || '');
       setUsername(user.username || '');
       setBio(user.bio || '');
-
       const parsed = Array.isArray(user.interests)
         ? user.interests
         : typeof user.interests === 'string'
-          ? (user.interests as string)
-            .split(',')
-            .map((interest: string) => interest.trim())
-            .filter(Boolean)
+          ? (user.interests as string).split(',').map(i => i.trim()).filter(Boolean)
           : [];
-
       setSelected(parsed);
     }
   }, [user]);
@@ -207,63 +193,42 @@ export default function ProfileEditor({ inModal = false, onClose }: ProfileEdito
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
-
     setLoading(true);
     setError(null);
 
     try {
-      const payload: UpdateUserProfilePayload = {
-        name,
-        interests: selected,
-      };
-
-
-      if (file) {
-        payload.profilePictureFile = file;
-      }
+      const payload: UpdateUserProfilePayload = { name, interests: selected };
+      if (file) payload.profilePictureFile = file;
 
       const response = await updateProfile(
         { id: user.id, profilePictureId: user.profilePictureId },
         payload,
         setLoading,
-      ) as ProfileResponse;
+      ) as any;
 
-      const optimisticUpdate: Partial<typeof user> = {
-        name,
-        bio,
-        interests: selected,
-      };
-
-      if (file) {
-        optimisticUpdate.profilePicture = URL.createObjectURL(file);
-      }
+      const optimisticUpdate: any = { name, bio, interests: selected };
+      if (file) optimisticUpdate.profilePicture = URL.createObjectURL(file);
 
       updateUser(optimisticUpdate);
-      if (response?.user) {
-        updateUser(response.user);
-      }
+      if (response?.user) updateUser(response.user);
 
-      alert(response?.message ?? "Profile updated successfully.");
       if (onClose) onClose();
     } catch (error) {
       const message = extractErrorMessage(error, "Failed to update profile.");
       setError(message);
       alert(message);
-      console.error("Failed to update profile", error);
+    } finally {
       setLoading(false);
     }
   };
 
   const handleVerifyNow = async () => {
     if (!user?.email) return;
-
     setVerifyLoading(true);
     setError(null);
     try {
-      const response = await resendUserOtp(user.role, user.email);
-      const expiresAt = response?.otpExpiresAt
-        ? `&expiresAt=${encodeURIComponent(response.otpExpiresAt)}`
-        : "";
+      const response = await resendUserOtp(user.role as any, user.email);
+      const expiresAt = response?.otpExpiresAt ? `&expiresAt=${encodeURIComponent(response.otpExpiresAt)}` : "";
       router.push(`/verify-otp?email=${encodeURIComponent(user.email)}${expiresAt}`);
     } catch (error) {
       const message = extractErrorMessage(error, "Unable to send verification OTP.");
@@ -275,112 +240,101 @@ export default function ProfileEditor({ inModal = false, onClose }: ProfileEdito
   };
 
   return (
-    <div
-      className={`w-full bg-transparent text-primary ${inModal
-        ? "mx-auto mt-4 sm:mt-10 max-w-2xl max-h-[92vh] overflow-y-auto border border-primary/20 bg-card p-6"
-        : "mx-auto max-w-none"
-      }`}
-    >
-      {inModal && <ProfileHeader onClose={handleClose} />}
+    <AnimateIn variant="fade-up" delay={0.05} className="w-full">
+      <div
+        className={`w-full bg-white mx-auto max-w-[600px] p-8 sm:p-10 rounded-[2.5rem] relative overflow-hidden`}
+      >
 
-      <div className="space-y-6">
-        <ProfilePictureUpdate
-          currentPicture={user?.profilePicture}
-          name={user?.name}
-          email={user?.email}
-          onFileSelect={setFile}
-        />
+        <div className="space-y-8">
+          <ProfilePictureUpdate
+            currentPicture={user?.profilePicture}
+            name={user?.name}
+            email={user?.email}
+            onFileSelect={setFile}
+          />
 
-        {user?.isEmailVerified === false && (
-          <div className="flex justify-center border-b border-primary/10 pb-6 mb-6">
-            <button
-              type="button"
-              onClick={handleVerifyNow}
-              disabled={verifyLoading}
-              className="h-10 rounded-none border border-primary px-5 text-xs font-bold uppercase tracking-widest text-primary hover:bg-primary/5 transition duration-150 disabled:opacity-60"
-            >
-              {verifyLoading ? "Sending OTP..." : "Verify Identity"}
-            </button>
-          </div>
-        )}
+          {user?.isEmailVerified === false && (
+            <div className="flex flex-col items-center bg-[#FDF9F0]/60 p-6 rounded-2xl mb-8">
+              <span className="text-[9px] font-black uppercase tracking-widest text-[#E6693E] mb-2 flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#E6693E] animate-pulse" />
+                Action Required
+              </span>
+              <p className="text-[11px] text-[#1D4E89]/60 italic font-serif mb-3 text-center">
+                Your email registry status is currently unverified.
+              </p>
+              <button
+                type="button"
+                onClick={handleVerifyNow}
+                disabled={verifyLoading}
+                className="w-full py-3 bg-[#1D4E89] text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-[#11325C] transition-all disabled:opacity-60"
+              >
+                {verifyLoading ? "Sending Code..." : "Verify Registry"}
+              </button>
+            </div>
+          )}
 
-        <form className="space-y-6" onSubmit={handleSave}>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-            <FormInput id="fullName" label="Full Name" value={name} onChange={(e) => setName(e.target.value)} />
-            <FormInput id="username" label="Username" value={username} onChange={(e) => setUsername(e.target.value)} prefix="@" />
-          </div>
+          <form className="space-y-6" onSubmit={handleSave}>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <FormInput id="fullName" label="Full Name" value={name} onChange={(e) => setName(e.target.value)} prefixIcon={<User size={16} />} />
+              <FormInput id="username" label="Archive Handle" value={username} onChange={(e) => setUsername(e.target.value)} prefixIcon={<AtSign size={16} />} />
+            </div>
 
-          <div className="space-y-2">
-            <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-primary/50">
-              Biography
-            </label>
-            <textarea
+            <FormInput
+              id="biography"
+              label="Archival Biography"
               value={bio}
+              isTextArea
               onChange={(e) => setBio(e.target.value)}
-              className="min-h-[120px] w-full resize-none border border-primary/20 bg-transparent p-3 text-sm font-serif text-primary outline-none transition duration-150 focus:border-primary rounded-none"
-              rows={4}
-              placeholder="Tell your story..."
+              prefixIcon={<Edit3 size={16} className="mt-1" />}
             />
-            <p className="text-right text-[10px] font-semibold text-primary/40 tracking-wider uppercase">{bio.length} / 300 Characters</p>
-          </div>
 
-          <div className="space-y-3">
-            <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-primary/50">
-              Atelier Interests & Topics
-            </label>
-
-            {selected.length > 0 && (
-              <div className="flex flex-wrap gap-2 border border-primary/10 bg-primary/5 p-3 rounded-none">
-                {selected.map((item) => (
-                  <span
+            <div className="space-y-3">
+              <label className="text-[10px] font-sans font-black uppercase tracking-[0.2em] text-[#1D4E89]/60">
+                Atelier Focus & Topics
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {allInterests.map((item) => (
+                  <motion.button
+                    type="button"
                     key={item}
-                    className="cursor-pointer border border-primary bg-card px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-primary transition hover:bg-red-50 hover:text-red-600 hover:border-red-200"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={() => toggleInterest(item)}
-                    title="Remove Tag"
+                    className={`px-4 py-2 text-[10px] font-sans font-black uppercase tracking-widest rounded-xl transition-all duration-200 cursor-pointer ${selected.includes(item)
+                      ? 'bg-[#1D4E89] text-white'
+                      : 'bg-[#FDF9F0]/60 text-[#1D4E89]/40 hover:text-[#1D4E89]'
+                      }`}
                   >
-                    {item} &times;
-                  </span>
+                    {item}
+                  </motion.button>
                 ))}
               </div>
-            )}
-
-            <div className="flex flex-wrap gap-2 pt-1">
-              {allInterests.map((item) => (
-                <button
-                  type="button"
-                  key={item}
-                  onClick={() => toggleInterest(item)}
-                  className={`border px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition rounded-none ${selected.includes(item)
-                    ? "border-primary bg-primary text-white"
-                    : "border-primary/20 bg-transparent text-primary/60 hover:bg-primary/5 hover:text-primary hover:border-primary/40"
-                    }`}
-                >
-                  {item}
-                </button>
-              ))}
             </div>
-          </div>
 
-          <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4 border-t border-primary/10">
-            <button
-              type="button"
-              onClick={handleClose}
-              disabled={loading}
-              className="h-12 w-full sm:flex-1 border border-primary/20 bg-transparent text-xs font-bold uppercase tracking-widest text-primary transition hover:bg-primary/5 rounded-none"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading || initialSyncLoading}
-              className="h-12 w-full sm:flex-1 bg-primary border border-primary text-xs font-bold uppercase tracking-widest text-white transition hover:bg-transparent hover:text-primary rounded-none shadow-md"
-            >
-              {loading ? "Saving..." : initialSyncLoading ? "Loading..." : "Save Changes"}
-            </button>
-          </div>
-        </form>
+            <div className="flex flex-col-reverse sm:flex-row gap-4 pt-6">
+              <motion.button
+                type="button"
+                onClick={handleClose}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="flex-1 py-4 text-[10px] font-sans font-black uppercase tracking-widest text-[#1D4E89]/50 bg-[#FDF9F0]/60 rounded-2xl transition-colors hover:text-[#1D4E89]"
+              >
+                Discard
+              </motion.button>
+              <motion.button
+                type="submit"
+                disabled={loading || initialSyncLoading}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="flex-1 py-4 bg-[#1D4E89] text-white text-[10px] font-sans font-black uppercase tracking-widest rounded-2xl transition-all hover:bg-[#11325C]"
+              >
+                {loading ? "Saving..." : initialSyncLoading ? "Syncing..." : "Commit Changes"}
+              </motion.button>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
+    </AnimateIn>
   );
 }
 

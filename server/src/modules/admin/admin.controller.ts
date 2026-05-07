@@ -23,21 +23,12 @@ import { CreatePublisherDto, UpdatePublisherDto } from './dto/publisher.dto';
 export class AdminController {
   constructor(private adminService: AdminService) {}
 
-<<<<<<< Updated upstream
-    //admin module different
-    // @Post("admin")
-    // async makeAdmin(@Body() dto: { email: string, password: string, confirmPassword: string }) {
-    //     return await this.adminService.createAdmin(dto);
-    // }
-=======
-  //admin module different
-  @Post('admin')
-  async makeAdmin(
-    @Body() dto: { email: string; password: string; confirmPassword: string },
-  ) {
-    return await this.adminService.createAdmin(dto);
-  }
->>>>>>> Stashed changes
+  // @Post('admin')
+  // async makeAdmin(
+  //   @Body() dto: { email: string; password: string; confirmPassword: string },
+  // ) {
+  //   return await this.adminService.createAdmin(dto);
+  // }
 
   @Post('login')
   async loginAdmin(

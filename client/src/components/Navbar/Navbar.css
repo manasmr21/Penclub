@@ -3,13 +3,11 @@
   display: none;
 }
 
-
 @media only screen and (max-width: 1050px) {
   .menu-items ul li {
     font-size: 13px;
   }
 }
-
 
 @media only screen and (max-width: 1024px) {
   .contacts {
@@ -22,21 +20,29 @@
 }
 
 .menu-items ul li {
-  border: 1px solid transparent;
-  padding: 4px 12px;
-  border-radius: 0;
-  transition: all 0.2s ease-out;
+  border: 2px solid transparent;
+  padding: 6px 16px;
+  border-radius: 8px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   background: transparent;
+  cursor: pointer;
 }
 
 .menu-items ul li a {
   display: block;
-  transition: color 0.2s ease-out;
+  transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  color: #1D4E89;
 }
 
-.menu-items ul li:hover,
+.menu-items ul li:hover {
+  background: #1D4E89;
+  border-color: #1D4E89;
+  transform: translateY(-1px);
+}
+
 .menu-items ul li.active {
-  background: var(--primary);
+  background: #1D4E89;
+  border-color: #1D4E89;
 }
 
 .menu-items ul li:hover a,
@@ -45,5 +51,5 @@
 }
 
 .menu-items ul li:active {
-  transform: scale(0.98);
+  transform: scale(0.95);
 }

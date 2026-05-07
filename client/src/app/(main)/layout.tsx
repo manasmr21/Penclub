@@ -55,6 +55,7 @@ export const metadata: Metadata = {
 };
 
 import SplashScreenProvider from "@/src/components/providers/SplashScreenProvider";
+import MainWrapper from "@/src/components/MainWrapper";
 
 export default function RootLayout({
   children,
@@ -67,7 +68,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${interFont.variable} ${rougeScript.variable} ${chauPhilomene.variable} ${quickSand.variable} ${notoSerif.variable} min-h-screen flex flex-col antialiased`}
       >
         <Navbar />
-        <main className="flex-1">{children}</main>
+        <MainWrapper>{children}</MainWrapper>
         <Footer />
       </div>
     </SplashScreenProvider>

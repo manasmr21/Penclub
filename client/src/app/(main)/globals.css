@@ -177,8 +177,20 @@
 
 .section-hero {
   background: url("../../../public/images/hero-bottom.png") no-repeat bottom;
-  background-size: contain;
+  background-size: 100% 100px;
   background-position: bottom;
+}
+
+@media (min-width: 768px) {
+  .section-hero {
+    background-size: 100% 140px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .section-hero {
+    background-size: 100% auto;
+  }
 }
 
 .publisher-heading span {

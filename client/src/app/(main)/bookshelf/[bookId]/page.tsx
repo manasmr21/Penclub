@@ -10,7 +10,7 @@ import Loader from "@/components/Loader";
 
 function BookDetailsSkeleton() {
   return (
-    <div className="main-container px-4 md:px-8 pt-28 pb-16 animate-pulse">
+    <div className="main-container px-4 md:px-8 pt-2 md:pt-12 pb-16 animate-pulse">
       {/* Back button skeleton */}
       <div className="h-4 w-36 bg-primary/10 rounded-none mb-10" />
 
@@ -109,7 +109,7 @@ export default function BookDetailsPage() {
   }
 
   return (
-    <div className="main-container px-4 md:px-8 pt-28 pb-16">
+    <div className="main-container px-4 md:px-8 pt-2 md:pt-12 pb-16">
       <p
         onClick={() => router.back()}
         className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary transition hover:-translate-x-1 cursor-pointer"

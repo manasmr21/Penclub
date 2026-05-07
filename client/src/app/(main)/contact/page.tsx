@@ -2,150 +2,177 @@
 
 import React from "react";
 import { motion } from "motion/react";
-import { Mail, Phone, MapPin, Send, Instagram, Twitter, Youtube, ArrowRight, ArrowUpRight } from "lucide-react";
+import { Mail, Phone, MapPin, Send, Instagram, Twitter, Youtube, ArrowUpRight, Clock } from "lucide-react";
+import AnimateIn from "@/src/components/ui/AnimateIn";
 
-const ContactPage = () => {
+export default function ContactPage() {
   return (
-    <div className="min-h-screen bg-white font-sans text-primary selection:bg-primary selection:text-white">
-      {/* Decorative Background Text */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden opacity-[0.03] z-0 flex items-center justify-center">
-        <h1 className="text-[20vw] font-serif font-black leading-none uppercase tracking-tighter select-none">
-          Converse
-        </h1>
-      </div>
+    <div className="min-h-screen bg-[#FDF9F0] text-[#1D4E89] font-sans pb-24">
+      
+      {/* Broadsheet Editorial Header */}
+      <header className="max-w-7xl mx-auto px-8 pt-20 pb-12 border-b border-[#1D4E89]/10">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <AnimateIn variant="fade-up" delay={0}>
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-[#E6693E]">
+                <Mail size={12} />
+                <span>Correspondence Office</span>
+              </div>
+              <h1 className="text-5xl md:text-7xl font-serif font-black tracking-tight leading-none text-gray-900">
+                The Atelier <br />
+                <span className="italic font-normal text-[#1D4E89]">Dispatch.</span>
+              </h1>
+            </div>
+          </AnimateIn>
+          <AnimateIn variant="fade-left" delay={0.15}>
+            <p className="text-sm md:text-base font-serif italic text-gray-500 max-w-sm leading-relaxed">
+              Whether you seek to collaborate on upcoming publications, publish broadside articles, or secure residency, let us correspond.
+            </p>
+          </AnimateIn>
+        </div>
+      </header>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 pt-32 pb-24">
-        {/* Main Grid: Broadsheet Style */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 border border-primary/20">
+      {/* Main Correspondence Content Grid (Unique Two-Column Broadsheet Structure!) */}
+      <main className="max-w-7xl mx-auto px-8 pt-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
           
-          {/* Section 1: The Identity (Vertical) */}
-          <div className="lg:col-span-1 border-r border-primary/20 hidden lg:flex flex-col justify-between py-12 items-center">
-            <span className="rotate-180 [writing-mode:vertical-lr] text-[10px] font-black uppercase tracking-[0.5em] text-primary/30">
-              Pen Club Archive
-            </span>
-            <div className="w-px h-24 bg-primary/20"></div>
-            <span className="[writing-mode:vertical-lr] text-[10px] font-black uppercase tracking-[0.5em] text-primary/30">
-              Est. MMXXIII
-            </span>
-          </div>
-
-          {/* Section 2: The Inquiry (Form) */}
-          <div className="lg:col-span-7 p-8 md:p-16 border-r border-primary/20">
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="space-y-12"
-            >
-              <div className="space-y-4">
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-secondary">Phase 01 — Inquiry</span>
-                <h2 className="text-5xl md:text-7xl font-serif font-black tracking-tighter leading-none">
-                  Tell your <br /> <span className="italic font-normal">Narrative.</span>
-                </h2>
-              </div>
-
-              <form className="space-y-10 pt-10">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
-                  <div className="relative group">
-                    <input type="text" id="name" required className="peer w-full bg-transparent border-b border-primary/20 py-3 focus:outline-none focus:border-primary transition-all font-serif italic text-xl placeholder:text-transparent" placeholder="Name" />
-                    <label htmlFor="name" className="absolute left-0 -top-4 text-[10px] font-black uppercase tracking-widest text-primary/40 peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm peer-placeholder-shown:italic peer-placeholder-shown:font-serif peer-placeholder-shown:text-primary/20 transition-all pointer-events-none">Full Name</label>
-                  </div>
-                  <div className="relative group">
-                    <input type="email" id="email" required className="peer w-full bg-transparent border-b border-primary/20 py-3 focus:outline-none focus:border-primary transition-all font-serif italic text-xl placeholder:text-transparent" placeholder="Email" />
-                    <label htmlFor="email" className="absolute left-0 -top-4 text-[10px] font-black uppercase tracking-widest text-primary/40 peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm peer-placeholder-shown:italic peer-placeholder-shown:font-serif peer-placeholder-shown:text-primary/20 transition-all pointer-events-none">Email Address</label>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-primary/40">Select Topic</p>
-                  <div className="flex flex-wrap gap-3">
-                    {["Collaborations", "Membership", "Press", "General"].map((topic) => (
-                      <button key={topic} type="button" className="px-5 py-2 border border-primary/10 text-[10px] font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all">
-                        {topic}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="relative group">
-                  <textarea id="message" rows={4} required className="peer w-full bg-transparent border-b border-primary/20 py-3 focus:outline-none focus:border-primary transition-all font-serif italic text-xl placeholder:text-transparent resize-none" placeholder="Message"></textarea>
-                  <label htmlFor="message" className="absolute left-0 -top-4 text-[10px] font-black uppercase tracking-widest text-primary/40 peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm peer-placeholder-shown:italic peer-placeholder-shown:font-serif peer-placeholder-shown:text-primary/20 transition-all pointer-events-none">Your Message</label>
-                </div>
-
-                <button className="w-full md:w-auto bg-primary text-white px-16 py-6 font-black text-[11px] uppercase tracking-[0.3em] hover:bg-secondary transition-all flex items-center justify-center gap-4 group">
-                  Transmit <Send size={14} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                </button>
-              </form>
-            </motion.div>
-          </div>
-
-          {/* Section 3: The Dispatch (Details) */}
-          <div className="lg:col-span-4 flex flex-col divide-y divide-primary/20">
-            {/* Top: Digital */}
-            <div className="p-8 md:p-12 space-y-8 flex-1">
-              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-secondary">Phase 02 — Dispatch</span>
-              <div className="space-y-12 pt-4">
-                <div className="space-y-4">
-                  <h4 className="text-[9px] font-black uppercase tracking-widest text-primary/30">Electronic Mail</h4>
-                  <a href="mailto:hello@penclub.com" className="text-2xl font-serif font-black hover:italic transition-all flex items-center justify-between group">
-                    hello@penclub.com <ArrowUpRight size={20} className="text-primary/20 group-hover:text-primary transition-colors" />
-                  </a>
-                </div>
-                <div className="space-y-4">
-                  <h4 className="text-[9px] font-black uppercase tracking-widest text-primary/30">Direct Dial</h4>
-                  <a href="tel:+442079460123" className="text-2xl font-serif font-black hover:italic transition-all flex items-center justify-between group">
-                    +44 20 7946 0123 <ArrowUpRight size={20} className="text-primary/20 group-hover:text-primary transition-colors" />
-                  </a>
-                </div>
-              </div>
+          {/* Left Column: Direct Inquiry Form Box */}
+          <AnimateIn variant="fade-right" delay={0} className="lg:col-span-7">
+            <section className="bg-white rounded-3xl p-8 md:p-12 shadow-xl border border-gray-100 space-y-10">
+            <div className="space-y-2">
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#E6693E]">Atelier Inquiry</span>
+              <h2 className="text-3xl md:text-4xl font-serif font-bold text-gray-900 tracking-tight">
+                Transmit your <span className="italic font-normal text-[#1D4E89]">inquiry</span>
+              </h2>
             </div>
 
-            {/* Middle: Physical */}
-            <div className="p-8 md:p-12 space-y-8 flex-1 bg-primary/[0.02]">
-              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-secondary">Phase 03 — Presence</span>
-              <div className="space-y-6 pt-4">
-                <h4 className="text-[9px] font-black uppercase tracking-widest text-primary/30">Bhubaneswar Atelier</h4>
-                <p className="text-xl font-serif italic text-primary/60 leading-tight">
+            <form className="space-y-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="flex flex-col gap-2">
+                  <label htmlFor="name" className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Full Name</label>
+                  <input 
+                    type="text" 
+                    id="name" 
+                    required 
+                    className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3.5 focus:outline-none focus:border-[#1D4E89] focus:bg-white transition-all text-sm font-medium text-gray-800" 
+                    placeholder="E.g., Marcus Aurelius" 
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label htmlFor="email" className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Email Address</label>
+                  <input 
+                    type="email" 
+                    id="email" 
+                    required 
+                    className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3.5 focus:outline-none focus:border-[#1D4E89] focus:bg-white transition-all text-sm font-medium text-gray-800" 
+                    placeholder="E.g., marcus@domain.com" 
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-3">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Select Topic</label>
+                <div className="flex flex-wrap gap-2">
+                  {["Collaborations", "Membership", "Press", "General"].map((topic, i) => (
+                    <button 
+                      key={topic} 
+                      type="button" 
+                      className={`px-4 py-2 border rounded-full text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer ${i === 0 ? "bg-[#1D4E89] text-white border-[#1D4E89]" : "border-gray-200 text-gray-600 hover:bg-gray-50"}`}
+                    >
+                      {topic}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label htmlFor="message" className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Your Message</label>
+                <textarea 
+                  id="message" 
+                  rows={5} 
+                  required 
+                  className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3.5 focus:outline-none focus:border-[#1D4E89] focus:bg-white transition-all text-sm font-serif italic text-gray-800 resize-none" 
+                  placeholder="Tell us your narrative..."
+                ></textarea>
+              </div>
+
+              <button className="w-full sm:w-auto bg-[#E6693E] hover:bg-opacity-90 text-white px-10 py-3.5 rounded-xl font-bold text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md active:scale-95">
+                Transmit <Send size={12} />
+              </button>
+            </form>
+          </section>
+          </AnimateIn>
+
+          {/* Right Column: Information Cards & Dispatch Details */}
+          <AnimateIn variant="fade-left" delay={0.15} className="lg:col-span-5">
+            <section className="space-y-8">
+            
+            {/* Presence Atelier Card */}
+            <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-md space-y-6">
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#E6693E]">Presence Atelier</span>
+              <div className="space-y-4">
+                <h4 className="text-[9px] font-black uppercase tracking-widest text-gray-400">Bhubaneswar Studio</h4>
+                <p className="text-lg font-serif italic text-gray-600 leading-relaxed">
                   Plot No. 12, Janpath Road,<br />
                   Saheed Nagar, Bhubaneswar,<br />
                   Odisha 751007, India
                 </p>
-                <button className="text-[9px] font-black uppercase tracking-widest flex items-center gap-2 border-b border-primary/20 pb-1 hover:border-primary transition-all">
-                  Open Atlas <MapPin size={12} />
+                <button className="text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 border-b border-gray-200 pb-1 hover:border-[#1D4E89] text-[#1D4E89] transition-all cursor-pointer">
+                  Open Atlas <MapPin size={11} />
                 </button>
               </div>
             </div>
 
-            {/* Bottom: Social */}
-            <div className="p-8 md:p-12 grid grid-cols-3 divide-x divide-primary/20">
-              <a href="#" className="flex flex-col items-center justify-center gap-3 hover:text-secondary transition-colors py-4">
-                <Instagram size={20} strokeWidth={1.5} />
+            {/* Direct Digital Communication Card */}
+            <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-md space-y-6">
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#E6693E]">Direct Dispatch</span>
+              <div className="space-y-4">
+                <div className="space-y-1">
+                  <h4 className="text-[9px] font-black uppercase tracking-widest text-gray-400">Electronic Mail</h4>
+                  <a href="mailto:hello@penclub.com" className="text-lg font-serif font-black hover:italic text-[#1D4E89] transition-all flex items-center justify-between group">
+                    hello@penclub.com <ArrowUpRight size={14} className="text-gray-300 group-hover:text-[#1D4E89] transition-colors" />
+                  </a>
+                </div>
+                <div className="space-y-1">
+                  <h4 className="text-[9px] font-black uppercase tracking-widest text-gray-400">Direct Dial</h4>
+                  <a href="tel:+442079460123" className="text-lg font-serif font-black hover:italic text-[#1D4E89] transition-all flex items-center justify-between group">
+                    +44 20 7946 0123 <ArrowUpRight size={14} className="text-gray-300 group-hover:text-[#1D4E89] transition-colors" />
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* Social Grid channels */}
+            <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-md grid grid-cols-3 divide-x divide-gray-100">
+              <a href="#" className="flex flex-col items-center justify-center gap-2 hover:text-[#E6693E] text-gray-400 transition-colors py-2 cursor-pointer">
+                <Instagram size={18} />
                 <span className="text-[8px] font-black uppercase tracking-widest">IG</span>
               </a>
-              <a href="#" className="flex flex-col items-center justify-center gap-3 hover:text-secondary transition-colors py-4">
-                <Twitter size={20} strokeWidth={1.5} />
+              <a href="#" className="flex flex-col items-center justify-center gap-2 hover:text-[#E6693E] text-gray-400 transition-colors py-2 cursor-pointer">
+                <Twitter size={18} />
                 <span className="text-[8px] font-black uppercase tracking-widest">TW</span>
               </a>
-              <a href="#" className="flex flex-col items-center justify-center gap-3 hover:text-secondary transition-colors py-4">
-                <Youtube size={20} strokeWidth={1.5} />
+              <a href="#" className="flex flex-col items-center justify-center gap-2 hover:text-[#E6693E] text-gray-400 transition-colors py-2 cursor-pointer">
+                <Youtube size={18} />
                 <span className="text-[8px] font-black uppercase tracking-widest">YT</span>
               </a>
             </div>
-          </div>
-        </div>
 
-        {/* Footer Accent */}
-        <div className="mt-12 flex flex-col md:flex-row justify-between items-center gap-8 px-8">
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/40">
-            Current Local Time: {new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' })}
-          </p>
-          <div className="flex items-center gap-3">
-            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/40">Our studio is currently open</span>
-          </div>
+            {/* Local Time Tracker */}
+            <div className="flex justify-between items-center px-4 text-gray-400 text-[10px] font-bold uppercase tracking-wider">
+              <span className="flex items-center gap-1.5"><Clock size={12} /> Local: Open</span>
+              <div className="flex items-center gap-1.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                <span>Studio Open</span>
+              </div>
+            </div>
+
+          </section>
+          </AnimateIn>
+
         </div>
-      </div>
+      </main>
+
     </div>
   );
-};
-
-export default ContactPage;
+}

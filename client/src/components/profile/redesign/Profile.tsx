@@ -48,7 +48,7 @@ const Profile = () => {
       animate={{ opacity: 1 }}
       className="relative min-h-screen"
     >
-      <div className="max-w-5xl mx-auto px-4 pt-12 pb-20 space-y-12">
+      <div className="max-w-5xl mx-auto px-4 pt-0 pb-20 space-y-12">
         <UserDetails />
 
         {isAuthor && (
@@ -60,13 +60,15 @@ const Profile = () => {
                   { id: 'Bookshelf', label: 'Bookshelf' },
                   { id: 'Articles', label: 'Articles' }
                 ].map((tab) => (
-                  <button
+                  <motion.button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id as any)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                     className={`relative pb-4 text-xs font-black uppercase tracking-[0.2em] transition-all
                     ${activeTab === tab.id
                         ? 'text-primary'
-                        : 'text-primary/30 hover:text-primary/50'
+                        : 'text-primary/60 hover:text-primary'
                       } cursor-pointer`}
                   >
                     {tab.label}
@@ -76,15 +78,18 @@ const Profile = () => {
                         className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-none" 
                       />
                     )}
-                  </button>
+                  </motion.button>
                 ))}
               </div>
 
               <motion.button
                 onClick={() => router.push(isBooks ? '/add-book' : '/post-article')}
-                className="mb-4 flex items-center gap-2 bg-primary text-white px-8 py-3 rounded-none font-sans font-semibold text-sm hover:opacity-90 transition-all active:scale-95 shadow-lg cursor-pointer"
+                whileHover={{ scale: 1.04, y: -2 }}
+                whileTap={{ scale: 0.96 }}
+                transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                className="mb-4 flex items-center gap-2.5 bg-primary text-white px-7 py-3 rounded-2xl font-sans font-black text-xs uppercase tracking-widest hover:bg-[#11325C] hover:shadow-xl hover:shadow-primary/30 transition-all cursor-pointer shadow-lg shadow-primary/20"
               >
-                <Plus size={16} />
+                <Plus size={14} className="stroke-[3px]" />
                 {isBooks ? 'Add Book' : 'Post Article'}
               </motion.button>
             </div>

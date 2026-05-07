@@ -36,6 +36,11 @@ export class BlogsController {
     return await this.blogsService.getUsersBlogs(id, page, limit);
   }
 
+  @Get('fetch-one/:blogId')
+  async getOneBlog(@Param('blogId') id: string) {
+    return await this.blogsService.getBlog(id);
+  }
+
   @Get('pending-author')
   @UseGuards(AuthGuard('jwt'))
   async getPendingBlogsAuthor(

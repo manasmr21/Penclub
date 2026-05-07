@@ -29,6 +29,17 @@ import writting from "./writing.png"
 import spotlight from "./spotlight.png"
 import podcastSvg from "./podcaster.png"
 import publicationSvg from "./publication.png"
+import inkAndQuill from "./inkAndQuill.png"
+import books from "./bookSvg.png"
+import bookShelf from "./bookShelf.png"
+import bookInkAndQuill from "./bookInkAndQuill.png"
+import bookCase from "./bookCase.png"
+import article1 from "./article-1.png"
+import article2 from "./article-2.png"
+import article3 from "./article-3.png"
+import article4 from "./article-4.png"
+import article5 from "./article-5.png"
+
 
 
 
@@ -64,5 +75,15 @@ export {
     writting,
     spotlight,
     podcastSvg,
-    publicationSvg
+    publicationSvg,
+    inkAndQuill,
+    books,
+    bookShelf,
+    bookInkAndQuill,
+    bookCase,
+    article1,
+    article2,
+    article3,
+    article4,
+    article5,
 };

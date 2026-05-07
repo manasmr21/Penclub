@@ -25,7 +25,7 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="mt-32 pb-24 px-4">
+    <div className="min-h-screen bg-[#FDF9F0]/60 pt-14 pb-20 px-4 flex items-center justify-center">
       <AuthForm type="login" />
     </div>
   );
