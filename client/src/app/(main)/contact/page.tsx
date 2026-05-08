@@ -6,6 +6,9 @@ import { Mail, Phone, MapPin, Send, Instagram, Twitter, Youtube, ArrowUpRight, C
 import AnimateIn from "@/src/components/ui/AnimateIn";
 
 export default function ContactPage() {
+  const studioAddress = "Plot No. 12, Janpath Road, Saheed Nagar, Bhubaneswar, Odisha 751007, India";
+  const studioMapQuery = encodeURIComponent(studioAddress);
+
   return (
     <div className="min-h-screen bg-[#FDF9F0] text-[#1D4E89] font-sans pb-24">
 
@@ -117,9 +120,14 @@ export default function ContactPage() {
                     Saheed Nagar, Bhubaneswar,<br />
                     Odisha 751007, India
                   </p>
-                  <button className="text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 border-b border-gray-200 pb-1 hover:border-[#1D4E89] text-[#1D4E89] transition-all cursor-pointer">
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${studioMapQuery}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex text-[9px] font-black uppercase tracking-widest items-center gap-1.5 border-b border-gray-200 pb-1 hover:border-[#1D4E89] text-[#1D4E89] transition-all cursor-pointer"
+                  >
                     Open Atlas <MapPin size={11} />
-                  </button>
+                  </a>
                 </div>
               </div>
 
@@ -171,6 +179,38 @@ export default function ContactPage() {
           </AnimateIn>
 
         </div>
+
+        <AnimateIn variant="fade-up" delay={0.2} className="mt-14">
+          <section className="bg-white rounded-[2rem] border border-gray-100 shadow-xl overflow-hidden">
+            <div className="px-8 md:px-10 pt-8 md:pt-10 pb-6 border-b border-[#1D4E89]/10">
+              <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+                <div className="space-y-2">
+                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#E6693E]">
+                    Studio Map
+                  </span>
+                  <h2 className="text-3xl md:text-4xl font-serif font-bold tracking-tight text-gray-900">
+                    Find our <span className="italic font-normal text-[#1D4E89]">Bhubaneswar desk</span>
+                  </h2>
+                </div>
+                <p className="max-w-xl text-sm md:text-base font-serif italic text-gray-500 leading-relaxed">
+                  {studioAddress}
+                </p>
+              </div>
+            </div>
+
+            <div className="p-3 md:p-4">
+              <div className="overflow-hidden rounded-[1.5rem] border border-gray-100">
+                <iframe
+                  title="Penclub Bhubaneswar Studio Map"
+                  src={`https://www.google.com/maps?q=${studioMapQuery}&z=15&output=embed`}
+                  className="w-full h-[320px] md:h-[440px]"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+              </div>
+            </div>
+          </section>
+        </AnimateIn>
       </main>
 
     </div>
